@@ -10,7 +10,7 @@
 <atom:link href="https://diegofilippomarino.github.io/Eigenholm/index.xml" rel="self" type="application/rss+xml"/>
 <description>Technical notes, paper analyses, reproductions, and personal projects.</description>
 <generator>quarto-1.9.38</generator>
-<lastBuildDate>Wed, 24 Jun 2026 22:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 25 Jun 2026 00:00:00 GMT</lastBuildDate>
 <item>
   <title>My First Technical Post</title>
   <dc:creator>Diego Filippo Marino</dc:creator>
@@ -105,7 +105,7 @@ font-style: inherit;">"Quadratic function"</span>) </span>
   <category>Mathematics</category>
   <category>Test</category>
   <guid>https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</guid>
-  <pubDate>Wed, 24 Jun 2026 22:00:00 GMT</pubDate>
+  <pubDate>Thu, 25 Jun 2026 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

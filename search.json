@@ -1,17 +1,10 @@
 [
   {
-    "objectID": "projects.html",
-    "href": "projects.html",
-    "title": "Projects",
-    "section": "",
-    "text": "This page will contain my personal and technical projects."
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Technical Blog",
     "section": "",
-    "text": "Welcome to my personal technical blog.\nHere I publish:"
+    "text": "Welcome to my personal technical blog.\nThis site is built with Quarto and automatically deployed with GitHub Actions.\nHere I publish:"
   },
   {
     "objectID": "index.html#latest-posts",
@@ -19,13 +12,6 @@
     "title": "Technical Blog",
     "section": "Latest posts",
     "text": "Latest posts"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
   },
   {
     "objectID": "posts/first-technical-post/index.html",
@@ -61,5 +47,19 @@
     "title": "My First Technical Post",
     "section": "Repository",
     "text": "Repository\nThe complete source code for future projects will be available on GitHub. View my GitHub profile"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "This page will contain my personal and technical projects."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
   }
 ]
