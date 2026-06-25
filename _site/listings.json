@@ -1,16 +1,17 @@
 [
   {
-    "listing": "/projects.html",
-    "items": []
-  },
-  {
-    "listing": "/notes.html",
+    "listing": "/projects/index.html",
     "items": []
   },
   {
     "listing": "/index.html",
     "items": [
-      "/posts/first-technical-post/index.html"
+      "/posts/first-technical-post/index.html",
+      "/posts/new-article/index.html"
     ]
+  },
+  {
+    "listing": "/notes/index.html",
+    "items": []
   }
 ]

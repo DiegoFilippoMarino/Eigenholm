@@ -14,18 +14,18 @@ website:
     left:
       - href: index.qmd
         text: Writing
-      - href: projects.qmd
+      - href: projects/index.qmd
         text: Projects
-      - href: notes.qmd
+      - href: notes/index.qmd
         text: Notes
-      - href: about.qmd
+      - href: about/index.qmd
         text: About
     right:
       - icon: github
         href: https://github.com/DiegoFilippoMarino/Eigenholm
         aria-label: GitHub
   page-footer:
-    left: "© 2026 Eigenholm · [Colophon](colophon.html)"
+    left: "© 2026 Eigenholm · [Colophon](/colophon/)"
     right: "Built with [Quarto](https://quarto.org)"
   comments:
     giscus:

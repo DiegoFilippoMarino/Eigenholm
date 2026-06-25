@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/projects.html</loc>
-    <lastmod>2026-06-25T13:19:52.803Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/projects/index.html</loc>
+    <lastmod>2026-06-25T14:40:53.515Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/notes.html</loc>
-    <lastmod>2026-06-25T13:20:01.722Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/colophon.html</loc>
-    <lastmod>2026-06-25T13:20:27.789Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/about.html</loc>
-    <lastmod>2026-06-25T13:20:18.611Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index.html</loc>
+    <lastmod>2026-06-25T09:28:42.155Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/index.html</loc>
     <lastmod>2026-06-25T13:20:08.641Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index.html</loc>
-    <lastmod>2026-06-25T09:28:42.155Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/about/index.html</loc>
+    <lastmod>2026-06-25T14:40:29.007Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/colophon/index.html</loc>
+    <lastmod>2026-06-25T14:40:32.344Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/index.html</loc>
+    <lastmod>2026-06-25T14:40:54.531Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/new-article/index.html</loc>
+    <lastmod>2026-06-25T13:28:31.640Z</lastmod>
   </url>
 </urlset>

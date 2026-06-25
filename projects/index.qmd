@@ -2,7 +2,7 @@
 title: "Projects"
 listing:
   id: projects-list
-  contents: projects
+  contents: "*/index.qmd"
   sort: "date desc"
   type: default
   categories: true
