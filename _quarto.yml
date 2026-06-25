@@ -2,7 +2,10 @@ project:
   type: website
 
 website:
-  title: "Diego Filippo Marino"
+  title: "Eigenholm"
+  site-url: "https://diegofilippomarino.github.io/Eigenholm/"
+  repo-url: "https://github.com/DiegoFilippoMarino/Eigenholm"
+  repo-actions: [source, issue]
   description: "Technical notes, paper analyses, reproductions, and personal projects."
   navbar:
     left:
