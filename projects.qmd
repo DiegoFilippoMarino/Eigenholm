@@ -1,5 +1,12 @@
 ---
 title: "Projects"
+toc: false
 ---
 
-This page will contain my personal and technical projects.
+Technical projects, implementations, and research experiments.
+
+Each project includes source code, documentation, and — where applicable — links to the relevant papers or references.
+
+::: {.project-placeholder}
+Projects will appear here as they are published. Check back soon, or visit the [GitHub repository](https://github.com/DiegoFilippoMarino/Eigenholm) for the latest work.
+:::

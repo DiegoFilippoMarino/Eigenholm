@@ -2,7 +2,7 @@
 title: "About"
 image: profile.jpg
 about:
-  template: jolla
+  template: solana
   links:
     - icon: bluesky
       text: Bluesky
@@ -13,7 +13,23 @@ about:
     - icon: github
       text: Github
       href: https://github.com
-
+toc: false
 ---
 
-About this blog
+Eigenholm is a personal technical site and research notebook focused on machine learning, deep learning, mathematics, and scientific computing.
+
+The writing here covers paper analyses, implementation notes, reproductions of published results, and documentation of technical projects. The goal is to think carefully, build from first principles, and share what is learned along the way.
+
+<!-- Replace the sections below with your own background and interests -->
+
+## Background
+
+*Add a short introduction about yourself here — your background, current work, and research interests.*
+
+## Interests
+
+- Machine learning and deep learning theory
+- Mathematical foundations of AI
+- Paper replications and reproducibility
+- Scientific computing and numerical methods
+- Software engineering for research

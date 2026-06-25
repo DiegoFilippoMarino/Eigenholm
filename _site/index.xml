@@ -8,7 +8,7 @@
 <title>Eigenholm</title>
 <link>https://diegofilippomarino.github.io/Eigenholm/</link>
 <atom:link href="https://diegofilippomarino.github.io/Eigenholm/index.xml" rel="self" type="application/rss+xml"/>
-<description>Technical notes, paper analyses, reproductions, and personal projects.</description>
+<description>Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing.</description>
 <generator>quarto-1.9.38</generator>
 <lastBuildDate>Wed, 24 Jun 2026 22:00:00 GMT</lastBuildDate>
 <item>

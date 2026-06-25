@@ -1,24 +1,33 @@
 ---
-title: "Technical Blog"
+pagetitle: "Eigenholm"
 listing:
+  id: latest-posts
   contents: posts
   sort: "date desc"
   type: default
   categories: true
   feed: true
 page-layout: full
+toc: false
+title-block-banner: false
 ---
 
-Welcome to my personal technical blog.
+::: {.eigenholm-hero}
+[Eigenholm]{.hero-title}
 
-This site is built with Quarto and automatically deployed with GitHub Actions.
+[Research notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.]{.hero-tagline}
 
-Here I publish:
+::: {.eigenholm-topics}
+[Machine Learning]{.topic-tag}
+[Deep Learning]{.topic-tag}
+[Mathematics]{.topic-tag}
+[Scientific Computing]{.topic-tag}
+[Paper Replications]{.topic-tag}
+[Software Engineering]{.topic-tag}
+:::
+:::
 
-- technical analyses of research papers;
-- paper reproductions and implementation notes;
-- mathematical explanations;
-- Python, machine learning, and scientific computing projects;
-- links to complete GitHub repositories.
+[Latest Writing]{.eigenholm-section-header}
 
-## Latest posts
+::: {#latest-posts}
+:::

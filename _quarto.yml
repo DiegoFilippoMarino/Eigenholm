@@ -6,7 +6,7 @@ website:
   site-url: "https://diegofilippomarino.github.io/Eigenholm/"
   repo-url: "https://github.com/DiegoFilippoMarino/Eigenholm"
   repo-actions: [source, issue]
-  description: "Technical notes, paper analyses, reproductions, and personal projects."
+  description: "Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing."
   navbar:
     left:
       - href: index.qmd
@@ -17,15 +17,17 @@ website:
         text: About
     right:
       - icon: github
-        href: https://github.com/
+        href: https://github.com/DiegoFilippoMarino/Eigenholm
         aria-label: GitHub
+  page-footer:
+    left: "© 2026 Eigenholm"
+    right: "Built with [Quarto](https://quarto.org)"
 
 format:
   html:
     theme:
-      light: cosmo
-      dark: darkly
-    css: styles.css
+      light: [cosmo, custom.scss]
+      dark: [darkly, custom.scss, custom-dark.scss]
     toc: true
     code-copy: true
     code-overflow: wrap
