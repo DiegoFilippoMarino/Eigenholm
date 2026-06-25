@@ -2,16 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Technical Blog",
+    "title": "Eigenholm",
     "section": "",
-    "text": "Welcome to my personal technical blog.\nThis site is built with Quarto and automatically deployed with GitHub Actions.\nHere I publish:"
-  },
-  {
-    "objectID": "index.html#latest-posts",
-    "href": "index.html#latest-posts",
-    "title": "Technical Blog",
-    "section": "Latest posts",
-    "text": "Latest posts"
+    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications Software Engineering\n\n\nLatest Writing\n\n\n\n\n\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/first-technical-post/index.html",
@@ -53,13 +46,27 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "This page will contain my personal and technical projects."
+    "text": "Technical projects, implementations, and research experiments.\nEach project includes source code, documentation, and — where applicable — links to the relevant papers or references.\n\nProjects will appear here as they are published. Check back soon, or visit the GitHub repository for the latest work."
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this blog"
+    "text": "Eigenholm is a personal technical site and research notebook focused on machine learning, deep learning, mathematics, and scientific computing.\nThe writing here covers paper analyses, implementation notes, reproductions of published results, and documentation of technical projects. The goal is to think carefully, build from first principles, and share what is learned along the way."
+  },
+  {
+    "objectID": "about.html#background",
+    "href": "about.html#background",
+    "title": "About",
+    "section": "Background",
+    "text": "Background\nAdd a short introduction about yourself here — your background, current work, and research interests."
+  },
+  {
+    "objectID": "about.html#interests",
+    "href": "about.html#interests",
+    "title": "About",
+    "section": "Interests",
+    "text": "Interests\n\nMachine learning and deep learning theory\nMathematical foundations of AI\nPaper replications and reproducibility\nScientific computing and numerical methods\nSoftware engineering for research"
   }
 ]
