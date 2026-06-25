@@ -1,0 +1,22 @@
+---
+title: "Technical Blog"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  feed: true
+page-layout: full
+---
+
+Welcome to my personal technical blog.
+
+Here I publish:
+
+- technical analyses of research papers;
+- paper reproductions and implementation notes;
+- mathematical explanations;
+- Python, machine learning, and scientific computing projects;
+- links to complete GitHub repositories.
+
+## Latest posts
