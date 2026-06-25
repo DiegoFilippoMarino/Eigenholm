@@ -36,37 +36,47 @@ h2 {
   border-bottom: 1px solid $eigenholm-border-light;
 }
 
-// ── Navbar ───────────────────────────────────
+// ── Navbar — Distinctive Identity ────────────
 
 .navbar {
+  border-top: 3px double $eigenholm-accent;
   border-bottom: 1px solid $eigenholm-border;
   background: $eigenholm-bg !important;
-  padding-top: 0.8rem;
-  padding-bottom: 0.8rem;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
 
   .navbar-brand {
-    font-family: $headings-font-family;
-    font-weight: 700;
-    font-size: 1.35rem;
-    letter-spacing: -0.02em;
+    font-family: $font-family-sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: $eigenholm-text !important;
+    padding-right: 1.5rem;
+    margin-right: 0.5rem;
+    border-right: 1px solid $eigenholm-border;
   }
 
   .navbar-nav .nav-link {
-    font-size: 0.9rem;
-    font-weight: 450;
-    color: $eigenholm-text-secondary !important;
-    padding: 0.4rem 0.85rem;
-    transition: color 0.15s ease;
-    letter-spacing: 0.01em;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: $eigenholm-text-muted !important;
+    padding: 0.35rem 0.9rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: transparent !important;
+    border-bottom: 1.5px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
 
-    &:hover,
-    &.active {
-      color: $eigenholm-accent !important;
+    &:hover {
+      color: $eigenholm-text !important;
+      border-bottom-color: $eigenholm-accent;
     }
 
     &.active {
+      color: $eigenholm-text !important;
       font-weight: 500;
+      border-bottom-color: $eigenholm-accent;
     }
   }
 
@@ -78,6 +88,7 @@ h2 {
   .quarto-navbar-tools {
     .nav-link {
       color: $eigenholm-text-muted !important;
+      border-bottom: none;
 
       &:hover {
         color: $eigenholm-accent !important;
@@ -405,7 +416,7 @@ table {
   }
 }
 
-// ── Listings ─────────────────────────────────
+// ── Listings — Journal TOC Style ─────────────
 
 .quarto-listing {
   .listing-title {
@@ -414,73 +425,112 @@ table {
 }
 
 .list.quarto-listing-default {
-  border-top: 1px solid $eigenholm-border;
+  border-top: none;
 }
 
 .quarto-post {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto;
+  align-items: start;
+  gap: 0 1.5rem;
   border-bottom: 1px solid $eigenholm-border-light !important;
-  padding: 1.5rem 0 !important;
+  padding: 1.2rem 0 !important;
   margin: 0 !important;
 
-  .thumbnail img {
-    border-radius: $border-radius;
+  // Hide thumbnails for clean typographic listing
+  .thumbnail {
+    display: none !important;
   }
 
-  .body h3.no-anchor a {
-    font-family: $headings-font-family;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: $eigenholm-text;
-    letter-spacing: -0.01em;
-    text-decoration: none;
+  .body {
+    grid-column: 1;
+    min-width: 0;
 
-    &:hover {
-      color: $eigenholm-accent;
+    h3.no-anchor {
+      margin-bottom: 0.2rem;
+
+      a {
+        font-family: $headings-font-family;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: $eigenholm-text;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        transition: color 0.15s ease;
+
+        &:hover {
+          color: $eigenholm-accent;
+        }
+      }
     }
-  }
 
-  .listing-description {
-    color: $eigenholm-text-secondary;
-    font-size: 0.92rem;
-    line-height: 1.5;
-    margin-top: 0.3rem;
+    .listing-description {
+      color: $eigenholm-text-secondary;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      margin-top: 0.15rem;
+    }
+
+    .listing-categories {
+      margin-top: 0.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+
+      .listing-category {
+        background: transparent !important;
+        border: none !important;
+        color: $eigenholm-text-muted;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0;
+        border-radius: 0;
+        transition: color 0.15s ease;
+
+        &:hover {
+          color: $eigenholm-accent;
+        }
+
+        &:not(:last-child)::after {
+          content: '·';
+          margin: 0 0.45rem;
+          color: $eigenholm-border;
+        }
+      }
+    }
   }
 
   .metadata {
+    grid-column: 2;
+    text-align: right;
+    padding-top: 0.15rem;
+    white-space: nowrap;
+
     .listing-date {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: $eigenholm-text-muted;
       font-variant-numeric: tabular-nums;
+      font-family: $font-family-sans-serif;
+      letter-spacing: 0.02em;
     }
 
     .listing-author {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: $eigenholm-text-muted;
-    }
-  }
-
-  .listing-categories {
-    margin-top: 0.5rem;
-
-    .listing-category {
-      background: transparent;
-      border: 1px solid $eigenholm-border;
-      color: $eigenholm-text-muted;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.15rem 0.5rem;
-      border-radius: 0.15rem;
-      transition: all 0.15s ease;
-
-      &:hover {
-        border-color: $eigenholm-accent;
-        color: $eigenholm-accent;
-      }
+      display: block;
+      margin-top: 0.1rem;
     }
   }
 }
 
+// First listing entry gets a top border
+.quarto-post:first-child {
+  border-top: 1px solid $eigenholm-border !important;
+}
+
+// Categories sidebar
 .quarto-listing-category {
   .category {
     font-size: 0.82rem;
@@ -569,30 +619,60 @@ table {
   }
 }
 
-// ── Homepage Hero ────────────────────────────
+// ── Homepage — Journal Masthead ──────────────
 
 .eigenholm-hero {
-  text-align: center;
-  padding: 3rem 1rem 2rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid $eigenholm-border;
+  text-align: left;
+  padding: 3.5rem 0 2.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: none;
+  position: relative;
+  overflow: hidden;
+}
+
+// Coordinate dot grid — geometric accent
+.eigenholm-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -20px;
+  width: 240px;
+  height: 100%;
+  background-image:
+    radial-gradient(circle, $eigenholm-border 0.6px, transparent 0.6px);
+  background-size: 18px 18px;
+  opacity: 0.6;
+  pointer-events: none;
+  mask-image: linear-gradient(to left, rgba(0,0,0,0.4) 0%, transparent 90%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.4) 0%, transparent 90%);
 }
 
 .hero-title {
   font-family: $headings-font-family;
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin-bottom: 0.5rem;
   color: $eigenholm-text;
+  margin-bottom: 0;
   display: block;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 2px;
+    background: $eigenholm-accent;
+    margin-top: 0.85rem;
+    margin-bottom: 0.85rem;
+  }
 }
 
 .hero-tagline {
   font-size: 1.05rem;
   color: $eigenholm-text-secondary;
-  max-width: 560px;
-  margin: 0 auto;
+  max-width: 520px;
+  margin: 0;
   line-height: 1.65;
   display: block;
 }
@@ -600,32 +680,41 @@ table {
 .eigenholm-topics {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  justify-content: center;
-  margin-top: 1.25rem;
+  gap: 0;
+  margin-top: 1.5rem;
+  align-items: center;
 
   .topic-tag {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: $eigenholm-text-muted;
-    border: 1px solid $eigenholm-border;
-    padding: 0.2rem 0.6rem;
-    border-radius: 0.15rem;
+    border: none;
+    padding: 0;
+    border-radius: 0;
     font-family: $font-family-sans-serif;
+    line-height: 1;
+
+    &:not(:last-child)::after {
+      content: '·';
+      margin: 0 0.55rem;
+      color: $eigenholm-border;
+      font-size: 0.8rem;
+    }
   }
 }
 
 .eigenholm-section-header {
-  font-family: $headings-font-family;
-  font-size: 1.15rem;
+  font-family: $font-family-sans-serif;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  color: $eigenholm-text;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $eigenholm-text-muted;
   margin-top: 2.5rem;
   margin-bottom: 0.25rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid $eigenholm-border-light;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid $eigenholm-border;
 }
 
 .eigenholm-nav-links {
@@ -743,35 +832,63 @@ a:focus-visible {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+
+  .eigenholm-hero::before {
+    display: none;
+  }
 }
 
 // ── Responsive ───────────────────────────────
 
 @media (max-width: 991px) {
   .eigenholm-hero {
-    padding: 2rem 1rem 1.5rem;
+    padding: 2.5rem 0 2rem;
+  }
+
+  .eigenholm-hero::before {
+    width: 160px;
+    opacity: 0.4;
   }
 
   .hero-title {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
   }
 
   .quarto-title .title {
     font-size: 2rem;
   }
+
+  .navbar .navbar-brand {
+    border-right: none;
+    padding-right: 0;
+    margin-right: 0;
+  }
 }
 
 @media (max-width: 576px) {
   .eigenholm-hero {
-    padding: 1.5rem 0.75rem 1.25rem;
+    padding: 1.5rem 0 1.25rem;
+  }
+
+  .eigenholm-hero::before {
+    display: none;
   }
 
   .hero-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 
   .hero-tagline {
     font-size: 0.95rem;
+  }
+
+  .eigenholm-topics {
+    flex-wrap: wrap;
+    gap: 0.2rem 0;
+
+    .topic-tag {
+      font-size: 0.62rem;
+    }
   }
 
   .quarto-title .title {
@@ -791,6 +908,15 @@ a:focus-visible {
     flex-direction: column;
     gap: 0.75rem;
     align-items: center;
+  }
+
+  .quarto-post {
+    grid-template-columns: 1fr !important;
+
+    .metadata {
+      text-align: left;
+      padding-top: 0.25rem;
+    }
   }
 }
 
@@ -813,5 +939,9 @@ a:focus-visible {
   a {
     color: #000;
     text-decoration: underline;
+  }
+
+  .eigenholm-hero::before {
+    display: none;
   }
 }

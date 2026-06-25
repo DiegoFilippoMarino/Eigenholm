@@ -23,7 +23,6 @@ title-block-banner: false
 [Mathematics]{.topic-tag}
 [Scientific Computing]{.topic-tag}
 [Paper Replications]{.topic-tag}
-[Software Engineering]{.topic-tag}
 :::
 :::
 
