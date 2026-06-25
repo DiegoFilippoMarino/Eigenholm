@@ -2,7 +2,16 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/new-article/index.html",
       "/posts/first-technical-post/index.html"
     ]
+  },
+  {
+    "listing": "/projects.html",
+    "items": []
+  },
+  {
+    "listing": "/notes.html",
+    "items": []
   }
 ]

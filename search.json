@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Eigenholm",
     "section": "",
-    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n1 min\n\n\n\n\nNo matching items\n\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  url = {https://diegofilippomarino.github.io/Eigenholm/},\n  langid = {en}\n}\nFor attribution, please cite this work as:\nn.d. https://diegofilippomarino.github.io/Eigenholm/."
+    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nArticle Title Here\n\n\n\nMachine Learning\n\nMathematics\n\n\n\nA one-line summary for listings and social sharing.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n4 min\n\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n1 min\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -67,7 +67,105 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Technical projects, implementations, and research experiments.\nEach project includes source code, documentation, and — where applicable — links to the relevant papers or references.\n\nProjects will appear here as they are published. Check back soon, or visit the GitHub repository for the latest work.\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  title = {Projects},\n  url = {https://diegofilippomarino.github.io/Eigenholm/projects.html},\n  langid = {en}\n}\nFor attribution, please cite this work as:\n“Projects.” n.d. https://diegofilippomarino.github.io/Eigenholm/projects.html."
+    "text": "Technical projects, implementations, and research experiments.\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/new-article/index.html",
+    "href": "posts/new-article/index.html",
+    "title": "Article Title Here",
+    "section": "",
+    "text": "Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.\nThis article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to index.qmd, remove draft: true, and replace the content."
+  },
+  {
+    "objectID": "posts/new-article/index.html#introduction",
+    "href": "posts/new-article/index.html#introduction",
+    "title": "Article Title Here",
+    "section": "",
+    "text": "Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.\nThis article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to index.qmd, remove draft: true, and replace the content."
+  },
+  {
+    "objectID": "posts/new-article/index.html#mathematical-content",
+    "href": "posts/new-article/index.html#mathematical-content",
+    "title": "Article Title Here",
+    "section": "Mathematical content",
+    "text": "Mathematical content\nInline math uses single dollars: the loss function \\mathcal{L}(\\theta) measures model error.\nDisplay equations use double dollars:\n\\nabla_\\theta \\mathcal{L}(\\theta) = -\\frac{1}{N} \\sum_{i=1}^{N} \\nabla_\\theta \\log p_\\theta(x_i) {#eq-gradient}\nReference equations with @eq-label: see ?@eq-gradient above.\nA matrix example:\nA = \\begin{bmatrix}\na_{11} & a_{12} \\\\\na_{21} & a_{22}\n\\end{bmatrix}, \\quad\n\\lambda \\in \\sigma(A)"
+  },
+  {
+    "objectID": "posts/new-article/index.html#code",
+    "href": "posts/new-article/index.html#code",
+    "title": "Article Title Here",
+    "section": "Code",
+    "text": "Code\n\nStatic code block (not executed)\nimport torch\nimport torch.nn as nn\n\nclass ResidualBlock(nn.Module):\n    def __init__(self, dim: int):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(dim, dim),\n            nn.GELU(),\n            nn.Linear(dim, dim),\n        )\n\n    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:\n        return x + self.net(x)\n\n\nExecutable code block\nUncomment jupyter: python3 in the YAML header to enable execution.\n```{python}\n#| label: fig-example\n#| fig-cap: \"Example plot generated from code.\"\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nx = np.linspace(-2 * np.pi, 2 * np.pi, 300)\ny = np.sin(x) * np.exp(-0.1 * x**2)\n\nfig, ax = plt.subplots(figsize=(7, 3))\nax.plot(x, y, color=\"#2a6e6e\", linewidth=1.5)\nax.set_xlabel(\"x\")\nax.set_ylabel(\"f(x)\")\nax.set_title(\"Damped sine wave\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nplt.tight_layout()\nplt.show()\n```\n\n\nInline code\nUse backticks for inline code: the Adam optimizer with lr=3e-4."
+  },
+  {
+    "objectID": "posts/new-article/index.html#text-formatting",
+    "href": "posts/new-article/index.html#text-formatting",
+    "title": "Article Title Here",
+    "section": "Text formatting",
+    "text": "Text formatting\nRegular paragraph with bold text, italic text, and bold italic. Use inline code for function names and variables. Add a hyperlink or an internal link.\n\nUnordered list\n\nFirst item with some detail\nSecond item\n\nNested item\nAnother nested item\n\nThird item\n\n\n\nOrdered list\n\nFirst step\nSecond step\nThird step\n\n\n\nBlockquote\n\nThe purpose of computing is insight, not numbers.\n— Richard Hamming"
+  },
+  {
+    "objectID": "posts/new-article/index.html#callouts",
+    "href": "posts/new-article/index.html#callouts",
+    "title": "Article Title Here",
+    "section": "Callouts",
+    "text": "Callouts\n\n\n\n\n\n\nNoteNote\n\n\n\nUse notes for supplementary information that supports the main text.\n\n\n\n\n\n\n\n\nWarningWarning\n\n\n\nUse warnings for common pitfalls or important caveats.\n\n\n\n\n\n\n\n\nTipTip\n\n\n\nUse tips for practical recommendations or shortcuts.\n\n\n\n\n\n\n\n\nImportantImportant\n\n\n\nUse important callouts for critical information the reader must not miss."
+  },
+  {
+    "objectID": "posts/new-article/index.html#figures-and-images",
+    "href": "posts/new-article/index.html#figures-and-images",
+    "title": "Article Title Here",
+    "section": "Figures and images",
+    "text": "Figures and images\n\n\n\n\n\n\nFigure 1: Placeholder for a figure. Replace with your own image.\n\n\n\nReference figures with @fig-label: see Figure 1."
+  },
+  {
+    "objectID": "posts/new-article/index.html#tables",
+    "href": "posts/new-article/index.html#tables",
+    "title": "Article Title Here",
+    "section": "Tables",
+    "text": "Tables\n\nComparison of methods on the benchmark dataset.\n\n\nMethod\nAccuracy\nParameters\nTraining time\n\n\n\n\nBaseline\n72.3%\n1.2M\n2h\n\n\nProposed\n78.1%\n1.4M\n3h\n\n\nEnsemble\n80.5%\n4.2M\n8h\n\n\n\nReference tables with @tbl-label: see ?@tbl-results."
+  },
+  {
+    "objectID": "posts/new-article/index.html#tabbed-content",
+    "href": "posts/new-article/index.html#tabbed-content",
+    "title": "Article Title Here",
+    "section": "Tabbed content",
+    "text": "Tabbed content\n\nPyTorchJAX\n\n\nloss = F.cross_entropy(logits, targets)\nloss.backward()\noptimizer.step()\n\n\nloss, grads = jax.value_and_grad(loss_fn)(params, batch)\nupdates, opt_state = optimizer.update(grads, opt_state)\nparams = optax.apply_updates(params, updates)"
+  },
+  {
+    "objectID": "posts/new-article/index.html#footnotes",
+    "href": "posts/new-article/index.html#footnotes",
+    "title": "Article Title Here",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nSource or explanation for the first claim.↩︎\nSource or explanation for the second claim.↩︎"
+  },
+  {
+    "objectID": "posts/new-article/index.html#definitions-and-terminology",
+    "href": "posts/new-article/index.html#definitions-and-terminology",
+    "title": "Article Title Here",
+    "section": "Definitions and terminology",
+    "text": "Definitions and terminology\n\nTerm\n\nDefinition of the term. Use definition lists for glossary-style entries.\n\nEigenvalue\n\nA scalar \\lambda such that Av = \\lambda v for some nonzero vector v."
+  },
+  {
+    "objectID": "posts/new-article/index.html#horizontal-rule",
+    "href": "posts/new-article/index.html#horizontal-rule",
+    "title": "Article Title Here",
+    "section": "Horizontal rule",
+    "text": "Horizontal rule\nUse three dashes for a thematic break:"
+  },
+  {
+    "objectID": "posts/new-article/index.html#conclusion",
+    "href": "posts/new-article/index.html#conclusion",
+    "title": "Article Title Here",
+    "section": "Conclusion",
+    "text": "Conclusion\nSummarize the key findings. State limitations. Suggest directions for future work."
+  },
+  {
+    "objectID": "posts/new-article/index.html#references",
+    "href": "posts/new-article/index.html#references",
+    "title": "Article Title Here",
+    "section": "References",
+    "text": "References"
   },
   {
     "objectID": "colophon.html",
@@ -123,6 +221,6 @@
     "href": "notes.html",
     "title": "Notes",
     "section": "",
-    "text": "Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.\nUnlike full articles, notes are informal — meant to capture ideas and technical details as they develop.\n\nResearch notes will appear here as they are written.\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  title = {Notes},\n  url = {https://diegofilippomarino.github.io/Eigenholm/notes.html},\n  langid = {en}\n}\nFor attribution, please cite this work as:\n“Notes.” n.d. https://diegofilippomarino.github.io/Eigenholm/notes.html."
+    "text": "Short-form research notes, reading logs, and work-in-progress observations.\n\n\n\n\nNo matching items"
   }
 ]

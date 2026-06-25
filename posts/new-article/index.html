@@ -8,9 +8,9 @@
 
 <meta name="author" content="Diego Filippo Marino">
 <meta name="dcterms.date" content="2026-06-25">
-<meta name="description" content="A test article with mathematics, Python code, and a generated plot.">
+<meta name="description" content="A one-line summary for listings and social sharing.">
 
-<title>My First Technical Post – Eigenholm</title>
+<title>Article Title Here – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -158,18 +177,12 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="My First Technical Post – Eigenholm">
-<meta property="og:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
+<meta property="og:title" content="Article Title Here – Eigenholm">
+<meta property="og:description" content="A one-line summary for listings and social sharing.">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="900">
-<meta property="og:image:width" content="1153">
-<meta name="twitter:title" content="My First Technical Post – Eigenholm">
-<meta name="twitter:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
-<meta name="twitter:image-height" content="900">
-<meta name="twitter:image-width" content="1153">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Article Title Here – Eigenholm">
+<meta name="twitter:description" content="A one-line summary for listings and social sharing.">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -392,11 +405,30 @@ window.Quarto = {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#a-mathematical-example" id="toc-a-mathematical-example" class="nav-link" data-scroll-target="#a-mathematical-example">A mathematical example</a></li>
-  <li><a href="#a-python-example" id="toc-a-python-example" class="nav-link" data-scroll-target="#a-python-example">A Python example</a></li>
-  <li><a href="#repository" id="toc-repository" class="nav-link" data-scroll-target="#repository">Repository</a></li>
+  <li><a href="#mathematical-content" id="toc-mathematical-content" class="nav-link" data-scroll-target="#mathematical-content">Mathematical content</a></li>
+  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a>
+  <ul class="collapse">
+  <li><a href="#static-code-block-not-executed" id="toc-static-code-block-not-executed" class="nav-link" data-scroll-target="#static-code-block-not-executed">Static code block (not executed)</a></li>
+  <li><a href="#executable-code-block" id="toc-executable-code-block" class="nav-link" data-scroll-target="#executable-code-block">Executable code block</a></li>
+  <li><a href="#inline-code" id="toc-inline-code" class="nav-link" data-scroll-target="#inline-code">Inline code</a></li>
+  </ul></li>
+  <li><a href="#text-formatting" id="toc-text-formatting" class="nav-link" data-scroll-target="#text-formatting">Text formatting</a>
+  <ul class="collapse">
+  <li><a href="#unordered-list" id="toc-unordered-list" class="nav-link" data-scroll-target="#unordered-list">Unordered list</a></li>
+  <li><a href="#ordered-list" id="toc-ordered-list" class="nav-link" data-scroll-target="#ordered-list">Ordered list</a></li>
+  <li><a href="#blockquote" id="toc-blockquote" class="nav-link" data-scroll-target="#blockquote">Blockquote</a></li>
+  </ul></li>
+  <li><a href="#callouts" id="toc-callouts" class="nav-link" data-scroll-target="#callouts">Callouts</a></li>
+  <li><a href="#figures-and-images" id="toc-figures-and-images" class="nav-link" data-scroll-target="#figures-and-images">Figures and images</a></li>
+  <li><a href="#tables" id="toc-tables" class="nav-link" data-scroll-target="#tables">Tables</a></li>
+  <li><a href="#tabbed-content" id="toc-tabbed-content" class="nav-link" data-scroll-target="#tabbed-content">Tabbed content</a></li>
+  <li><a href="#footnotes" id="toc-footnotes" class="nav-link" data-scroll-target="#footnotes">Footnotes</a></li>
+  <li><a href="#definitions-and-terminology" id="toc-definitions-and-terminology" class="nav-link" data-scroll-target="#definitions-and-terminology">Definitions and terminology</a></li>
+  <li><a href="#horizontal-rule" id="toc-horizontal-rule" class="nav-link" data-scroll-target="#horizontal-rule">Horizontal rule</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/new-article/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -404,17 +436,16 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">My First Technical Post</h1>
+<h1 class="title">Article Title Here</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Python</div>
+    <div class="quarto-category">Machine Learning</div>
     <div class="quarto-category">Mathematics</div>
-    <div class="quarto-category">Test</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    A test article with mathematics, Python code, and a generated plot.
+    A one-line summary for listings and social sharing.
   </div>
 </div>
 
@@ -445,68 +476,274 @@ window.Quarto = {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This is the first article published on my technical blog.</p>
-<p>The purpose of this post is to verify that Quarto correctly renders:</p>
+<p>Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.</p>
+<p>This article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to <code>index.qmd</code>, remove <code>draft: true</code>, and replace the content.</p>
+</section>
+<section id="mathematical-content" class="level2">
+<h2 class="anchored" data-anchor-id="mathematical-content">Mathematical content</h2>
+<p>Inline math uses single dollars: the loss function <span class="math inline">\mathcal{L}(\theta)</span> measures model error.</p>
+<p>Display equations use double dollars:</p>
+<p><span class="math display">\nabla_\theta \mathcal{L}(\theta) = -\frac{1}{N} \sum_{i=1}^{N} \nabla_\theta \log p_\theta(x_i)</span> {#eq-gradient}</p>
+<p>Reference equations with <code>@eq-label</code>: see <strong>?@eq-gradient</strong> above.</p>
+<p>A matrix example:</p>
+<p><span class="math display">A = \begin{bmatrix}
+a_{11} &amp; a_{12} \\
+a_{21} &amp; a_{22}
+\end{bmatrix}, \quad
+\lambda \in \sigma(A)</span></p>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<section id="static-code-block-not-executed" class="level3">
+<h3 class="anchored" data-anchor-id="static-code-block-not-executed">Static code block (not executed)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResidualBlock(nn.Module):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim: <span class="bu">int</span>):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.net <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            nn.Linear(dim, dim),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            nn.GELU(),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            nn.Linear(dim, dim),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x: torch.Tensor) <span class="op">-&gt;</span> torch.Tensor:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x <span class="op">+</span> <span class="va">self</span>.net(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="executable-code-block" class="level3">
+<h3 class="anchored" data-anchor-id="executable-code-block">Executable code block</h3>
+<p>Uncomment <code>jupyter: python3</code> in the YAML header to enable execution.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-example</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Example plot generated from code."</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">300</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sin(x) <span class="op">*</span> np.exp(<span class="op">-</span><span class="fl">0.1</span> <span class="op">*</span> x<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">3</span>))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ax.plot(x, y, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"x"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"f(x)"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Damped sine wave"</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="inline-code" class="level3">
+<h3 class="anchored" data-anchor-id="inline-code">Inline code</h3>
+<p>Use backticks for inline code: the <code>Adam</code> optimizer with <code>lr=3e-4</code>.</p>
+</section>
+</section>
+<section id="text-formatting" class="level2">
+<h2 class="anchored" data-anchor-id="text-formatting">Text formatting</h2>
+<p>Regular paragraph with <strong>bold text</strong>, <em>italic text</em>, and <strong><em>bold italic</em></strong>. Use <code>inline code</code> for function names and variables. Add a <a href="https://quarto.org">hyperlink</a> or an <a href="../../posts/first-technical-post/index.html">internal link</a>.</p>
+<section id="unordered-list" class="level3">
+<h3 class="anchored" data-anchor-id="unordered-list">Unordered list</h3>
 <ul>
-<li>mathematical equations;</li>
-<li>Python code;</li>
-<li>Jupyter output;</li>
-<li>figures;</li>
-<li>links to external repositories.</li>
+<li>First item with some detail</li>
+<li>Second item
+<ul>
+<li>Nested item</li>
+<li>Another nested item</li>
+</ul></li>
+<li>Third item</li>
 </ul>
 </section>
-<section id="a-mathematical-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-mathematical-example">A mathematical example</h2>
-<p>Consider the mean squared error:</p>
-<p><span id="eq-mse"><span class="math display">
-\mathcal{L}(\theta)
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left(f_\theta(x_i)-y_i\right)^2
-\tag{1}</span></span></p>
-<p>Equation <a href="#eq-mse" class="quarto-xref">Equation&nbsp;1</a> measures the average squared difference between predictions and targets.</p>
+<section id="ordered-list" class="level3">
+<h3 class="anchored" data-anchor-id="ordered-list">Ordered list</h3>
+<ol type="1">
+<li>First step</li>
+<li>Second step</li>
+<li>Third step</li>
+</ol>
 </section>
-<section id="a-python-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-python-example">A Python example</h2>
-<div id="2fc87cbc" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">200</span>) </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>plt.plot(x, y) </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"x"</span>) </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"x²"</span>) </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Quadratic function"</span>) </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-2-output-1.png" width="577" height="450" class="figure-img"></p>
+<section id="blockquote" class="level3">
+<h3 class="anchored" data-anchor-id="blockquote">Blockquote</h3>
+<blockquote class="blockquote">
+<p>The purpose of computing is insight, not numbers.</p>
+<p>— Richard Hamming</p>
+</blockquote>
+</section>
+</section>
+<section id="callouts" class="level2">
+<h2 class="anchored" data-anchor-id="callouts">Callouts</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use notes for supplementary information that supports the main text.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use warnings for common pitfalls or important caveats.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use tips for practical recommendations or shortcuts.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use important callouts for critical information the reader must not miss.</p>
+</div>
+</div>
+</section>
+<section id="figures-and-images" class="level2">
+<h2 class="anchored" data-anchor-id="figures-and-images">Figures and images</h2>
+<div id="fig-placeholder" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Placeholder image">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-placeholder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://via.placeholder.com/700x300/f0eeea/65656d?text=Figure+placeholder.png" class="img-fluid figure-img" style="width:100.0%" alt="Placeholder image">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-placeholder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Placeholder for a figure. Replace with your own image.
+</figcaption>
 </figure>
 </div>
+<p>Reference figures with <code>@fig-label</code>: see <a href="#fig-placeholder" class="quarto-xref">Figure&nbsp;1</a>.</p>
+</section>
+<section id="tables" class="level2">
+<h2 class="anchored" data-anchor-id="tables">Tables</h2>
+<table class="caption-top table">
+<caption>Comparison of methods on the benchmark dataset.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: center;">Accuracy</th>
+<th style="text-align: right;">Parameters</th>
+<th style="text-align: right;">Training time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Baseline</td>
+<td style="text-align: center;">72.3%</td>
+<td style="text-align: right;">1.2M</td>
+<td style="text-align: right;">2h</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Proposed</td>
+<td style="text-align: center;">78.1%</td>
+<td style="text-align: right;">1.4M</td>
+<td style="text-align: right;">3h</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ensemble</td>
+<td style="text-align: center;">80.5%</td>
+<td style="text-align: right;">4.2M</td>
+<td style="text-align: right;">8h</td>
+</tr>
+</tbody>
+</table>
+<p>Reference tables with <code>@tbl-label</code>: see <strong>?@tbl-results</strong>.</p>
+</section>
+<section id="tabbed-content" class="level2">
+<h2 class="anchored" data-anchor-id="tabbed-content">Tabbed content</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">PyTorch</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">JAX</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> F.cross_entropy(logits, targets)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>loss.backward()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>optimizer.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>loss, grads <span class="op">=</span> jax.value_and_grad(loss_fn)(params, batch)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>updates, opt_state <span class="op">=</span> optimizer.update(grads, opt_state)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> optax.apply_updates(params, updates)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </div>
 </div>
 </section>
-<section id="repository" class="level2">
-<h2 class="anchored" data-anchor-id="repository">Repository</h2>
-<p>The complete source code for future projects will be available on GitHub. <a href="https://github.com/">View my GitHub profile</a></p>
+<section id="footnotes" class="level2">
+<h2 class="anchored" data-anchor-id="footnotes">Footnotes</h2>
+<p>This claim needs a citation<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. This is another footnote<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+</section>
+<section id="definitions-and-terminology" class="level2">
+<h2 class="anchored" data-anchor-id="definitions-and-terminology">Definitions and terminology</h2>
+<dl>
+<dt>Term</dt>
+<dd>
+<p>Definition of the term. Use definition lists for glossary-style entries.</p>
+</dd>
+<dt>Eigenvalue</dt>
+<dd>
+<p>A scalar <span class="math inline">\lambda</span> such that <span class="math inline">Av = \lambda v</span> for some nonzero vector <span class="math inline">v</span>.</p>
+</dd>
+</dl>
+</section>
+<section id="horizontal-rule" class="level2">
+<h2 class="anchored" data-anchor-id="horizontal-rule">Horizontal rule</h2>
+<p>Use three dashes for a thematic break:</p>
+<hr>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Summarize the key findings. State limitations. Suggest directions for future work.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" role="list">
+
+</div>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{filippo_marino2026,
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Source or explanation for the first claim.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Source or explanation for the second claim.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{filippo_marino2026,
   author = {Filippo Marino, Diego},
-  title = {My {First} {Technical} {Post}},
+  title = {Article {Title} {Here}},
   date = {2026-06-25},
-  url = {https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/new-article/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-filippo_marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Filippo Marino, Diego. 2026. <span>“My First Technical Post.”</span>
-June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/">https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</a>.
+Filippo Marino, Diego. 2026. <span>“Article Title Here.”</span> June 25.
+<a href="https://diegofilippomarino.github.io/Eigenholm/posts/new-article/">https://diegofilippomarino.github.io/Eigenholm/posts/new-article/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -968,7 +1205,7 @@ June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-tec
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/new-article/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>

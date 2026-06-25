@@ -12,11 +12,412 @@
 <generator>quarto-1.9.38</generator>
 <lastBuildDate>Thu, 25 Jun 2026 00:00:00 GMT</lastBuildDate>
 <item>
+  <title>Article Title Here</title>
+  <dc:creator>Diego Filippo Marino</dc:creator>
+  <link>https://diegofilippomarino.github.io/Eigenholm/posts/new-article/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.</p>
+<p>This article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to <code>index.qmd</code>, remove <code>draft: true</code>, and replace the content.</p>
+</section>
+<section id="mathematical-content" class="level2">
+<h2 class="anchored" data-anchor-id="mathematical-content">Mathematical content</h2>
+<p>Inline math uses single dollars: the loss function <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BL%7D(%5Ctheta)"> measures model error.</p>
+<p>Display equations use double dollars:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cnabla_%5Ctheta%20%5Cmathcal%7BL%7D(%5Ctheta)%20=%20-%5Cfrac%7B1%7D%7BN%7D%20%5Csum_%7Bi=1%7D%5E%7BN%7D%20%5Cnabla_%5Ctheta%20%5Clog%20p_%5Ctheta(x_i)"> {#eq-gradient}</p>
+<p>Reference equations with <code>@eq-label</code>: see <strong>?@eq-gradient</strong> above.</p>
+<p>A matrix example:</p>
+<p><img src="https://latex.codecogs.com/png.latex?A%20=%20%5Cbegin%7Bbmatrix%7D%0Aa_%7B11%7D%20&amp;%20a_%7B12%7D%20%5C%5C%0Aa_%7B21%7D%20&amp;%20a_%7B22%7D%0A%5Cend%7Bbmatrix%7D,%20%5Cquad%0A%5Clambda%20%5Cin%20%5Csigma(A)"></p>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<section id="static-code-block-not-executed" class="level3">
+<h3 class="anchored" data-anchor-id="static-code-block-not-executed">Static code block (not executed)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch.nn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> nn</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">class</span> ResidualBlock(nn.Module):</span>
+<span id="cb1-5">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__init__</span>(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>, dim: <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>):</span>
+<span id="cb1-6">        <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">super</span>().<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__init__</span>()</span>
+<span id="cb1-7">        <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.net <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.Sequential(</span>
+<span id="cb1-8">            nn.Linear(dim, dim),</span>
+<span id="cb1-9">            nn.GELU(),</span>
+<span id="cb1-10">            nn.Linear(dim, dim),</span>
+<span id="cb1-11">        )</span>
+<span id="cb1-12"></span>
+<span id="cb1-13">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> forward(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>, x: torch.Tensor) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> torch.Tensor:</span>
+<span id="cb1-14">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> x <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.net(x)</span></code></pre></div></div>
+</section>
+<section id="executable-code-block" class="level3">
+<h3 class="anchored" data-anchor-id="executable-code-block">Executable code block</h3>
+<p>Uncomment <code>jupyter: python3</code> in the YAML header to enable execution.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">```{python}</span></span>
+<span id="cb2-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#| label: fig-example</span></span>
+<span id="cb2-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#| fig-cap: "Example plot generated from code."</span></span>
+<span id="cb2-4"></span>
+<span id="cb2-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb2-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb2-7"></span>
+<span id="cb2-8">x <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> np.pi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> np.pi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">300</span>)</span>
+<span id="cb2-9">y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.sin(x) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> np.exp(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb2-10"></span>
+<span id="cb2-11">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb2-12">ax.plot(x, y, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#2a6e6e"</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>)</span>
+<span id="cb2-13">ax.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"x"</span>)</span>
+<span id="cb2-14">ax.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"f(x)"</span>)</span>
+<span id="cb2-15">ax.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Damped sine wave"</span>)</span>
+<span id="cb2-16">ax.spines[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"top"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"right"</span>]].set_visible(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb2-17">plt.tight_layout()</span>
+<span id="cb2-18">plt.show()</span>
+<span id="cb2-19"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">```</span></span></code></pre></div></div>
+</section>
+<section id="inline-code" class="level3">
+<h3 class="anchored" data-anchor-id="inline-code">Inline code</h3>
+<p>Use backticks for inline code: the <code>Adam</code> optimizer with <code>lr=3e-4</code>.</p>
+</section>
+</section>
+<section id="text-formatting" class="level2">
+<h2 class="anchored" data-anchor-id="text-formatting">Text formatting</h2>
+<p>Regular paragraph with <strong>bold text</strong>, <em>italic text</em>, and <strong><em>bold italic</em></strong>. Use <code>inline code</code> for function names and variables. Add a <a href="https://quarto.org">hyperlink</a> or an <a href="../../posts/first-technical-post/index.html">internal link</a>.</p>
+<section id="unordered-list" class="level3">
+<h3 class="anchored" data-anchor-id="unordered-list">Unordered list</h3>
+<ul>
+<li>First item with some detail</li>
+<li>Second item
+<ul>
+<li>Nested item</li>
+<li>Another nested item</li>
+</ul></li>
+<li>Third item</li>
+</ul>
+</section>
+<section id="ordered-list" class="level3">
+<h3 class="anchored" data-anchor-id="ordered-list">Ordered list</h3>
+<ol type="1">
+<li>First step</li>
+<li>Second step</li>
+<li>Third step</li>
+</ol>
+</section>
+<section id="blockquote" class="level3">
+<h3 class="anchored" data-anchor-id="blockquote">Blockquote</h3>
+<blockquote class="blockquote">
+<p>The purpose of computing is insight, not numbers.</p>
+<p>— Richard Hamming</p>
+</blockquote>
+</section>
+</section>
+<section id="callouts" class="level2">
+<h2 class="anchored" data-anchor-id="callouts">Callouts</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use notes for supplementary information that supports the main text.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use warnings for common pitfalls or important caveats.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use tips for practical recommendations or shortcuts.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use important callouts for critical information the reader must not miss.</p>
+</div>
+</div>
+</section>
+<section id="figures-and-images" class="level2">
+<h2 class="anchored" data-anchor-id="figures-and-images">Figures and images</h2>
+<div id="fig-placeholder" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Placeholder image">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-placeholder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://via.placeholder.com/700x300/f0eeea/65656d?text=Figure+placeholder.png" class="img-fluid figure-img" style="width:100.0%" alt="Placeholder image">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-placeholder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Placeholder for a figure. Replace with your own image.
+</figcaption>
+</figure>
+</div>
+<p>Reference figures with <code>@fig-label</code>: see Figure&nbsp;1.</p>
+</section>
+<section id="tables" class="level2">
+<h2 class="anchored" data-anchor-id="tables">Tables</h2>
+<table class="caption-top table">
+<caption>Comparison of methods on the benchmark dataset.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: center;">Accuracy</th>
+<th style="text-align: right;">Parameters</th>
+<th style="text-align: right;">Training time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Baseline</td>
+<td style="text-align: center;">72.3%</td>
+<td style="text-align: right;">1.2M</td>
+<td style="text-align: right;">2h</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Proposed</td>
+<td style="text-align: center;">78.1%</td>
+<td style="text-align: right;">1.4M</td>
+<td style="text-align: right;">3h</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ensemble</td>
+<td style="text-align: center;">80.5%</td>
+<td style="text-align: right;">4.2M</td>
+<td style="text-align: right;">8h</td>
+</tr>
+</tbody>
+</table>
+<p>Reference tables with <code>@tbl-label</code>: see <strong>?@tbl-results</strong>.</p>
+</section>
+<section id="tabbed-content" class="level2">
+<h2 class="anchored" data-anchor-id="tabbed-content">Tabbed content</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" aria-controls="tabset-1-1" aria-selected="true" href="">PyTorch</a></li><li class="nav-item"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" aria-controls="tabset-1-2" aria-selected="false" href="">JAX</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" aria-labelledby="tabset-1-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> F.cross_entropy(logits, targets)</span>
+<span id="cb3-2">loss.backward()</span>
+<span id="cb3-3">optimizer.step()</span></code></pre></div></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" aria-labelledby="tabset-1-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">loss, grads <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> jax.value_and_grad(loss_fn)(params, batch)</span>
+<span id="cb4-2">updates, opt_state <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> optimizer.update(grads, opt_state)</span>
+<span id="cb4-3">params <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> optax.apply_updates(params, updates)</span></code></pre></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id="footnotes" class="level2">
+<h2 class="anchored" data-anchor-id="footnotes">Footnotes</h2>
+<p>This claim needs a citation<sup>1</sup>. This is another footnote<sup>2</sup>.</p>
+</section>
+<section id="definitions-and-terminology" class="level2">
+<h2 class="anchored" data-anchor-id="definitions-and-terminology">Definitions and terminology</h2>
+<dl>
+<dt>Term</dt>
+<dd>
+<p>Definition of the term. Use definition lists for glossary-style entries.</p>
+</dd>
+<dt>Eigenvalue</dt>
+<dd>
+<p>A scalar <img src="https://latex.codecogs.com/png.latex?%5Clambda"> such that <img src="https://latex.codecogs.com/png.latex?Av%20=%20%5Clambda%20v"> for some nonzero vector <img src="https://latex.codecogs.com/png.latex?v">.</p>
+</dd>
+</dl>
+</section>
+<section id="horizontal-rule" class="level2">
+<h2 class="anchored" data-anchor-id="horizontal-rule">Horizontal rule</h2>
+<p>Use three dashes for a thematic break:</p>
+<hr>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Summarize the key findings. State limitations. Suggest directions for future work.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs">
+
+</div>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Source or explanation for the first claim.↩︎</p></li>
+<li id="fn2"><p>Source or explanation for the second claim.↩︎</p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{filippo_marino2026,
+  author = {Filippo Marino, Diego},
+  title = {Article {Title} {Here}},
+  date = {2026-06-25},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/new-article/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-filippo_marino2026" class="csl-entry quarto-appendix-citeas">
+Filippo Marino, Diego. 2026. <span>“Article Title Here.”</span> June 25.
+<a href="https://diegofilippomarino.github.io/Eigenholm/posts/new-article/">https://diegofilippomarino.github.io/Eigenholm/posts/new-article/</a>.
+</div></div></section></div> ]]></description>
+  <category>Machine Learning</category>
+  <category>Mathematics</category>
+  <guid>https://diegofilippomarino.github.io/Eigenholm/posts/new-article/</guid>
+  <pubDate>Thu, 25 Jun 2026 00:00:00 GMT</pubDate>
+</item>
+<item>
   <title>My First Technical Post</title>
   <dc:creator>Diego Filippo Marino</dc:creator>
   <link>https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</link>
   <description><![CDATA[ 
-
 
 
 
