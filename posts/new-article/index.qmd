@@ -1,7 +1,10 @@
 ---
 title: "Article Title Here"
 description: "A one-line summary for listings and social sharing."
-author: "Diego Filippo Marino"
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
 date: "2026-06-25"
 categories:
   - Machine Learning

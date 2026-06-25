@@ -41,7 +41,7 @@
 </section>
 <section id="a-python-example" class="level2">
 <h2 class="anchored" data-anchor-id="a-python-example">A Python example</h2>
-<div id="2fc87cbc" class="cell" data-execution_count="1">
+<div id="bade00e3" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
@@ -99,15 +99,15 @@ font-style: inherit;">"Quadratic function"</span>) </span>
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{filippo_marino2026,
-  author = {Filippo Marino, Diego},
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
+  author = {Marino, Diego Filippo},
   title = {My {First} {Technical} {Post}},
   date = {2026-06-25},
   url = {https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/},
   langid = {en}
 }
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-filippo_marino2026" class="csl-entry quarto-appendix-citeas">
-Filippo Marino, Diego. 2026. <span>“My First Technical Post.”</span>
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas">
+Marino, Diego Filippo. 2026. <span>“My First Technical Post.”</span>
 June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/">https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</a>.
 </div></div></section></div> ]]></description>
   <category>Python</category>

@@ -1,7 +1,10 @@
 ---
 title: "My First Technical Post"
 description: "A test article with mathematics, Python code, and a generated plot."
-author: "Diego Filippo Marino"
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
 date: "2026-06-25"
 categories:
   - Python

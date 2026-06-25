@@ -1,7 +1,10 @@
 ---
 title: "Project Title Here"
 description: "One-line summary of what this project does and why."
-author: "Diego Filippo Marino"
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
 date: "2026-01-01"
 categories:
   - Python
