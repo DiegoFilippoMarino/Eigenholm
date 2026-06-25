@@ -1,0 +1,208 @@
+---
+title: "Article Title Here"
+description: "A one-line summary for listings and social sharing."
+author: "Diego Filippo Marino"
+date: "2026-06-25"
+categories:
+  - Machine Learning
+  - Mathematics
+# image: thumbnail.png
+# bibliography: references.bib
+# jupyter: python3
+draft: false
+---
+
+## Introduction
+
+Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.
+
+This article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to `index.qmd`, remove `draft: true`, and replace the content.
+
+## Mathematical content
+
+Inline math uses single dollars: the loss function $\mathcal{L}(\theta)$ measures model error.
+
+Display equations use double dollars:
+
+$$\nabla_\theta \mathcal{L}(\theta) = -\frac{1}{N} \sum_{i=1}^{N} \nabla_\theta \log p_\theta(x_i)$$
+ {#eq-gradient}
+
+Reference equations with `@eq-label`: see @eq-gradient above.
+
+A matrix example:
+
+$$A = \begin{bmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{bmatrix}, \quad
+\lambda \in \sigma(A)$$
+
+## Code
+
+### Static code block (not executed)
+
+``` python
+import torch
+import torch.nn as nn
+
+class ResidualBlock(nn.Module):
+    def __init__(self, dim: int):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(dim, dim),
+            nn.GELU(),
+            nn.Linear(dim, dim),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x + self.net(x)
+```
+
+### Executable code block
+
+Uncomment `jupyter: python3` in the YAML header to enable execution.
+
+```{{python}}
+#| label: fig-example
+#| fig-cap: "Example plot generated from code."
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-2 * np.pi, 2 * np.pi, 300)
+y = np.sin(x) * np.exp(-0.1 * x**2)
+
+fig, ax = plt.subplots(figsize=(7, 3))
+ax.plot(x, y, color="#2a6e6e", linewidth=1.5)
+ax.set_xlabel("x")
+ax.set_ylabel("f(x)")
+ax.set_title("Damped sine wave")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+### Inline code
+
+Use backticks for inline code: the `Adam` optimizer with `lr=3e-4`.
+
+## Text formatting
+
+Regular paragraph with **bold text**, *italic text*, and ***bold italic***. Use `inline code` for function names and variables. Add a [hyperlink](https://quarto.org) or an [internal link](../first-technical-post/index.qmd).
+
+### Unordered list
+
+- First item with some detail
+- Second item
+  - Nested item
+  - Another nested item
+- Third item
+
+### Ordered list
+
+1.  First step
+2.  Second step
+3.  Third step
+
+### Blockquote
+
+> The purpose of computing is insight, not numbers.
+>
+> — Richard Hamming
+
+## Callouts
+
+::: callout-note
+## Note
+
+Use notes for supplementary information that supports the main text.
+:::
+
+::: callout-warning
+## Warning
+
+Use warnings for common pitfalls or important caveats.
+:::
+
+::: callout-tip
+## Tip
+
+Use tips for practical recommendations or shortcuts.
+:::
+
+::: callout-important
+## Important
+
+Use important callouts for critical information the reader must not miss.
+:::
+
+## Figures and images
+
+![Placeholder for a figure. Replace with your own image.](https://via.placeholder.com/700x300/f0eeea/65656d?text=Figure+placeholder){#fig-placeholder fig-alt="Placeholder image" width="100%"}
+
+Reference figures with `@fig-label`: see @fig-placeholder.
+
+## Tables
+
+| Method   | Accuracy | Parameters | Training time |
+|:---------|:--------:|-----------:|--------------:|
+| Baseline |  72.3%   |       1.2M |            2h |
+| Proposed |  78.1%   |       1.4M |            3h |
+| Ensemble |  80.5%   |       4.2M |            8h |
+
+: Comparison of methods on the benchmark dataset.
+
+Reference tables with `@tbl-label`: see @tbl-results.
+
+## Tabbed content
+
+::: panel-tabset
+### PyTorch
+
+``` python
+loss = F.cross_entropy(logits, targets)
+loss.backward()
+optimizer.step()
+```
+
+### JAX
+
+``` python
+loss, grads = jax.value_and_grad(loss_fn)(params, batch)
+updates, opt_state = optimizer.update(grads, opt_state)
+params = optax.apply_updates(params, updates)
+```
+:::
+
+## Footnotes
+
+This claim needs a citation[^1]. This is another footnote[^2].
+
+[^1]: Source or explanation for the first claim.
+
+[^2]: Source or explanation for the second claim.
+
+## Definitions and terminology
+
+Term
+
+:   Definition of the term. Use definition lists for glossary-style entries.
+
+Eigenvalue
+
+:   A scalar $\lambda$ such that $Av = \lambda v$ for some nonzero vector $v$.
+
+## Horizontal rule
+
+Use three dashes for a thematic break:
+
+------------------------------------------------------------------------
+
+## Conclusion
+
+Summarize the key findings. State limitations. Suggest directions for future work.
+
+## References
+
+::: {#refs}
+:::

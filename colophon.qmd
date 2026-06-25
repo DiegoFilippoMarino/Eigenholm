@@ -1,6 +1,8 @@
 ---
 title: "Colophon"
 toc: false
+comments: false
+citation: false
 ---
 
 Eigenholm is an independent technical website and research notebook maintained by Diego Filippo Marino.

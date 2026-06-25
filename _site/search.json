@@ -4,14 +4,14 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Technical projects, implementations, and research experiments.\nEach project includes source code, documentation, and — where applicable — links to the relevant papers or references.\n\nProjects will appear here as they are published. Check back soon, or visit the GitHub repository for the latest work.\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  title = {Projects},\n  url = {https://diegofilippomarino.github.io/Eigenholm/projects.html},\n  langid = {en}\n}\nFor attribution, please cite this work as:\n“Projects.” n.d. https://diegofilippomarino.github.io/Eigenholm/projects.html."
+    "text": "Technical projects, implementations, and research experiments.\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "notes.html",
     "href": "notes.html",
     "title": "Notes",
     "section": "",
-    "text": "Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.\nUnlike full articles, notes are informal — meant to capture ideas and technical details as they develop.\n\nResearch notes will appear here as they are written.\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  title = {Notes},\n  url = {https://diegofilippomarino.github.io/Eigenholm/notes.html},\n  langid = {en}\n}\nFor attribution, please cite this work as:\n“Notes.” n.d. https://diegofilippomarino.github.io/Eigenholm/notes.html."
+    "text": "Short-form research notes, reading logs, and work-in-progress observations.\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "colophon.html",
@@ -88,7 +88,7 @@
     "href": "index.html",
     "title": "Eigenholm",
     "section": "",
-    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n1 min\n\n\n\n\nNo matching items\n\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  url = {https://diegofilippomarino.github.io/Eigenholm/},\n  langid = {en}\n}\nFor attribution, please cite this work as:\nn.d. https://diegofilippomarino.github.io/Eigenholm/."
+    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n1 min\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/first-technical-post/index.html",

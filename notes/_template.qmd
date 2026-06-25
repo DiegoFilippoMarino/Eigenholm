@@ -1,0 +1,61 @@
+---
+title: "Note Title Here"
+description: "Brief description of what this note captures."
+author: "Diego Filippo Marino"
+date: "2026-01-01"
+categories:
+  - Reading
+  - Mathematics
+# image: thumbnail.png
+# bibliography: references.bib
+draft: true
+---
+
+## Context
+
+What prompted this note. A paper you read, a problem you encountered, an idea during implementation. Notes are informal — they capture thinking in progress.
+
+## Key idea
+
+The core observation, result, or technique. Be direct.
+
+For a mathematical note:
+
+$$
+\text{Given } A \in \mathbb{R}^{n \times n}, \quad \text{tr}(A) = \sum_{i=1}^{n} \lambda_i
+$$
+
+For a code observation:
+
+```python
+# Unexpected behavior: torch.einsum is faster than manual broadcasting
+# for batch matrix multiplication when batch_size > 128
+result = torch.einsum("bij,bjk->bik", A, B)
+```
+
+## Details
+
+Expand on the idea. Show the derivation, the experiment, the edge case.
+
+### Sub-point
+
+Use sub-headings to organize longer notes.
+
+- Observation 1
+- Observation 2
+- Open question: *why does this happen?*
+
+::: {.callout-tip}
+## Takeaway
+One-sentence summary of the practical insight from this note.
+:::
+
+## Links
+
+- [Relevant paper or resource](https://arxiv.org)
+- [Related note or article on this site](../other-note/index.qmd)
+- [GitHub issue or discussion](https://github.com)
+
+## Status
+
+*Work in progress* — last updated {{< meta date >}}.

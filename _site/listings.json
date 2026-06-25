@@ -1,5 +1,13 @@
 [
   {
+    "listing": "/projects.html",
+    "items": []
+  },
+  {
+    "listing": "/notes.html",
+    "items": []
+  },
+  {
     "listing": "/index.html",
     "items": [
       "/posts/first-technical-post/index.html"

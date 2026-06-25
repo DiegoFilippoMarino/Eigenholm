@@ -1,12 +1,19 @@
 ---
 title: "Notes"
+listing:
+  id: notes-list
+  contents: notes
+  sort: "date desc"
+  type: default
+  categories: true
+  fields: [title, description, date, categories]
+page-layout: full
 toc: false
+comments: false
+citation: false
 ---
 
-Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.
+Short-form research notes, reading logs, and work-in-progress observations.
 
-Unlike full articles, notes are informal — meant to capture ideas and technical details as they develop.
-
-::: {.project-placeholder}
-Research notes will appear here as they are written.
+::: {#notes-list}
 :::

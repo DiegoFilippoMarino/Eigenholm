@@ -11,6 +11,8 @@ listing:
 page-layout: full
 toc: false
 title-block-banner: false
+comments: false
+citation: false
 ---
 
 ::: {.eigenholm-hero}

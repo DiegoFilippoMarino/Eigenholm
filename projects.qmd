@@ -1,12 +1,19 @@
 ---
 title: "Projects"
+listing:
+  id: projects-list
+  contents: projects
+  sort: "date desc"
+  type: default
+  categories: true
+  fields: [title, description, author, date, categories]
+page-layout: full
 toc: false
+comments: false
+citation: false
 ---
 
 Technical projects, implementations, and research experiments.
 
-Each project includes source code, documentation, and — where applicable — links to the relevant papers or references.
-
-::: {.project-placeholder}
-Projects will appear here as they are published. Check back soon, or visit the [GitHub repository](https://github.com/DiegoFilippoMarino/Eigenholm) for the latest work.
+::: {#projects-list}
 :::

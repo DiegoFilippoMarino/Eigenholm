@@ -9,11 +9,13 @@ about:
       href: https://bsky.app/
     - icon: linkedin
       text: LinkedIn
-      href: https://linkedin.com
+      href: https://www.linkedin.com/in/dfmarino/
     - icon: github
       text: Github
-      href: https://github.com
+      href: https://github.com/DiegoFilippoMarino
 toc: false
+comments: false
+citation: false
 ---
 
 Eigenholm is a personal technical site and research notebook focused on machine learning, deep learning, mathematics, and scientific computing.

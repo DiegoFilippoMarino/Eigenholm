@@ -40,8 +40,6 @@ website:
         light: light
         dark: dark_dimmed
 
-citation: true
-
 format:
   html:
     theme:

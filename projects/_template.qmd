@@ -1,0 +1,114 @@
+---
+title: "Project Title Here"
+description: "One-line summary of what this project does and why."
+author: "Diego Filippo Marino"
+date: "2026-01-01"
+categories:
+  - Python
+  - Machine Learning
+# image: thumbnail.png
+# bibliography: references.bib
+# jupyter: python3
+draft: true
+---
+
+## Overview
+
+What this project is, what problem it solves, and why it exists. One to three paragraphs.
+
+Link to the full repository: [GitHub](https://github.com/DiegoFilippoMarino/repo-name).
+
+## Motivation
+
+Why this project was built. What gap it fills. What paper or idea it implements.
+
+If implementing a paper, cite it:
+
+> Author et al., *"Paper Title"*, Conference/Journal, Year. [arXiv:XXXX.XXXXX](https://arxiv.org/abs/XXXX.XXXXX)
+
+## Architecture
+
+Describe the system design, model architecture, or algorithmic approach.
+
+$$\hat{y} = f_\theta(x) = \sigma(W_2 \cdot \text{ReLU}(W_1 x + b_1) + b_2)$$
+
+### Key components
+
+- **Component A** — what it does
+- **Component B** — what it does
+- **Component C** — what it does
+
+## Implementation
+
+### Setup
+
+``` bash
+git clone https://github.com/DiegoFilippoMarino/repo-name.git
+cd repo-name
+uv sync
+```
+
+### Usage
+
+``` python
+from project import Model
+
+model = Model(config)
+model.train(dataset)
+results = model.evaluate(test_set)
+```
+
+### Configuration
+
+| Parameter       | Default | Description               |
+|:----------------|:-------:|:--------------------------|
+| `learning_rate` |  3e-4   | Optimizer learning rate   |
+| `batch_size`    |   64    | Training batch size       |
+| `epochs`        |   100   | Number of training epochs |
+| `hidden_dim`    |   256   | Hidden layer dimension    |
+
+: Default configuration parameters.
+
+## Results
+
+Summarize experimental results. Include plots, tables, or comparisons.
+
+```{{python}}
+#| label: fig-results
+#| fig-cap: "Training loss over epochs."
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+epochs = np.arange(1, 101)
+loss = 2.0 * np.exp(-0.03 * epochs) + 0.1 * np.random.randn(100) * np.exp(-0.02 * epochs)
+
+fig, ax = plt.subplots(figsize=(7, 3))
+ax.plot(epochs, loss, color="#2a6e6e", linewidth=1.2, alpha=0.8)
+ax.set_xlabel("Epoch")
+ax.set_ylabel("Loss")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+::: callout-note
+## Reproducibility
+
+All experiments use seed `42`. Full training logs are available in the repository.
+:::
+
+## Limitations
+
+What this project does not do. Known issues. Scope boundaries.
+
+## Future work
+
+- Planned improvement 1
+- Planned improvement 2
+- Planned improvement 3
+
+## References
+
+::: {#refs}
+:::
