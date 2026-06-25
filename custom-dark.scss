@@ -1,9 +1,12 @@
 /*-- scss:defaults --*/
 
 // ============================================
-// EIGENHOLM — Dark Mode Color Overrides
+// EIGENHOLM — Dark Theme
 // ============================================
 
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Inter:wght@300..600&display=swap');
+
+// Color Palette — Dark
 $eigenholm-bg:               #1a1d24;
 $eigenholm-surface:          #22252e;
 $eigenholm-text:             #dcdce0;
@@ -14,273 +17,67 @@ $eigenholm-border-light:     #2a2d35;
 $eigenholm-accent:           #4fb8b8;
 $eigenholm-accent-hover:     #6ccece;
 $eigenholm-accent-light:     rgba(79, 184, 184, 0.1);
+$eigenholm-accent-secondary: #7a82b8;
 $eigenholm-code-bg:          #1f222a;
 
+// Bootstrap Overrides
 $body-bg:          $eigenholm-bg;
 $body-color:       $eigenholm-text;
 $link-color:       $eigenholm-accent;
 $link-hover-color: $eigenholm-accent-hover;
+$link-decoration:      none;
+$link-hover-decoration: underline;
 
-$navbar-bg: $eigenholm-bg;
-$navbar-fg: $eigenholm-text;
+$font-family-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$headings-font-family:   "Source Serif 4", Georgia, "Times New Roman", serif;
+$font-family-monospace:  "Cascadia Code", "JetBrains Mono", "Fira Code", "Source Code Pro", Consolas, monospace;
 
-$code-color:    $eigenholm-accent;
-$pre-color:     $eigenholm-text;
+$font-size-base:         1.05rem;
+$line-height-base:       1.7;
+$headings-font-weight:   600;
+$headings-line-height:   1.3;
+$headings-margin-bottom: 0.75rem;
+
+$h1-font-size: 2.25rem;
+$h2-font-size: 1.6rem;
+$h3-font-size: 1.3rem;
+$h4-font-size: 1.1rem;
+
+$paragraph-margin-bottom: 1.25rem;
+
+$navbar-bg:        $eigenholm-bg;
+$navbar-fg:        $eigenholm-text;
+$navbar-padding-y: 1rem;
+
+$code-font-size: 0.88em;
+$code-color:     $eigenholm-accent;
+$pre-color:      $eigenholm-text;
 
 $border-color:      $eigenholm-border;
+$border-radius:     0.25rem;
+$border-radius-sm:  0.2rem;
+$border-radius-lg:  0.35rem;
+
 $card-bg:           $eigenholm-surface;
 $card-border-color: $eigenholm-border;
+$card-border-radius: $border-radius;
+$card-spacer-y:      1.25rem;
+$card-spacer-x:      1.5rem;
+$card-cap-bg:        transparent;
+
+$box-shadow:    none;
+$box-shadow-sm: none;
+$box-shadow-lg: none;
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 860px,
+  xl: 920px,
+  xxl: 960px
+);
 
 
 /*-- scss:rules --*/
 
-// ============================================
-// Dark mode specifics
-// ============================================
-
-body {
-  background: $eigenholm-bg;
-}
-
-::selection {
-  background: rgba($eigenholm-accent, 0.25);
-  color: $eigenholm-text;
-}
-
-.navbar {
-  background: $eigenholm-bg !important;
-  border-bottom-color: $eigenholm-border;
-
-  .navbar-brand {
-    color: $eigenholm-text !important;
-  }
-
-  .navbar-nav .nav-link {
-    color: $eigenholm-text-secondary !important;
-
-    &:hover,
-    &.active {
-      color: $eigenholm-accent !important;
-    }
-  }
-
-  .quarto-navbar-tools .nav-link {
-    color: $eigenholm-text-muted !important;
-
-    &:hover {
-      color: $eigenholm-accent !important;
-    }
-  }
-}
-
-h1, h2, h3, h4, h5, h6 {
-  color: $eigenholm-text;
-}
-
-h2 {
-  border-bottom-color: $eigenholm-border-light;
-}
-
-p code, li code, td code {
-  background: $eigenholm-code-bg;
-  color: $eigenholm-text;
-}
-
-pre {
-  background: $eigenholm-code-bg !important;
-  border-color: $eigenholm-border;
-
-  code {
-    color: $eigenholm-text;
-  }
-}
-
-div.sourceCode {
-  background: $eigenholm-code-bg !important;
-  border-color: $eigenholm-border;
-}
-
-// Title banner
-.quarto-title-banner {
-  background: transparent !important;
-  border-bottom-color: $eigenholm-border;
-
-  .title,
-  .description {
-    color: $eigenholm-text !important;
-  }
-
-  .quarto-title-meta-heading {
-    color: $eigenholm-text-muted !important;
-  }
-
-  .quarto-title-meta-contents {
-    color: $eigenholm-text-secondary !important;
-
-    a {
-      color: $eigenholm-accent !important;
-    }
-  }
-}
-
-// Listings
-.list.quarto-listing-default {
-  border-top-color: $eigenholm-border;
-}
-
-.quarto-post {
-  border-bottom-color: $eigenholm-border-light !important;
-
-  .body h3.no-anchor a {
-    color: $eigenholm-text;
-
-    &:hover {
-      color: $eigenholm-accent;
-    }
-  }
-
-  .listing-description {
-    color: $eigenholm-text-secondary;
-  }
-
-  .metadata {
-    .listing-date,
-    .listing-author {
-      color: $eigenholm-text-muted;
-    }
-  }
-
-  .listing-categories .listing-category {
-    border-color: $eigenholm-border;
-    color: $eigenholm-text-muted;
-
-    &:hover {
-      border-color: $eigenholm-accent;
-      color: $eigenholm-accent;
-    }
-  }
-}
-
-.quarto-category {
-  border-color: $eigenholm-border;
-  color: $eigenholm-text-muted;
-
-  &:hover {
-    border-color: $eigenholm-accent;
-    color: $eigenholm-accent;
-  }
-}
-
-// Categories sidebar
-.quarto-listing-category .category {
-  color: $eigenholm-text-secondary;
-
-  &:hover,
-  &.active {
-    color: $eigenholm-accent;
-  }
-}
-
-// Article
-article blockquote {
-  border-left-color: $eigenholm-accent;
-  background: rgba($eigenholm-accent, 0.05);
-  color: $eigenholm-text-secondary;
-}
-
-// Tables
-table {
-  th {
-    border-bottom-color: $eigenholm-border;
-    color: $eigenholm-text-secondary;
-  }
-
-  td {
-    border-bottom-color: $eigenholm-border-light;
-  }
-
-  tr:hover td {
-    background: rgba($eigenholm-accent, 0.03);
-  }
-}
-
-// About
-.about-entity {
-  .about-link {
-    border-color: $eigenholm-border;
-    color: $eigenholm-text-secondary;
-
-    &:hover {
-      border-color: $eigenholm-accent;
-      color: $eigenholm-accent;
-    }
-  }
-
-  img.round {
-    border-color: $eigenholm-border;
-  }
-}
-
-// Footer
-.nav-footer {
-  border-top-color: $eigenholm-border;
-  color: $eigenholm-text-muted;
-
-  a {
-    color: $eigenholm-text-secondary;
-
-    &:hover {
-      color: $eigenholm-accent;
-    }
-  }
-}
-
-// Homepage hero
-.eigenholm-hero {
-  border-bottom-color: $eigenholm-border;
-}
-
-.hero-title {
-  color: $eigenholm-text;
-}
-
-.hero-tagline {
-  color: $eigenholm-text-secondary;
-}
-
-.eigenholm-topics .topic-tag {
-  color: $eigenholm-text-muted;
-  border-color: $eigenholm-border;
-}
-
-.eigenholm-section-header {
-  color: $eigenholm-text;
-  border-bottom-color: $eigenholm-border-light;
-}
-
-// Projects placeholder
-.project-placeholder {
-  color: $eigenholm-text-muted;
-  border-color: $eigenholm-border;
-}
-
-// Footnotes
-.footnotes {
-  border-top-color: $eigenholm-border-light;
-  color: $eigenholm-text-secondary;
-}
-
-// Prev/next nav
-.page-navigation {
-  border-top-color: $eigenholm-border-light;
-}
-
-// TOC sidebar
-nav[role="doc-toc"] {
-  border-left-color: $eigenholm-border-light;
-}
-
-// Search
-.aa-DetachedSearchButton {
-  border-color: $eigenholm-border !important;
-}
+@import 'eigenholm-rules';

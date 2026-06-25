@@ -1,0 +1,12 @@
+---
+title: "Notes"
+toc: false
+---
+
+Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.
+
+Unlike full articles, notes are informal — meant to capture ideas and technical details as they develop.
+
+::: {.project-placeholder}
+Research notes will appear here as they are written.
+:::

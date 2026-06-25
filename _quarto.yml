@@ -10,9 +10,11 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Writing
       - href: projects.qmd
         text: Projects
+      - href: notes.qmd
+        text: Notes
       - href: about.qmd
         text: About
     right:
@@ -27,7 +29,7 @@ format:
   html:
     theme:
       light: [cosmo, custom.scss]
-      dark: [darkly, custom.scss, custom-dark.scss]
+      dark: [darkly, custom-dark.scss]
     toc: true
     code-copy: true
     code-overflow: wrap

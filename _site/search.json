@@ -7,11 +7,11 @@
     "text": "Technical projects, implementations, and research experiments.\nEach project includes source code, documentation, and — where applicable — links to the relevant papers or references.\n\nProjects will appear here as they are published. Check back soon, or visit the GitHub repository for the latest work."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Eigenholm",
+    "objectID": "notes.html",
+    "href": "notes.html",
+    "title": "Notes",
     "section": "",
-    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications Software Engineering\n\n\nLatest Writing\n\n\n\n\n\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n\n\n\n\nNo matching items"
+    "text": "Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.\nUnlike full articles, notes are informal — meant to capture ideas and technical details as they develop.\n\nResearch notes will appear here as they are written."
   },
   {
     "objectID": "about.html",
@@ -33,6 +33,13 @@
     "title": "About",
     "section": "Interests",
     "text": "Interests\n\nMachine learning and deep learning theory\nMathematical foundations of AI\nPaper replications and reproducibility\nScientific computing and numerical methods\nSoftware engineering for research"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Eigenholm",
+    "section": "",
+    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications Software Engineering\n\n\nLatest Writing\n\n\n\n\n\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/first-technical-post/index.html",
