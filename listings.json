@@ -7,11 +7,11 @@
     ]
   },
   {
-    "listing": "/projects.html",
+    "listing": "/notes/index.html",
     "items": []
   },
   {
-    "listing": "/notes.html",
+    "listing": "/projects/index.html",
     "items": []
   }
 ]
