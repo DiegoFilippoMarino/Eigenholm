@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "This page will contain my personal and technical projects."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Technical Blog",
+    "section": "",
+    "text": "Welcome to my personal technical blog.\nHere I publish:"
+  },
+  {
+    "objectID": "index.html#latest-posts",
+    "href": "index.html#latest-posts",
+    "title": "Technical Blog",
+    "section": "Latest posts",
+    "text": "Latest posts"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "posts/first-technical-post/index.html",
+    "href": "posts/first-technical-post/index.html",
+    "title": "My First Technical Post",
+    "section": "",
+    "text": "This is the first article published on my technical blog.\nThe purpose of this post is to verify that Quarto correctly renders:\n\nmathematical equations;\nPython code;\nJupyter output;\nfigures;\nlinks to external repositories."
+  },
+  {
+    "objectID": "posts/first-technical-post/index.html#introduction",
+    "href": "posts/first-technical-post/index.html#introduction",
+    "title": "My First Technical Post",
+    "section": "",
+    "text": "This is the first article published on my technical blog.\nThe purpose of this post is to verify that Quarto correctly renders:\n\nmathematical equations;\nPython code;\nJupyter output;\nfigures;\nlinks to external repositories."
+  },
+  {
+    "objectID": "posts/first-technical-post/index.html#a-mathematical-example",
+    "href": "posts/first-technical-post/index.html#a-mathematical-example",
+    "title": "My First Technical Post",
+    "section": "A mathematical example",
+    "text": "A mathematical example\nConsider the mean squared error:\n\\[\n\\mathcal{L}(\\theta)\n=\n\\frac{1}{N}\n\\sum_{i=1}^{N}\n\\left(f_\\theta(x_i)-y_i\\right)^2\n\\tag{1}\\]\nEquation Equation 1 measures the average squared difference between predictions and targets."
+  },
+  {
+    "objectID": "posts/first-technical-post/index.html#a-python-example",
+    "href": "posts/first-technical-post/index.html#a-python-example",
+    "title": "My First Technical Post",
+    "section": "A Python example",
+    "text": "A Python example\n\nimport numpy as np \nimport matplotlib.pyplot as plt\n\nx = np.linspace(-3, 3, 200) \ny = x**2\n\nplt.plot(x, y) \nplt.xlabel(\"x\") \nplt.ylabel(\"x²\") \nplt.title(\"Quadratic function\") \nplt.show()"
+  },
+  {
+    "objectID": "posts/first-technical-post/index.html#repository",
+    "href": "posts/first-technical-post/index.html#repository",
+    "title": "My First Technical Post",
+    "section": "Repository",
+    "text": "Repository\nThe complete source code for future projects will be available on GitHub. View my GitHub profile"
+  }
+]
