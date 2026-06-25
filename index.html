@@ -33,6 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./favicon.svg" rel="icon" type="image/svg+xml">
 <script src="site_libs/quarto-listing/list.min.js"></script>
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
@@ -86,7 +87,7 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-title','listing-description','listing-author','listing-date','listing-categories','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
       searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
@@ -106,8 +107,22 @@ ul.task-list li input[type="checkbox"] {
   })
   </script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -136,7 +151,13 @@ window.Quarto = {
 };
 </script>
 
-<link rel="alternate" type="application/rss+xml" title="Eigenholm" href="index.xml" data-external="1"></head>
+<link rel="alternate" type="application/rss+xml" title="Eigenholm" href="index.xml" data-external="1"><meta property="og:title" content="Eigenholm">
+<meta property="og:description" content="Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing.">
+<meta property="og:site_name" content="Eigenholm">
+<meta name="twitter:title" content="Eigenholm">
+<meta name="twitter:description" content="Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing.">
+<meta name="twitter:card" content="summary">
+</head>
 
 <body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
@@ -371,12 +392,7 @@ window.Quarto = {
 <p><span class="eigenholm-section-header">Latest Writing</span></p>
 <div id="listing-latest-posts" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="UHl0aG9uJTJDTWF0aGVtYXRpY3MlMkNUZXN0" data-listing-date-sort="1782345600000" data-listing-file-modified-sort="1782390764461" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="88">
-<div class="thumbnail"><a href="./posts/first-technical-post/index.html" class="no-external">
-
-<p class="card-img-top"><img loading='lazy' src="posts/first-technical-post/index_files/figure-html/cell-2-output-1.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
+<div class="quarto-post image-right" data-index="0" data-categories="UHl0aG9uJTJDTWF0aGVtYXRpY3MlMkNUZXN0" data-listing-date-sort="1782345600000" data-listing-file-modified-sort="1782392209928" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="88">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/first-technical-post/index.html" class="no-external">My First Technical Post</a>
@@ -402,6 +418,7 @@ Jun 25, 2026
 <div class="listing-author">
 Diego Filippo Marino
 </div>
+<div class="listing-reading-time">1 min</div>
 </a>
 </div>
 </div>
@@ -412,7 +429,14 @@ Diego Filippo Marino
 
 
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{untitled,
+  author = {},
+  url = {https://diegofilippomarino.github.io/Eigenholm/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-untitled" class="csl-entry quarto-appendix-citeas" role="listitem">
+n.d. <a href="https://diegofilippomarino.github.io/Eigenholm/">https://diegofilippomarino.github.io/Eigenholm/</a>.
+</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -833,11 +857,43 @@ Diego Filippo Marino
     }
   });
   </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "DiegoFilippoMarino/Eigenholm";
+    script.dataset.repoId = "R_kgDOTEzjQw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOTEzjQ84C_3sV";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2026 Eigenholm</p>
+<p>© 2026 Eigenholm · <a href="colophon.html">Colophon</a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;

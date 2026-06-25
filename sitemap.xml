@@ -2,22 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/index.html</loc>
-    <lastmod>2026-06-25T12:32:44.460Z</lastmod>
+    <lastmod>2026-06-25T12:56:49.927Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/about.html</loc>
-    <lastmod>2026-06-25T12:32:44.460Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/projects.html</loc>
-    <lastmod>2026-06-25T12:32:44.461Z</lastmod>
+    <lastmod>2026-06-25T12:56:49.927Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index.html</loc>
-    <lastmod>2026-06-25T12:32:44.461Z</lastmod>
+    <lastmod>2026-06-25T12:56:49.928Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/projects.html</loc>
+    <lastmod>2026-06-25T12:56:49.928Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/colophon.html</loc>
+    <lastmod>2026-06-25T12:56:49.927Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/notes.html</loc>
-    <lastmod>2026-06-25T12:32:44.460Z</lastmod>
+    <lastmod>2026-06-25T12:56:49.927Z</lastmod>
   </url>
 </urlset>
