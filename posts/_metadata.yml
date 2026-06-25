@@ -1,8 +1,10 @@
-# options specified here will apply to all posts in this folder
+# Options applied to all posts in this folder
 
-# freeze computational output
-# (see https://quarto.org/docs/projects/code-execution.html#freeze)
+# Freeze computational output
 freeze: true
 
-# Enable banner style title blocks
+# Clean title block (restyled via SCSS, not the default colored banner)
 title-block-banner: true
+
+# Auto-generate citation info for each article
+citation: true

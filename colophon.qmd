@@ -1,0 +1,35 @@
+---
+title: "Colophon"
+toc: false
+---
+
+Eigenholm is an independent technical website and research notebook maintained by Diego Filippo Marino.
+
+## Purpose
+
+This site publishes research notes, paper analyses, implementation details, and technical experiments. The goal is to think carefully about problems in machine learning, mathematics, and scientific computing — and to document what is learned along the way.
+
+Articles here are written for a technical audience. They aim to be precise, reproducible, and useful.
+
+## Tools
+
+This site is built with [Quarto](https://quarto.org), an open-source scientific publishing system. Mathematics is rendered with [KaTeX](https://katex.org). Code is executed in Python via Jupyter kernels.
+
+The source is version-controlled with Git and hosted on [GitHub](https://github.com/DiegoFilippoMarino/Eigenholm). Deployment is automated through GitHub Actions to GitHub Pages.
+
+## Typography
+
+Headings use [Inter](https://rsms.me/inter/), a typeface designed for computer screens. Body text uses the browser's default serif stack. Code is set in the system monospace font.
+
+## Design
+
+The visual identity is intentionally restrained: generous whitespace, a muted teal accent, uppercase headings with wide tracking, and minimal decoration. The coordinate-dot motif references the mathematical meaning of *eigen* — characteristic values, fixed points, structure.
+
+## Citing articles
+
+Each article on this site includes automatically generated citation metadata. Use the citation appendix at the bottom of any article to reference it in your own work.
+
+## Contact
+
+<!-- Replace with your preferred contact method -->
+For questions, corrections, or collaboration, open an issue on the [GitHub repository](https://github.com/DiegoFilippoMarino/Eigenholm/issues).

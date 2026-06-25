@@ -100,7 +100,17 @@ font-style: inherit;">"Quadratic function"</span>) </span>
 
 </section>
 
- ]]></description>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{filippo_marino2026,
+  author = {Filippo Marino, Diego},
+  title = {My {First} {Technical} {Post}},
+  date = {2026-06-25},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-filippo_marino2026" class="csl-entry quarto-appendix-citeas">
+Filippo Marino, Diego. 2026. <span>“My First Technical Post.”</span>
+June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/">https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</a>.
+</div></div></section></div> ]]></description>
   <category>Python</category>
   <category>Mathematics</category>
   <category>Test</category>

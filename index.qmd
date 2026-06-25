@@ -7,6 +7,7 @@ listing:
   type: default
   categories: true
   feed: true
+  fields: [title, description, author, date, categories, reading-time]
 page-layout: full
 toc: false
 title-block-banner: false

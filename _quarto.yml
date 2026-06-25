@@ -7,6 +7,9 @@ website:
   repo-url: "https://github.com/DiegoFilippoMarino/Eigenholm"
   repo-actions: [source, issue]
   description: "Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing."
+  favicon: favicon.svg
+  open-graph: true
+  twitter-card: true
   navbar:
     left:
       - href: index.qmd
@@ -22,14 +25,29 @@ website:
         href: https://github.com/DiegoFilippoMarino/Eigenholm
         aria-label: GitHub
   page-footer:
-    left: "© 2026 Eigenholm"
+    left: "© 2026 Eigenholm · [Colophon](colophon.html)"
     right: "Built with [Quarto](https://quarto.org)"
+  comments:
+    giscus:
+      repo: DiegoFilippoMarino/Eigenholm
+      repo-id: "R_kgDOTEzjQw"
+      category: "Announcements"
+      category-id: "DIC_kwDOTEzjQ84C_3sV"
+      mapping: pathname
+      reactions-enabled: true
+      input-position: bottom
+      theme:
+        light: light
+        dark: dark_dimmed
+
+citation: true
 
 format:
   html:
     theme:
       light: [cosmo, custom.scss]
       dark: [darkly, custom-dark.scss]
+    html-math-method: katex
     toc: true
     code-copy: true
     code-overflow: wrap

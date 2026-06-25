@@ -4,14 +4,63 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Technical projects, implementations, and research experiments.\nEach project includes source code, documentation, and — where applicable — links to the relevant papers or references.\n\nProjects will appear here as they are published. Check back soon, or visit the GitHub repository for the latest work."
+    "text": "Technical projects, implementations, and research experiments.\nEach project includes source code, documentation, and — where applicable — links to the relevant papers or references.\n\nProjects will appear here as they are published. Check back soon, or visit the GitHub repository for the latest work.\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  title = {Projects},\n  url = {https://diegofilippomarino.github.io/Eigenholm/projects.html},\n  langid = {en}\n}\nFor attribution, please cite this work as:\n“Projects.” n.d. https://diegofilippomarino.github.io/Eigenholm/projects.html."
   },
   {
     "objectID": "notes.html",
     "href": "notes.html",
     "title": "Notes",
     "section": "",
-    "text": "Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.\nUnlike full articles, notes are informal — meant to capture ideas and technical details as they develop.\n\nResearch notes will appear here as they are written."
+    "text": "Short-form research notes, reading logs, implementation sketches, and work-in-progress observations.\nUnlike full articles, notes are informal — meant to capture ideas and technical details as they develop.\n\nResearch notes will appear here as they are written.\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  title = {Notes},\n  url = {https://diegofilippomarino.github.io/Eigenholm/notes.html},\n  langid = {en}\n}\nFor attribution, please cite this work as:\n“Notes.” n.d. https://diegofilippomarino.github.io/Eigenholm/notes.html."
+  },
+  {
+    "objectID": "colophon.html",
+    "href": "colophon.html",
+    "title": "Colophon",
+    "section": "",
+    "text": "Eigenholm is an independent technical website and research notebook maintained by Diego Filippo Marino."
+  },
+  {
+    "objectID": "colophon.html#purpose",
+    "href": "colophon.html#purpose",
+    "title": "Colophon",
+    "section": "Purpose",
+    "text": "Purpose\nThis site publishes research notes, paper analyses, implementation details, and technical experiments. The goal is to think carefully about problems in machine learning, mathematics, and scientific computing — and to document what is learned along the way.\nArticles here are written for a technical audience. They aim to be precise, reproducible, and useful."
+  },
+  {
+    "objectID": "colophon.html#tools",
+    "href": "colophon.html#tools",
+    "title": "Colophon",
+    "section": "Tools",
+    "text": "Tools\nThis site is built with Quarto, an open-source scientific publishing system. Mathematics is rendered with KaTeX. Code is executed in Python via Jupyter kernels.\nThe source is version-controlled with Git and hosted on GitHub. Deployment is automated through GitHub Actions to GitHub Pages."
+  },
+  {
+    "objectID": "colophon.html#typography",
+    "href": "colophon.html#typography",
+    "title": "Colophon",
+    "section": "Typography",
+    "text": "Typography\nHeadings use Inter, a typeface designed for computer screens. Body text uses the browser’s default serif stack. Code is set in the system monospace font."
+  },
+  {
+    "objectID": "colophon.html#design",
+    "href": "colophon.html#design",
+    "title": "Colophon",
+    "section": "Design",
+    "text": "Design\nThe visual identity is intentionally restrained: generous whitespace, a muted teal accent, uppercase headings with wide tracking, and minimal decoration. The coordinate-dot motif references the mathematical meaning of eigen — characteristic values, fixed points, structure."
+  },
+  {
+    "objectID": "colophon.html#citing-articles",
+    "href": "colophon.html#citing-articles",
+    "title": "Colophon",
+    "section": "Citing articles",
+    "text": "Citing articles\nEach article on this site includes automatically generated citation metadata. Use the citation appendix at the bottom of any article to reference it in your own work."
+  },
+  {
+    "objectID": "colophon.html#contact",
+    "href": "colophon.html#contact",
+    "title": "Colophon",
+    "section": "Contact",
+    "text": "Contact\n\nFor questions, corrections, or collaboration, open an issue on the GitHub repository."
   },
   {
     "objectID": "about.html",
@@ -39,7 +88,7 @@
     "href": "index.html",
     "title": "Eigenholm",
     "section": "",
-    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n\n\n\n\nNo matching items"
+    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n1 min\n\n\n\n\nNo matching items\n\n\n\n\n\nCitationBibTeX citation:@online{untitled,\n  author = {},\n  url = {https://diegofilippomarino.github.io/Eigenholm/},\n  langid = {en}\n}\nFor attribution, please cite this work as:\nn.d. https://diegofilippomarino.github.io/Eigenholm/."
   },
   {
     "objectID": "posts/first-technical-post/index.html",
@@ -60,7 +109,7 @@
     "href": "posts/first-technical-post/index.html#a-mathematical-example",
     "title": "My First Technical Post",
     "section": "A mathematical example",
-    "text": "A mathematical example\nConsider the mean squared error:\n\\[\n\\mathcal{L}(\\theta)\n=\n\\frac{1}{N}\n\\sum_{i=1}^{N}\n\\left(f_\\theta(x_i)-y_i\\right)^2\n\\tag{1}\\]\nEquation Equation 1 measures the average squared difference between predictions and targets."
+    "text": "A mathematical example\nConsider the mean squared error:\n\n\\mathcal{L}(\\theta)\n=\n\\frac{1}{N}\n\\sum_{i=1}^{N}\n\\left(f_\\theta(x_i)-y_i\\right)^2\n\\tag{1}\nEquation Equation 1 measures the average squared difference between predictions and targets."
   },
   {
     "objectID": "posts/first-technical-post/index.html#a-python-example",
