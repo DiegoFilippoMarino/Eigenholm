@@ -11,6 +11,8 @@ page-layout: full
 
 Welcome to my personal technical blog.
 
+This site is built with Quarto and automatically deployed with GitHub Actions.
+
 Here I publish:
 
 - technical analyses of research papers;
