@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Diego Filippo Marino">
-<meta name="dcterms.date" content="2026-08-13">
-<meta name="description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
+<meta name="dcterms.date" content="2026-08-14">
+<meta name="description" content="Why candidate correlation and verifier error determine whether more test-time sampling improves reasoning or merely searches harder for a mistake.">
 
-<title>The Geometry of Rotary Position Embeddings – Eigenholm</title>
+<title>Inference Compute Has Two Ceilings – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -180,17 +180,17 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
-<meta property="og:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
+<meta property="og:title" content="Inference Compute Has Two Ceilings – Eigenholm">
+<meta property="og:description" content="Why candidate correlation and verifier error determine whether more test-time sampling improves reasoning or merely searches harder for a mistake.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/index_files/figure-html/fig-correlated-passk-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="938">
-<meta property="og:image:width" content="1519">
-<meta name="twitter:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
-<meta name="twitter:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
-<meta name="twitter:image-height" content="938">
-<meta name="twitter:image-width" content="1519">
+<meta property="og:image:height" content="708">
+<meta property="og:image:width" content="1365">
+<meta name="twitter:title" content="Inference Compute Has Two Ceilings – Eigenholm">
+<meta name="twitter:description" content="Why candidate correlation and verifier error determine whether more test-time sampling improves reasoning or merely searches harder for a mistake.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/index_files/figure-html/fig-correlated-passk-output-1.png">
+<meta name="twitter:image-height" content="708">
+<meta name="twitter:image-width" content="1365">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -413,15 +413,16 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#a-two-dimensional-representation-of-position" id="toc-a-two-dimensional-representation-of-position" class="nav-link active" data-scroll-target="#a-two-dimensional-representation-of-position">A two-dimensional representation of position</a></li>
-  <li><a href="#complex-notation-exposes-the-mechanism" id="toc-complex-notation-exposes-the-mechanism" class="nav-link" data-scroll-target="#complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</a></li>
-  <li><a href="#a-vectorized-implementation" id="toc-a-vectorized-implementation" class="nav-link" data-scroll-target="#a-vectorized-implementation">A vectorized implementation</a></li>
-  <li><a href="#why-extrapolation-is-difficult" id="toc-why-extrapolation-is-difficult" class="nav-link" data-scroll-target="#why-extrapolation-is-difficult">Why extrapolation is difficult</a></li>
-  <li><a href="#numerical-and-implementation-details" id="toc-numerical-and-implementation-details" class="nav-link" data-scroll-target="#numerical-and-implementation-details">Numerical and implementation details</a></li>
-  <li><a href="#what-rope-buys" id="toc-what-rope-buys" class="nav-link" data-scroll-target="#what-rope-buys">What RoPE buys</a></li>
+  <li><a href="#coverage-is-not-selection" id="toc-coverage-is-not-selection" class="nav-link active" data-scroll-target="#coverage-is-not-selection">Coverage is not selection</a></li>
+  <li><a href="#first-ceiling-samples-are-correlated" id="toc-first-ceiling-samples-are-correlated" class="nav-link" data-scroll-target="#first-ceiling-samples-are-correlated">First ceiling: samples are correlated</a></li>
+  <li><a href="#second-ceiling-selection-searches-the-verifier" id="toc-second-ceiling-selection-searches-the-verifier" class="nav-link" data-scroll-target="#second-ceiling-selection-searches-the-verifier">Second ceiling: selection searches the verifier</a></li>
+  <li><a href="#why-process-supervision-helps-but-does-not-remove-the-ceiling" id="toc-why-process-supervision-helps-but-does-not-remove-the-ceiling" class="nav-link" data-scroll-target="#why-process-supervision-helps-but-does-not-remove-the-ceiling">Why process supervision helps, but does not remove the ceiling</a></li>
+  <li><a href="#rl-with-verifiable-rewards-changes-the-proposal" id="toc-rl-with-verifiable-rewards-changes-the-proposal" class="nav-link" data-scroll-target="#rl-with-verifiable-rewards-changes-the-proposal">RL with verifiable rewards changes the proposal</a></li>
+  <li><a href="#compute-optimal-allocation-needs-two-confidence-estimates" id="toc-compute-optimal-allocation-needs-two-confidence-estimates" class="nav-link" data-scroll-target="#compute-optimal-allocation-needs-two-confidence-estimates">Compute-optimal allocation needs two confidence estimates</a></li>
+  <li><a href="#what-the-toy-model-omits" id="toc-what-the-toy-model-omits" class="nav-link" data-scroll-target="#what-the-toy-model-omits">What the toy model omits</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/test-time-compute-ceilings/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -429,17 +430,17 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">The Geometry of Rotary Position Embeddings</h1>
+<h1 class="title">Inference Compute Has Two Ceilings</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Transformers</div>
-    <div class="quarto-category">Positional Encoding</div>
-    <div class="quarto-category">Mathematics</div>
+    <div class="quarto-category">Reasoning</div>
+    <div class="quarto-category">Test-Time Compute</div>
+    <div class="quarto-category">Evaluation</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.
+    Why candidate correlation and verifier error determine whether more test-time sampling improves reasoning or merely searches harder for a mistake.
   </div>
 </div>
 
@@ -456,7 +457,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 13, 2026</p>
+      <p class="date">August 14, 2026</p>
     </div>
   </div>
   
@@ -468,160 +469,231 @@ window.Quarto = {
 </header>
 
 
-<p>Self-attention is permutation equivariant. If the rows of <span class="math inline">Q</span>, <span class="math inline">K</span>, and <span class="math inline">V</span> are permuted together, the output rows are permuted in the same way. A language model therefore needs an additional structure that distinguishes token order.</p>
-<p>Rotary position embedding, usually called RoPE, inserts that structure by rotating query and key coordinates <span class="citation" data-cites="su2024roformer">(<a href="#ref-su2024roformer" role="doc-biblioref">Su et al. 2024</a>)</span>. The construction is small enough to fit in a few lines of code, but its real value is algebraic: absolute positions become relative offsets inside the attention dot product.</p>
-<section id="a-two-dimensional-representation-of-position" class="level2">
-<h2 class="anchored" data-anchor-id="a-two-dimensional-representation-of-position">A two-dimensional representation of position</h2>
-<p>For one coordinate pair, define</p>
-<p><span class="math display">
-R(m\theta)=
-\begin{bmatrix}
-\cos(m\theta)&amp;-\sin(m\theta)\\
-\sin(m\theta)&amp; \cos(m\theta)
-\end{bmatrix}.
-</span></p>
-<p>At position <span class="math inline">m</span>, RoPE maps <span class="math inline">q\mapsto R(m\theta)q</span> and <span class="math inline">k\mapsto R(m\theta)k</span>. Orthogonality and the group law <span class="math inline">R(a)^\top R(b)=R(b-a)</span> give</p>
-<p><span id="eq-relative"><span class="math display">
-\langle R(m\theta)q,R(n\theta)k\rangle
-=q^\top R((n-m)\theta)k.
+<p>Sampling more solutions sounds like a monotone strategy. If one attempt has probability <span class="math inline">p</span> of being correct, then <span class="math inline">k</span> independent attempts succeed at least once with probability</p>
+<p><span id="eq-independent-passk"><span class="math display">
+\operatorname{pass@}k=1-(1-p)^k.
 \tag{1}</span></span></p>
-<p>The inputs carry absolute angles, but the logit depends only on <span class="math inline">n-m</span>. Equation <a href="#eq-relative" class="quarto-xref">Equation&nbsp;1</a> is the core of RoPE.</p>
-<p>For even dimension <span class="math inline">d</span>, the complete operator is block diagonal:</p>
-<p><span class="math display">
-R_{\Theta,m}=\operatorname{diag}
-\left(R(m\theta_0),R(m\theta_1),\ldots,R(m\theta_{d/2-1})\right),
-</span></p>
-<p>with the conventional schedule</p>
-<p><span class="math display">
-\theta_i=b^{-2i/d},\qquad b=10{,}000.
-</span></p>
-<p>The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.</p>
-<div id="cell-fig-rope-frequencies" class="cell" data-execution_count="1">
+<p>The formula is correct and often misleading. Real samples share failure modes, and a practical system still needs to select one answer. More compute can hit a correlation ceiling before it hits a generation ceiling. It can then hit a verifier ceiling, where additional search finds outputs that exploit the scorer rather than solve the task.</p>
+<p>These are separate failures. Pass@k measures whether a correct candidate exists. Best-of-<span class="math inline">N</span>, self-consistency, and search measure whether a selection rule returns it. Conflating the two makes test-time scaling curves look more mysterious than they are.</p>
+<section id="coverage-is-not-selection" class="level2">
+<h2 class="anchored" data-anchor-id="coverage-is-not-selection">Coverage is not selection</h2>
+<p>Given <span class="math inline">n</span> sampled programs with <span class="math inline">c</span> correct ones, the standard unbiased estimator is</p>
+<p><span id="eq-passk-estimator"><span class="math display">
+\widehat{\operatorname{pass@}k}
+=1-\frac{\binom{n-c}{k}}{\binom{n}{k}}.
+\tag{2}</span></span></p>
+<p>It asks an oracle question: would at least one of <span class="math inline">k</span> samples pass the checker? The metric originated in code generation, where unit tests make this oracle operational <span class="citation" data-cites="chen2021codex">(<a href="#ref-chen2021codex" role="doc-biblioref"><span class="nocase">Chen et al.</span> 2021</a>)</span>. It does not specify how to recognize the passing sample without running the checker.</p>
+<p>Self-consistency chooses the modal final answer among independently sampled chains of thought <span class="citation" data-cites="wang2023selfconsistency">(<a href="#ref-wang2023selfconsistency" role="doc-biblioref">Wang et al. 2023</a>)</span>. Best-of-<span class="math inline">N</span> uses a learned or rule-based verifier. Process reward models score intermediate steps, providing denser credit than outcome-only reward models <span class="citation" data-cites="lightman2023verify">(<a href="#ref-lightman2023verify" role="doc-biblioref">Lightman et al. 2023</a>)</span>. These methods turn latent coverage into useful accuracy, but each introduces its own assumptions.</p>
+</section>
+<section id="first-ceiling-samples-are-correlated" class="level2">
+<h2 class="anchored" data-anchor-id="first-ceiling-samples-are-correlated">First ceiling: samples are correlated</h2>
+<p>Equation <a href="#eq-independent-passk" class="quarto-xref">Equation&nbsp;1</a> assumes that each attempt is an independent Bernoulli trial with the same fixed <span class="math inline">p</span>. A simple alternative gives each problem a latent success rate</p>
+<p><span id="eq-beta-binomial"><span class="math display">
+P\sim\operatorname{Beta}(\alpha,\beta),qquad
+Y_i\mid P\sim\operatorname{Bernoulli}(P).
+\tag{3}</span></span></p>
+<p>Marginally, attempts have mean success probability <span class="math inline">p=\alpha/(\alpha+\beta)</span> and positive pairwise correlation</p>
+<p><span id="eq-intraclass-correlation"><span class="math display">
+\rho=\frac{1}{\alpha+\beta+1}.
+\tag{4}</span></span></p>
+<p>The probability of at least one success is</p>
+<p><span id="eq-correlated-passk"><span class="math display">
+\Pr\left(\max_iY_i=1\right)
+=1-\frac{B(\alpha,\beta+k)}{B(\alpha,\beta)}
+=1-\prod_{i=0}^{k-1}\frac{\beta+i}{\alpha+\beta+i}.
+\tag{5}</span></span></p>
+<p>As <span class="math inline">\rho</span> grows, failures cluster by problem. Ten paraphrases of the same mistaken plan are not ten independent attempts.</p>
+<div id="cell-fig-correlated-passk" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">64</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="dv">10_000</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">24</span>])</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair_ids <span class="op">/</span> d)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">4097</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, i, frequency <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, pair_ids, theta):</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    ax.plot(offset, np.cos(offset <span class="op">*</span> frequency), lw<span class="op">=</span><span class="fl">1.1</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="vs">fr"pair </span><span class="dv">$</span><span class="vs">i=</span><span class="sc">{</span>i<span class="sc">}</span><span class="dv">$</span><span class="vs">, period </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">pprox </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>np<span class="sc">.</span>pi<span class="op">/</span>frequency<span class="sc">:.0f}</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[<span class="op">-</span><span class="dv">1</span>]:</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"relative offset"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[:, <span class="dv">0</span>]:</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"cosine phase"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fl">0.20</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">257</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> beta_binomial_passk(k_values, mean, rho):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rho <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span> <span class="op">-</span> (<span class="dv">1</span> <span class="op">-</span> mean) <span class="op">**</span> k_values</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    concentration <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> rho <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> mean <span class="op">*</span> concentration</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> mean) <span class="op">*</span> concentration</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    failure <span class="op">=</span> np.ones_like(k_values, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    running <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">int</span>(k_values.<span class="bu">max</span>())):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        running <span class="op">*=</span> (beta <span class="op">+</span> i) <span class="op">/</span> (alpha <span class="op">+</span> beta <span class="op">+</span> i)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        failure[i] <span class="op">=</span> running</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">-</span> failure</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rho <span class="kw">in</span> [<span class="dv">0</span>, <span class="fl">0.02</span>, <span class="fl">0.10</span>, <span class="fl">0.30</span>]:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    ax.plot(k, beta_binomial_passk(k, p, rho), label<span class="op">=</span><span class="ss">f"correlation $</span><span class="ch">\\</span><span class="ss">rho=</span><span class="sc">{</span>rho<span class="sc">:.2f}</span><span class="ss">$"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="st">"samples $k$"</span>, ylabel<span class="op">=</span><span class="st">"probability of at least one success"</span>, title<span class="op">=</span><span class="st">"A correlation ceiling on candidate coverage"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.02</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div id="fig-rope-frequencies" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-correlated-passk" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-rope-frequencies-output-1.png" width="760" height="469" class="figure-img">
+<div aria-describedby="fig-correlated-passk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-correlated-passk-output-1.png" width="683" height="354" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-correlated-passk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Pass@k under equal marginal pass@1 but different within-problem sample correlations. Independence greatly overstates the value of repeated draws when failures share a latent cause.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>The schedule is not a collection of position counters. Each pair is periodic and therefore ambiguous on its own. Position is represented by the joint phase across all pairs.</p>
+<p>The beta-binomial model is not a model of language generation. It is a diagnostic model of shared uncertainty. It tells us what a pass@k curve can reveal: its curvature contains information about whether sampling explores new modes or repeats old ones.</p>
+<p>Temperature, prompt perturbations, tool access, and genuinely different reasoning strategies matter because they can reduce correlation, not simply because they make individual samples noisier.</p>
 </section>
-<section id="complex-notation-exposes-the-mechanism" class="level2">
-<h2 class="anchored" data-anchor-id="complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</h2>
-<p>Identify a coordinate pair <span class="math inline">(x_{2i},x_{2i+1})</span> with the complex number <span class="math inline">z_i=x_{2i}+\mathrm{i}x_{2i+1}</span>. Rotation becomes multiplication:</p>
-<p><span class="math display">
-z_i^{(m)}=z_i e^{\mathrm{i}m\theta_i}.
-</span></p>
-<p>The real part of the Hermitian product between a rotated query and key contains</p>
-<p><span class="math display">
-\operatorname{Re}\left(q_i\overline{k_i}e^{\mathrm{i}(m-n)\theta_i}\right).
-</span></p>
-<p>This makes two facts visible. First, relative position modulates content similarity rather than adding an independent bias. Second, the model can learn how much each frequency matters by shaping <span class="math inline">q_i\overline{k_i}</span> through the projection matrices.</p>
-</section>
-<section id="a-vectorized-implementation" class="level2">
-<h2 class="anchored" data-anchor-id="a-vectorized-implementation">A vectorized implementation</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_rope(x: np.ndarray, positions: np.ndarray, base: <span class="bu">float</span> <span class="op">=</span> <span class="fl">10_000.0</span>):</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Rotate x with shape [sequence, heads, head_dim]."""</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> x.shape[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> d <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span>np.arange(<span class="dv">0</span>, d, <span class="dv">2</span>) <span class="op">/</span> d)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> positions[:, <span class="va">None</span>] <span class="op">*</span> inv_freq[<span class="va">None</span>, :]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    cos, sin <span class="op">=</span> np.cos(angle)[:, <span class="va">None</span>, :], np.sin(angle)[:, <span class="va">None</span>, :]</span>
+<section id="second-ceiling-selection-searches-the-verifier" class="level2">
+<h2 class="anchored" data-anchor-id="second-ceiling-selection-searches-the-verifier">Second ceiling: selection searches the verifier</h2>
+<p>Suppose candidates belong to three classes:</p>
+<ol type="1">
+<li>correct solutions;</li>
+<li>ordinary incorrect solutions;</li>
+<li>rare incorrect solutions that trigger a verifier blind spot.</li>
+</ol>
+<p>Let a learned verifier assign noisy Gaussian scores. Correct candidates have a positive mean score, ordinary errors have mean zero, and exploit candidates have an even higher mean. The third class may be rare under the generator. Its chance of appearing nevertheless grows as <span class="math inline">1-(1-h)^N</span>.</p>
+<div id="cell-fig-verifier-ceiling" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">19</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>budgets <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> np.arange(<span class="dv">0</span>, <span class="dv">11</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>trials <span class="op">=</span> <span class="dv">18000</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>p_correct <span class="op">=</span> <span class="fl">0.18</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>p_exploit <span class="op">=</span> <span class="fl">0.003</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> []</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>selected <span class="op">=</span> []</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>majority <span class="op">=</span> []</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    even, odd <span class="op">=</span> x[..., <span class="dv">0</span>::<span class="dv">2</span>], x[..., <span class="dv">1</span>::<span class="dv">2</span>]</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(x)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> cos <span class="op">-</span> odd <span class="op">*</span> sin</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> sin <span class="op">+</span> odd <span class="op">*</span> cos</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Real kernels often use a <code>rotate_half</code> formulation or interleave dimensions differently. The pairing convention may vary, but queries and keys must use the same convention.</p>
-</section>
-<section id="why-extrapolation-is-difficult" class="level2">
-<h2 class="anchored" data-anchor-id="why-extrapolation-is-difficult">Why extrapolation is difficult</h2>
-<p>RoPE defines angles at every integer position, so it is mechanically valid beyond the training length. That does not imply reliable extrapolation. At longer contexts, the model encounters phase combinations and attention distances absent during training.</p>
-<p>For a training limit <span class="math inline">L</span>, frequency pair <span class="math inline">i</span> completes</p>
-<p><span class="math display">
-c_i(L)=\frac{L\theta_i}{2\pi}
-</span></p>
-<p>cycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.</p>
-<div id="cell-fig-rope-cycles" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> np.arange(d <span class="op">//</span> <span class="dv">2</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair <span class="op">/</span> d)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> length <span class="kw">in</span> (<span class="dv">2048</span>, <span class="dv">32768</span>):</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(pair, length <span class="op">*</span> inv_freq <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> np.pi), marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>length<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">1</span>, color<span class="op">=</span><span class="st">"0.5"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"coordinate-pair index"</span>, ylabel<span class="op">=</span><span class="st">"completed rotations"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> budgets:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 0 = ordinary wrong, 1 = correct, 2 = verifier exploit</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> rng.random((trials, n))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    kind <span class="op">=</span> np.zeros_like(u, dtype<span class="op">=</span>np.int8)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    kind[u <span class="op">&lt;</span> p_exploit] <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    kind[(u <span class="op">&gt;=</span> p_exploit) <span class="op">&amp;</span> (u <span class="op">&lt;</span> p_exploit <span class="op">+</span> p_correct)] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    oracle.append(np.mean(np.<span class="bu">any</span>(kind <span class="op">==</span> <span class="dv">1</span>, axis<span class="op">=</span><span class="dv">1</span>)))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    score <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>(trials, n))</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    score <span class="op">+=</span> (kind <span class="op">==</span> <span class="dv">1</span>) <span class="op">*</span> <span class="fl">1.8</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    score <span class="op">+=</span> (kind <span class="op">==</span> <span class="dv">2</span>) <span class="op">*</span> <span class="fl">4.0</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    winner <span class="op">=</span> np.argmax(score, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    selected.append(np.mean(kind[np.arange(trials), winner] <span class="op">==</span> <span class="dv">1</span>))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Correct paths agree on one answer. Ordinary errors spread over 12 answers;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># exploit errors share a convincing but wrong answer.</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    answers <span class="op">=</span> rng.integers(<span class="dv">2</span>, <span class="dv">14</span>, size<span class="op">=</span>(trials, n))</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    answers[kind <span class="op">==</span> <span class="dv">1</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    answers[kind <span class="op">==</span> <span class="dv">2</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> np.stack([(answers <span class="op">==</span> a).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="cf">for</span> a <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">14</span>)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    majority.append(np.mean(np.argmax(counts, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">==</span> <span class="dv">0</span>))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>ax.plot(budgets, oracle, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"oracle pass@N"</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>ax.plot(budgets, selected, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"learned verifier"</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>ax.plot(budgets, majority, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"self-consistency"</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>ax.set_xscale(<span class="st">"log"</span>, base<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>shown <span class="op">=</span> budgets[::<span class="dv">2</span>]</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(shown, [<span class="ss">f"$2^</span><span class="ch">{{</span><span class="sc">{</span>i<span class="sc">}</span><span class="ch">}}</span><span class="ss">$"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">11</span>, <span class="dv">2</span>)])</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"candidate budget $N$"</span>, ylabel<span class="op">=</span><span class="st">"probability returned answer is correct"</span>, title<span class="op">=</span><span class="st">"Coverage can rise while usable accuracy falls"</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.02</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div id="fig-rope-cycles" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-verifier-ceiling" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-rope-cycles-output-1.png" width="661" height="336" class="figure-img">
+<div aria-describedby="fig-verifier-ceiling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-verifier-ceiling-output-1.png" width="683" height="354" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-verifier-ceiling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A synthetic selection experiment. Oracle pass@N rises monotonically, but a misspecified verifier eventually selects rare high-scoring errors as the search budget grows.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Changing the base <span class="math inline">b</span> stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.</p>
+<p>The decline is not caused by sampling itself. The oracle curve still improves. It is caused by optimizing a proxy over a growing candidate set. Extreme-value search amplifies small regions where the verifier is systematically wrong.</p>
+<p>This synthetic mechanism mirrors a practical warning in test-time search: beam or lookahead search can over-optimize a process reward model, particularly on easier problems where the base proposal was already adequate <span class="citation" data-cites="snell2024testtime">(<a href="#ref-snell2024testtime" role="doc-biblioref">Snell et al. 2024</a>)</span>. A verifier is not a passive measurement device. Once it determines which candidate survives, the generator and search procedure exert optimization pressure against it.</p>
 </section>
-<section id="numerical-and-implementation-details" class="level2">
-<h2 class="anchored" data-anchor-id="numerical-and-implementation-details">Numerical and implementation details</h2>
-<p>RoPE preserves vector norms in exact arithmetic because every block is orthogonal. This provides a useful unit test:</p>
+<section id="why-process-supervision-helps-but-does-not-remove-the-ceiling" class="level2">
+<h2 class="anchored" data-anchor-id="why-process-supervision-helps-but-does-not-remove-the-ceiling">Why process supervision helps, but does not remove the ceiling</h2>
+<p>An outcome reward model sees only whether the final answer is correct. A process reward model assigns step-level probabilities <span class="math inline">r_t</span> and may score a solution by</p>
 <p><span class="math display">
-\|R_{\Theta,m}x\|_2=\|x\|_2.
+R_{\mathrm{process}}=\prod_{t=1}^{T}r_t
+\quad\text{or}\quad
+\log R_{\mathrm{process}}=\sum_{t=1}^{T}\log r_t.
 </span></p>
-<p>It also preserves a strict relative-position identity. For random <span class="math inline">q,k,m,n</span>, the following quantities should agree:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> np.dot(rotate(q, m), rotate(k, n))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> np.dot(q, rotate(k, n <span class="op">-</span> m))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>np.testing.assert_allclose(left, right, rtol<span class="op">=</span><span class="fl">1e-6</span>, atol<span class="op">=</span><span class="fl">1e-6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>For long contexts, compute the trigonometric tables with care. Low-precision angle formation can lose phase accuracy before the final vectors are cast to the model dtype. Many implementations form frequencies or angles in FP32 even when attention runs in BF16 or FP16.</p>
+<p>Step supervision improves credit assignment. In the MATH experiments of Lightman et al., process supervision selected better solutions than outcome supervision and majority voting, with the gap growing at larger best-of-<span class="math inline">N</span> budgets <span class="citation" data-cites="lightman2023verify">(<a href="#ref-lightman2023verify" role="doc-biblioref">Lightman et al. 2023</a>)</span>.</p>
+<p>The result is evidence that verifier quality moves the ceiling. It is not evidence that the ceiling disappears. Distribution shift across generator families, mislabeled intermediate steps, and search-induced adversarial examples all matter. A rule-based checker is preferable when one exists because its semantics are tied to the task rather than learned from examples.</p>
 </section>
-<section id="what-rope-buys" class="level2">
-<h2 class="anchored" data-anchor-id="what-rope-buys">What RoPE buys</h2>
-<p>RoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate <span class="math inline">Q</span> and <span class="math inline">K</span>, leave <span class="math inline">V</span> unchanged, and preserve the rest of the attention kernel.</p>
-<p>The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.</p>
+<section id="rl-with-verifiable-rewards-changes-the-proposal" class="level2">
+<h2 class="anchored" data-anchor-id="rl-with-verifiable-rewards-changes-the-proposal">RL with verifiable rewards changes the proposal</h2>
+<p>RL with verifiable rewards moves probability mass toward outputs that pass a deterministic checker. DeepSeek-R1 showed that this can elicit longer and more structured reasoning without human step labels <span class="citation" data-cites="deepseek2025r1">(<a href="#ref-deepseek2025r1" role="doc-biblioref">DeepSeek-AI 2025</a>)</span>. It also changes the interpretation of test-time scaling.</p>
+<p>Recent work compares base and RL-trained models across large <span class="math inline">k</span> and reports a crossover: RL models improve pass@1, while the base model can retain broader large-<span class="math inline">k</span> coverage <span class="citation" data-cites="yue2025rlvr">(<a href="#ref-yue2025rlvr" role="doc-biblioref">Yue et al. 2025</a>)</span>. The proposed interpretation is distribution sharpening. RL makes successful modes easier to sample but may narrow the set of reachable modes.</p>
+<p>This can be written as two distinct objectives. Training for average reward increases</p>
+<p><span class="math display">
+J(\theta)=\mathbb E_{y\sim\pi_\theta(\cdot\mid x)}[V(x,y)],
+</span></p>
+<p>while broad capability coverage depends on the support and tail mass of <span class="math inline">\pi_\theta</span>. Raising the first need not expand the second.</p>
+<p>The evidence is not an impossibility theorem. A sufficiently exploratory RL procedure could discover new useful modes. The important methodological point is that pass@1 cannot tell these stories apart. Large-<span class="math inline">k</span> evaluation, diversity diagnostics, and base-model likelihoods provide additional evidence.</p>
+</section>
+<section id="compute-optimal-allocation-needs-two-confidence-estimates" class="level2">
+<h2 class="anchored" data-anchor-id="compute-optimal-allocation-needs-two-confidence-estimates">Compute-optimal allocation needs two confidence estimates</h2>
+<p>Adaptive test-time compute is usually framed around problem difficulty. Snell et al.&nbsp;show that different strategies win in different difficulty regimes, and adaptive allocation can match a fixed strategy with substantially less compute <span class="citation" data-cites="snell2024testtime">(<a href="#ref-snell2024testtime" role="doc-biblioref">Snell et al. 2024</a>)</span>.</p>
+<p>Difficulty alone is insufficient. A scheduler should estimate at least two quantities:</p>
+<p><span id="eq-marginal-compute"><span class="math display">
+\text{marginal value of another proposal}
+\approx
+\Pr(\text{new mode})\times
+\Pr(\text{recognize it correctly}).
+\tag{6}</span></span></p>
+<p>The first factor falls when candidates are correlated. The second falls when selection enters a region where the verifier is poorly calibrated.</p>
+<p>A practical controller could monitor:</p>
+<ul>
+<li>semantic or program-structure diversity among candidates;</li>
+<li>disagreement between independent verifiers;</li>
+<li>score margins and calibration on held-out search traces;</li>
+<li>growth of oracle-checkable pass@k on a development subset;</li>
+<li>the frequency with which higher verifier scores fail external checks.</li>
+</ul>
+<p>Stopping only when verifier confidence is high can be dangerous, because the search itself manufactures high confidence. Stopping when independent information gain is low is a safer principle.</p>
+</section>
+<section id="what-the-toy-model-omits" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-toy-model-omits">What the toy model omits</h2>
+<p>Real chains of thought are not exchangeable Bernoulli trials. Candidate quality depends on decoding history, and search can deliberately branch from partial states. Correct answers may also have many textual forms, complicating majority voting. The exploit class in the simulation is deliberately explicit, while real verifier failures form a changing continuum.</p>
+<p>The model is still useful because it separates three curves that are often reported as one:</p>
+<ol type="1">
+<li><strong>proposal coverage:</strong> did any candidate solve the task?</li>
+<li><strong>selection accuracy:</strong> did the policy return a correct candidate?</li>
+<li><strong>compute efficiency:</strong> how much new information did each additional candidate add?</li>
+</ol>
+<p>More inference compute is valuable when it explores genuinely different possibilities and when the selection mechanism remains reliable over the expanded search distribution. If either condition fails, scaling <span class="math inline">N</span> is not reasoning harder. It is paying to repeat a mistake or to find a new way to fool the judge.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-su2024roformer" class="csl-entry" role="listitem">
-Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024. <span>“RoFormer: Enhanced Transformer with Rotary Position Embedding.”</span> <em>Neurocomputing</em> 568: 127063. <a href="https://doi.org/10.1016/j.neucom.2023.127063">https://doi.org/10.1016/j.neucom.2023.127063</a>.
+<div id="ref-chen2021codex" class="csl-entry" role="listitem">
+<span class="nocase">Chen, Mark, Jerry Tworek, Heewoo Jun, et al.</span> 2021. <span>“Evaluating Large Language Models Trained on Code.”</span> <em>arXiv Preprint arXiv:2107.03374</em>. <a href="https://arxiv.org/abs/2107.03374">https://arxiv.org/abs/2107.03374</a>.
+</div>
+<div id="ref-deepseek2025r1" class="csl-entry" role="listitem">
+DeepSeek-AI. 2025. <span>“DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning.”</span> <em>arXiv Preprint arXiv:2501.12948</em>. <a href="https://arxiv.org/abs/2501.12948">https://arxiv.org/abs/2501.12948</a>.
+</div>
+<div id="ref-lightman2023verify" class="csl-entry" role="listitem">
+Lightman, Hunter, Vineet Kosaraju, Yura Burda, et al. 2023. <span>“Let’s Verify Step by Step.”</span> <em>arXiv Preprint arXiv:2305.20050</em>. <a href="https://arxiv.org/abs/2305.20050">https://arxiv.org/abs/2305.20050</a>.
+</div>
+<div id="ref-snell2024testtime" class="csl-entry" role="listitem">
+Snell, Charlie, Jaehoon Lee, Kelvin Xu, and Aviral Kumar. 2024. <span>“Scaling LLM Test-Time Compute Optimally Can Be More Effective Than Scaling Model Parameters.”</span> <em>arXiv Preprint arXiv:2408.03314</em>. <a href="https://arxiv.org/abs/2408.03314">https://arxiv.org/abs/2408.03314</a>.
+</div>
+<div id="ref-wang2023selfconsistency" class="csl-entry" role="listitem">
+Wang, Xuezhi, Jason Wei, Dale Schuurmans, et al. 2023. <span>“Self-Consistency Improves Chain of Thought Reasoning in Language Models.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2203.11171">https://arxiv.org/abs/2203.11171</a>.
+</div>
+<div id="ref-yue2025rlvr" class="csl-entry" role="listitem">
+Yue, Yang, Zhiqi Chen, Rui Lu, et al. 2025. <span>“Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?”</span> <em>arXiv Preprint arXiv:2504.13837</em>. <a href="https://arxiv.org/abs/2504.13837">https://arxiv.org/abs/2504.13837</a>.
 </div>
 </div>
 
@@ -630,14 +702,14 @@ Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
   author = {Marino, Diego Filippo},
-  title = {The {Geometry} of {Rotary} {Position} {Embeddings}},
-  date = {2026-08-13},
-  url = {https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/},
+  title = {Inference {Compute} {Has} {Two} {Ceilings}},
+  date = {2026-08-14},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Marino, Diego Filippo. 2026. <span>“The Geometry of Rotary Position
-Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/">https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/</a>.
+Marino, Diego Filippo. 2026. <span>“Inference Compute Has Two
+Ceilings.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/">https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1099,7 +1171,7 @@ Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/E
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/test-time-compute-ceilings/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>

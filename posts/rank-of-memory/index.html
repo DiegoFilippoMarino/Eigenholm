@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Diego Filippo Marino">
-<meta name="dcterms.date" content="2026-08-13">
-<meta name="description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
+<meta name="dcterms.date" content="2026-08-14">
+<meta name="description" content="A matrix view of attention and state-space models that makes compressed memory capacity measurable at a sequence boundary.">
 
-<title>The Geometry of Rotary Position Embeddings – Eigenholm</title>
+<title>The Rank of Memory – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -180,17 +180,17 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
-<meta property="og:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
+<meta property="og:title" content="The Rank of Memory – Eigenholm">
+<meta property="og:description" content="A matrix view of attention and state-space models that makes compressed memory capacity measurable at a sequence boundary.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/index_files/figure-html/fig-ssm-rank-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="938">
-<meta property="og:image:width" content="1519">
-<meta name="twitter:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
-<meta name="twitter:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
-<meta name="twitter:image-height" content="938">
-<meta name="twitter:image-width" content="1519">
+<meta property="og:image:height" content="632">
+<meta property="og:image:width" content="1596">
+<meta name="twitter:title" content="The Rank of Memory – Eigenholm">
+<meta name="twitter:description" content="A matrix view of attention and state-space models that makes compressed memory capacity measurable at a sequence boundary.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/index_files/figure-html/fig-ssm-rank-output-1.png">
+<meta name="twitter:image-height" content="632">
+<meta name="twitter:image-width" content="1596">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -413,15 +413,16 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#a-two-dimensional-representation-of-position" id="toc-a-two-dimensional-representation-of-position" class="nav-link active" data-scroll-target="#a-two-dimensional-representation-of-position">A two-dimensional representation of position</a></li>
-  <li><a href="#complex-notation-exposes-the-mechanism" id="toc-complex-notation-exposes-the-mechanism" class="nav-link" data-scroll-target="#complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</a></li>
-  <li><a href="#a-vectorized-implementation" id="toc-a-vectorized-implementation" class="nav-link" data-scroll-target="#a-vectorized-implementation">A vectorized implementation</a></li>
-  <li><a href="#why-extrapolation-is-difficult" id="toc-why-extrapolation-is-difficult" class="nav-link" data-scroll-target="#why-extrapolation-is-difficult">Why extrapolation is difficult</a></li>
-  <li><a href="#numerical-and-implementation-details" id="toc-numerical-and-implementation-details" class="nav-link" data-scroll-target="#numerical-and-implementation-details">Numerical and implementation details</a></li>
-  <li><a href="#what-rope-buys" id="toc-what-rope-buys" class="nav-link" data-scroll-target="#what-rope-buys">What RoPE buys</a></li>
+  <li><a href="#unrolling-a-recurrence-into-a-matrix" id="toc-unrolling-a-recurrence-into-a-matrix" class="nav-link active" data-scroll-target="#unrolling-a-recurrence-into-a-matrix">Unrolling a recurrence into a matrix</a></li>
+  <li><a href="#a-cut-through-time" id="toc-a-cut-through-time" class="nav-link" data-scroll-target="#a-cut-through-time">A cut through time</a></li>
+  <li><a href="#verifying-the-factorization" id="toc-verifying-the-factorization" class="nav-link" data-scroll-target="#verifying-the-factorization">Verifying the factorization</a></li>
+  <li><a href="#attention-buys-cross-cut-rank" id="toc-attention-buys-cross-cut-rank" class="nav-link" data-scroll-target="#attention-buys-cross-cut-rank">Attention buys cross-cut rank</a></li>
+  <li><a href="#associative-memory-and-compression" id="toc-associative-memory-and-compression" class="nav-link" data-scroll-target="#associative-memory-and-compression">Associative memory and compression</a></li>
+  <li><a href="#hardware-does-not-erase-algebra" id="toc-hardware-does-not-erase-algebra" class="nav-link" data-scroll-target="#hardware-does-not-erase-algebra">Hardware does not erase algebra</a></li>
+  <li><a href="#what-this-model-leaves-out" id="toc-what-this-model-leaves-out" class="nav-link" data-scroll-target="#what-this-model-leaves-out">What this model leaves out</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rank-of-memory/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -429,17 +430,17 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">The Geometry of Rotary Position Embeddings</h1>
+<h1 class="title">The Rank of Memory</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Transformers</div>
-    <div class="quarto-category">Positional Encoding</div>
-    <div class="quarto-category">Mathematics</div>
+    <div class="quarto-category">Sequence Models</div>
+    <div class="quarto-category">State Space Models</div>
+    <div class="quarto-category">Linear Algebra</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.
+    A matrix view of attention and state-space models that makes compressed memory capacity measurable at a sequence boundary.
   </div>
 </div>
 
@@ -456,7 +457,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 13, 2026</p>
+      <p class="date">August 14, 2026</p>
     </div>
   </div>
   
@@ -468,160 +469,238 @@ window.Quarto = {
 </header>
 
 
-<p>Self-attention is permutation equivariant. If the rows of <span class="math inline">Q</span>, <span class="math inline">K</span>, and <span class="math inline">V</span> are permuted together, the output rows are permuted in the same way. A language model therefore needs an additional structure that distinguishes token order.</p>
-<p>Rotary position embedding, usually called RoPE, inserts that structure by rotating query and key coordinates <span class="citation" data-cites="su2024roformer">(<a href="#ref-su2024roformer" role="doc-biblioref">Su et al. 2024</a>)</span>. The construction is small enough to fit in a few lines of code, but its real value is algebraic: absolute positions become relative offsets inside the attention dot product.</p>
-<section id="a-two-dimensional-representation-of-position" class="level2">
-<h2 class="anchored" data-anchor-id="a-two-dimensional-representation-of-position">A two-dimensional representation of position</h2>
-<p>For one coordinate pair, define</p>
-<p><span class="math display">
-R(m\theta)=
-\begin{bmatrix}
-\cos(m\theta)&amp;-\sin(m\theta)\\
-\sin(m\theta)&amp; \cos(m\theta)
-\end{bmatrix}.
-</span></p>
-<p>At position <span class="math inline">m</span>, RoPE maps <span class="math inline">q\mapsto R(m\theta)q</span> and <span class="math inline">k\mapsto R(m\theta)k</span>. Orthogonality and the group law <span class="math inline">R(a)^\top R(b)=R(b-a)</span> give</p>
-<p><span id="eq-relative"><span class="math display">
-\langle R(m\theta)q,R(n\theta)k\rangle
-=q^\top R((n-m)\theta)k.
+<p>Attention and recurrence are often compared by counting operations. That comparison misses the harder question. What information can cross from an old prefix into a new suffix?</p>
+<p>For a linear recurrent model, the answer has an exact algebraic form: no more than the state dimension. The state is not just a cache with a different implementation. It is a rank constraint on communication through time. This observation connects selective state-space models, linear attention, semiseparable matrices, and the persistent advantage of hybrid architectures.</p>
+<section id="unrolling-a-recurrence-into-a-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="unrolling-a-recurrence-into-a-matrix">Unrolling a recurrence into a matrix</h2>
+<p>Consider a time-varying linear state-space model</p>
+<p><span id="eq-ssm-recurrence"><span class="math display">
+h_i=A_i h_{i-1}+B_i x_i,qquad y_i=C_i^\top h_i,
 \tag{1}</span></span></p>
-<p>The inputs carry absolute angles, but the logit depends only on <span class="math inline">n-m</span>. Equation <a href="#eq-relative" class="quarto-xref">Equation&nbsp;1</a> is the core of RoPE.</p>
-<p>For even dimension <span class="math inline">d</span>, the complete operator is block diagonal:</p>
+<p>where <span class="math inline">h_i\in\mathbb R^N</span>. Unrolling <a href="#eq-ssm-recurrence" class="quarto-xref">Equation&nbsp;1</a> gives</p>
+<p><span id="eq-ssm-unrolled"><span class="math display">
+y_i=\sum_{j\le i} C_i^\top
+\left(\prod_{k=j+1}^{i}A_k\right)B_j x_j.
+\tag{2}</span></span></p>
+<p>The complete sequence operator is therefore a lower-triangular matrix <span class="math inline">M</span> with entries</p>
+<p><span id="eq-ssm-matrix"><span class="math display">
+M_{ij}=C_i^\top A_iA_{i-1}\cdots A_{j+1}B_j,qquad j\le i.
+\tag{3}</span></span></p>
+<p>This is the matrix side of state-space duality <span class="citation" data-cites="dao2024transformers">(<a href="#ref-dao2024transformers" role="doc-biblioref">Dao and Gu 2024</a>)</span>. Computing <span class="math inline">Mx</span> directly looks like masked attention. Evaluating <a href="#eq-ssm-recurrence" class="quarto-xref">Equation&nbsp;1</a> is a linear scan. They are two schedules for the same operator.</p>
+<p>Mamba makes <span class="math inline">A_i</span>, <span class="math inline">B_i</span>, and <span class="math inline">C_i</span> depend on the current input, which restores content-dependent selection while retaining a recurrent evaluation <span class="citation" data-cites="gu2023mamba">(<a href="#ref-gu2023mamba" role="doc-biblioref">Gu and Dao 2023</a>)</span>. Mamba-2 takes the matrix view seriously. Its structured state-space duality algorithm mixes recurrent computation across blocks with matrix multiplication inside blocks <span class="citation" data-cites="dao2024transformers">(<a href="#ref-dao2024transformers" role="doc-biblioref">Dao and Gu 2024</a>)</span>.</p>
+</section>
+<section id="a-cut-through-time" class="level2">
+<h2 class="anchored" data-anchor-id="a-cut-through-time">A cut through time</h2>
+<p>Split a sequence after token <span class="math inline">s</span>. Let <span class="math inline">P=M_{s:n,0:s}</span> be the block mapping the entire prefix into future outputs. From <a href="#eq-ssm-matrix" class="quarto-xref">Equation&nbsp;3</a>,</p>
 <p><span class="math display">
-R_{\Theta,m}=\operatorname{diag}
-\left(R(m\theta_0),R(m\theta_1),\ldots,R(m\theta_{d/2-1})\right),
+P_{ij}=C_i^\top
+\underbrace{A_i\cdots A_{s+1}}_{L_i}
+\underbrace{A_s\cdots A_{j+1}B_j}_{R_j}.
 </span></p>
-<p>with the conventional schedule</p>
+<p>Collecting the left and right factors yields</p>
 <p><span class="math display">
-\theta_i=b^{-2i/d},\qquad b=10{,}000.
+P=LR,qquad L\in\mathbb R^{(n-s)\times N},quad
+R\in\mathbb R^{N\times s},
 </span></p>
-<p>The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.</p>
-<div id="cell-fig-rope-frequencies" class="cell" data-execution_count="1">
+<p>so</p>
+<p><span id="eq-cut-rank"><span class="math display">
+\operatorname{rank}(P)\le N.
+\tag{4}</span></span></p>
+<p>Equation <a href="#eq-cut-rank" class="quarto-xref">Equation&nbsp;4</a> is the operational meaning of an <span class="math inline">N</span>-dimensional state. Everything the future can recover about the prefix must pass through an <span class="math inline">N</span>-dimensional bottleneck at the cut.</p>
+<p>This statement does not say that an SSM remembers only <span class="math inline">N</span> tokens. A real-valued state can encode complicated summaries of arbitrarily long histories. It says that the <em>linearized channels of independent influence</em> across one boundary are bounded by <span class="math inline">N</span>. Exact associative recall of many unrelated items is difficult because those items compete for the same channels.</p>
+</section>
+<section id="verifying-the-factorization" class="level2">
+<h2 class="anchored" data-anchor-id="verifying-the-factorization">Verifying the factorization</h2>
+<p>The following experiment builds a stable diagonal time-varying SSM, evaluates it both as a recurrence and as a dense matrix, then inspects a prefix-to-suffix block.</p>
+<div id="cell-fig-ssm-rank" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">64</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="dv">10_000</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">24</span>])</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair_ids <span class="op">/</span> d)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">4097</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, i, frequency <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, pair_ids, theta):</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    ax.plot(offset, np.cos(offset <span class="op">*</span> frequency), lw<span class="op">=</span><span class="fl">1.1</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="vs">fr"pair </span><span class="dv">$</span><span class="vs">i=</span><span class="sc">{</span>i<span class="sc">}</span><span class="dv">$</span><span class="vs">, period </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">pprox </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>np<span class="sc">.</span>pi<span class="op">/</span>frequency<span class="sc">:.0f}</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[<span class="op">-</span><span class="dv">1</span>]:</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"relative offset"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[:, <span class="dv">0</span>]:</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"cosine phase"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>length, state_dim, cut <span class="op">=</span> <span class="dv">64</span>, <span class="dv">4</span>, <span class="dv">32</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Diagonal, stable, and time-varying transitions.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> <span class="fl">0.72</span> <span class="op">+</span> <span class="fl">0.22</span> <span class="op">*</span> rng.random((length, state_dim))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> rng.normal(size<span class="op">=</span>(length, state_dim))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> rng.normal(size<span class="op">=</span>(length, state_dim))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> rng.normal(size<span class="op">=</span>length)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> np.zeros((length, length))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(length):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    carried <span class="op">=</span> B[j].copy()</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    M[j, j] <span class="op">=</span> C[j] <span class="op">@</span> carried</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(j <span class="op">+</span> <span class="dv">1</span>, length):</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        carried <span class="op">=</span> A[i] <span class="op">*</span> carried</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        M[i, j] <span class="op">=</span> C[i] <span class="op">@</span> carried</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> np.zeros(state_dim)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>y_scan <span class="op">=</span> np.empty(length)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(length):</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> A[i] <span class="op">*</span> h <span class="op">+</span> B[i] <span class="op">*</span> x[i]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    y_scan[i] <span class="op">=</span> C[i] <span class="op">@</span> h</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(y_scan, M <span class="op">@</span> x, atol<span class="op">=</span><span class="fl">1e-10</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>cross <span class="op">=</span> M[cut:, :cut]</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>singular <span class="op">=</span> np.linalg.svd(cross, compute_uv<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>rank <span class="op">=</span> np.linalg.matrix_rank(cross, tol<span class="op">=</span><span class="fl">1e-10</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> rank <span class="op">&lt;=</span> state_dim</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">8.4</span>, <span class="fl">3.4</span>))</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> axes[<span class="dv">0</span>].imshow(M, cmap<span class="op">=</span><span class="st">"coolwarm"</span>, aspect<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axhline(cut <span class="op">-</span> <span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axvline(cut <span class="op">-</span> <span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"input position"</span>, ylabel<span class="op">=</span><span class="st">"output position"</span>, title<span class="op">=</span><span class="st">"Sequence operator $M$"</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>fig.colorbar(im, ax<span class="op">=</span>axes[<span class="dv">0</span>], fraction<span class="op">=</span><span class="fl">0.046</span>, label<span class="op">=</span><span class="st">"coupling"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(np.arange(<span class="dv">1</span>, <span class="bu">len</span>(singular) <span class="op">+</span> <span class="dv">1</span>), singular, <span class="st">"o-"</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axvline(state_dim <span class="op">+</span> <span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="ss">f"state size $N=</span><span class="sc">{</span>state_dim<span class="sc">}</span><span class="ss">$"</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"singular-value index"</span>, ylabel<span class="op">=</span><span class="st">"singular value"</span>, title<span class="op">=</span><span class="ss">f"Cross-cut rank = </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div id="fig-rope-frequencies" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-ssm-rank" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-rope-frequencies-output-1.png" width="760" height="469" class="figure-img">
+<div aria-describedby="fig-ssm-rank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-ssm-rank-output-1.png" width="798" height="316" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ssm-rank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The dense operator of a time-varying SSM and the singular spectrum of its prefix-to-suffix block. The numerical rank cannot exceed the four-dimensional state.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>The schedule is not a collection of position counters. Each pair is periodic and therefore ambiguous on its own. Position is represented by the joint phase across all pairs.</p>
+<p>The lower-left quadrant contains all influence of the prefix on the suffix. It looks dense, yet it has only four nonzero singular directions. Density and rank are different notions.</p>
 </section>
-<section id="complex-notation-exposes-the-mechanism" class="level2">
-<h2 class="anchored" data-anchor-id="complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</h2>
-<p>Identify a coordinate pair <span class="math inline">(x_{2i},x_{2i+1})</span> with the complex number <span class="math inline">z_i=x_{2i}+\mathrm{i}x_{2i+1}</span>. Rotation becomes multiplication:</p>
-<p><span class="math display">
-z_i^{(m)}=z_i e^{\mathrm{i}m\theta_i}.
-</span></p>
-<p>The real part of the Hermitian product between a rotated query and key contains</p>
-<p><span class="math display">
-\operatorname{Re}\left(q_i\overline{k_i}e^{\mathrm{i}(m-n)\theta_i}\right).
-</span></p>
-<p>This makes two facts visible. First, relative position modulates content similarity rather than adding an independent bias. Second, the model can learn how much each frequency matters by shaping <span class="math inline">q_i\overline{k_i}</span> through the projection matrices.</p>
-</section>
-<section id="a-vectorized-implementation" class="level2">
-<h2 class="anchored" data-anchor-id="a-vectorized-implementation">A vectorized implementation</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_rope(x: np.ndarray, positions: np.ndarray, base: <span class="bu">float</span> <span class="op">=</span> <span class="fl">10_000.0</span>):</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Rotate x with shape [sequence, heads, head_dim]."""</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> x.shape[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> d <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span>np.arange(<span class="dv">0</span>, d, <span class="dv">2</span>) <span class="op">/</span> d)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> positions[:, <span class="va">None</span>] <span class="op">*</span> inv_freq[<span class="va">None</span>, :]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    cos, sin <span class="op">=</span> np.cos(angle)[:, <span class="va">None</span>, :], np.sin(angle)[:, <span class="va">None</span>, :]</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    even, odd <span class="op">=</span> x[..., <span class="dv">0</span>::<span class="dv">2</span>], x[..., <span class="dv">1</span>::<span class="dv">2</span>]</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(x)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> cos <span class="op">-</span> odd <span class="op">*</span> sin</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> sin <span class="op">+</span> odd <span class="op">*</span> cos</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Real kernels often use a <code>rotate_half</code> formulation or interleave dimensions differently. The pairing convention may vary, but queries and keys must use the same convention.</p>
-</section>
-<section id="why-extrapolation-is-difficult" class="level2">
-<h2 class="anchored" data-anchor-id="why-extrapolation-is-difficult">Why extrapolation is difficult</h2>
-<p>RoPE defines angles at every integer position, so it is mechanically valid beyond the training length. That does not imply reliable extrapolation. At longer contexts, the model encounters phase combinations and attention distances absent during training.</p>
-<p>For a training limit <span class="math inline">L</span>, frequency pair <span class="math inline">i</span> completes</p>
-<p><span class="math display">
-c_i(L)=\frac{L\theta_i}{2\pi}
-</span></p>
-<p>cycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.</p>
-<div id="cell-fig-rope-cycles" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> np.arange(d <span class="op">//</span> <span class="dv">2</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair <span class="op">/</span> d)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> length <span class="kw">in</span> (<span class="dv">2048</span>, <span class="dv">32768</span>):</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(pair, length <span class="op">*</span> inv_freq <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> np.pi), marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>length<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">1</span>, color<span class="op">=</span><span class="st">"0.5"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"coordinate-pair index"</span>, ylabel<span class="op">=</span><span class="st">"completed rotations"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="attention-buys-cross-cut-rank" class="level2">
+<h2 class="anchored" data-anchor-id="attention-buys-cross-cut-rank">Attention buys cross-cut rank</h2>
+<p>Causal softmax attention has no fixed state at the boundary. Each future query can address every stored key separately. The corresponding cross-cut block can therefore have rank as large as <span class="math inline">\min(s,n-s)</span>, subject to the head dimension and the actual query-key geometry.</p>
+<p>To isolate this difference, compare a recurrent operator of state size <span class="math inline">N</span> with a causal attention matrix built from random queries and keys. Both maps are dense below the diagonal. Only one has a fixed cross-cut rank ceiling.</p>
+<div id="cell-fig-memory-spectra" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> causal_attention(q, k):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    scores <span class="op">=</span> q <span class="op">@</span> k.T <span class="op">/</span> np.sqrt(q.shape[<span class="dv">1</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    scores[np.triu_indices_from(scores, k<span class="op">=</span><span class="dv">1</span>)] <span class="op">=</span> <span class="op">-</span>np.inf</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    row_max <span class="op">=</span> np.<span class="bu">max</span>(scores, axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> np.exp(scores <span class="op">-</span> row_max)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">/=</span> weights.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> weights</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> rng.normal(size<span class="op">=</span>(length, <span class="dv">24</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> rng.normal(size<span class="op">=</span>(length, <span class="dv">24</span>))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>W <span class="op">=</span> causal_attention(q, k)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>s_ssm <span class="op">=</span> np.linalg.svd(M[cut:, :cut], compute_uv<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>s_attn <span class="op">=</span> np.linalg.svd(W[cut:, :cut], compute_uv<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>s_ssm <span class="op">/=</span> s_ssm[<span class="dv">0</span>]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>s_attn <span class="op">/=</span> s_attn[<span class="dv">0</span>]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> np.arange(<span class="dv">1</span>, cut <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.semilogy(idx, s_attn, <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">"causal softmax attention"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.semilogy(idx, np.maximum(s_ssm, <span class="fl">1e-16</span>), <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="ss">f"SSM, state </span><span class="sc">{</span>state_dim<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.axvline(state_dim <span class="op">+</span> <span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"singular-value index"</span>, ylabel<span class="op">=</span><span class="st">"value / largest value"</span>, title<span class="op">=</span><span class="st">"Information channels across one cut"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div id="fig-rope-cycles" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-memory-spectra" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-rope-cycles-output-1.png" width="661" height="336" class="figure-img">
+<div aria-describedby="fig-memory-spectra-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-memory-spectra-output-1.png" width="681" height="355" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-memory-spectra-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Normalized cross-boundary singular spectra. Full attention retains many independent prefix directions, while recurrent memory truncates after its state dimension.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Changing the base <span class="math inline">b</span> stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.</p>
-</section>
-<section id="numerical-and-implementation-details" class="level2">
-<h2 class="anchored" data-anchor-id="numerical-and-implementation-details">Numerical and implementation details</h2>
-<p>RoPE preserves vector norms in exact arithmetic because every block is orthogonal. This provides a useful unit test:</p>
+<p>This comparison also clarifies linear attention. Kernel attention can be written with a running state such as</p>
 <p><span class="math display">
-\|R_{\Theta,m}x\|_2=\|x\|_2.
+S_i=\sum_{j\le i}\phi(k_j)v_j^\top,qquad
+z_i=\sum_{j\le i}\phi(k_j),
 </span></p>
-<p>It also preserves a strict relative-position identity. For random <span class="math inline">q,k,m,n</span>, the following quantities should agree:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> np.dot(rotate(q, m), rotate(k, n))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> np.dot(q, rotate(k, n <span class="op">-</span> m))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>np.testing.assert_allclose(left, right, rtol<span class="op">=</span><span class="fl">1e-6</span>, atol<span class="op">=</span><span class="fl">1e-6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>For long contexts, compute the trigonometric tables with care. Low-precision angle formation can lose phase accuracy before the final vectors are cast to the model dtype. Many implementations form frequencies or angles in FP32 even when attention runs in BF16 or FP16.</p>
+<p>followed by <span class="math inline">y_i=\phi(q_i)^\top S_i/(\phi(q_i)^\top z_i)</span>. Its efficiency comes from a finite sufficient statistic. Performer improves the approximation to the softmax kernel, but the recurrent state still fixes the number of channels carried through time <span class="citation" data-cites="choromanski2021performer">(<a href="#ref-choromanski2021performer" role="doc-biblioref">Choromanski et al. 2021</a>)</span>.</p>
 </section>
-<section id="what-rope-buys" class="level2">
-<h2 class="anchored" data-anchor-id="what-rope-buys">What RoPE buys</h2>
-<p>RoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate <span class="math inline">Q</span> and <span class="math inline">K</span>, leave <span class="math inline">V</span> unchanged, and preserve the rest of the attention kernel.</p>
-<p>The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.</p>
+<section id="associative-memory-and-compression" class="level2">
+<h2 class="anchored" data-anchor-id="associative-memory-and-compression">Associative memory and compression</h2>
+<p>Modern Hopfield networks give a complementary view of attention. A softmax attention update is a continuous associative-memory lookup <span class="citation" data-cites="ramsauer2021hopfield">(<a href="#ref-ramsauer2021hopfield" role="doc-biblioref"><span class="nocase">Ramsauer et al.</span> 2021</a>)</span>. Keys remain individually addressable, so a query can retrieve one pattern without first compressing all patterns into a fixed-size summary.</p>
+<p>An SSM instead performs online lossy compression. Selection decides what to preserve, much like a learned write gate. This is why input-dependent dynamics matter so much in Mamba. The model does not remove the bottleneck. It learns a better compressor.</p>
+<p>The same view explains several empirical design choices:</p>
+<ol type="1">
+<li><strong>Larger state helps recall.</strong> Increasing <span class="math inline">N</span> raises the bound in <a href="#eq-cut-rank" class="quarto-xref">Equation&nbsp;4</a>.</li>
+<li><strong>Multiple heads partition memory.</strong> Independent recurrent heads provide separate low-rank channels.</li>
+<li><strong>Occasional attention layers reset the bottleneck.</strong> A hybrid can recover high-rank, content-addressed communication at selected depths.</li>
+<li><strong>Local attention is unusually compatible with recurrence.</strong> Recent tokens stay explicitly addressable while the distant past is summarized.</li>
+</ol>
+<p>Jamba follows this hybrid logic, interleaving Mamba and attention rather than treating them as mutually exclusive <span class="citation" data-cites="lieber2024jamba">(<a href="#ref-lieber2024jamba" role="doc-biblioref"><span class="nocase">Lieber et al.</span> 2024</a>)</span>. Hyena reaches long range through implicit convolutions and gating, another compressed operator with subquadratic evaluation <span class="citation" data-cites="poli2023hyena">(<a href="#ref-poli2023hyena" role="doc-biblioref">Poli et al. 2023</a>)</span>. RWKV makes the recurrent state especially explicit through time-decayed weighted key-value statistics <span class="citation" data-cites="peng2023rwkv">(<a href="#ref-peng2023rwkv" role="doc-biblioref"><span class="nocase">Peng et al.</span> 2023</a>)</span>.</p>
+</section>
+<section id="hardware-does-not-erase-algebra" class="level2">
+<h2 class="anchored" data-anchor-id="hardware-does-not-erase-algebra">Hardware does not erase algebra</h2>
+<p>The dense form may still be the fastest way to compute within a block. GPUs favor matrix multiplication, so Mamba-2 deliberately exposes a quadratic local form while keeping a recurrent global form. This is a systems result built on an algebraic result.</p>
+<p>It is useful to separate three questions:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Question</th>
+<th style="text-align: left;">Governing quantity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">How much work scales with sequence length?</td>
+<td style="text-align: left;">algorithmic schedule</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">How well does the hardware execute that work?</td>
+<td style="text-align: left;">arithmetic intensity and kernel shape</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">How many independent prefix directions reach the future?</td>
+<td style="text-align: left;">cross-cut rank</td>
+</tr>
+</tbody>
+</table>
+<p>A method can improve the first two without changing the third. Faster scans do not create more memory channels. Conversely, a larger state may improve recall but lose its throughput advantage if the scan is poorly mapped to hardware.</p>
+</section>
+<section id="what-this-model-leaves-out" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-model-leaves-out">What this model leaves out</h2>
+<p>Real sequence models are nonlinear, layered, data-dependent, and residual. A Jacobian at one input replaces the fixed linear operator used here, and ranks can change from layer to layer. Finite precision also makes numerical rank a spectrum rather than a sharp integer.</p>
+<p>Still, every recurrent layer must communicate through its state at each cut. The local Jacobian of that communication factors through the state, so the bottleneck survives linearization. Residual depth can compose and reroute information, but it cannot make a single fixed-size boundary state behave exactly like an arbitrarily large key-value store.</p>
+<p>The practical question is therefore not whether recurrence can remember. It can. The question is whether the task’s useful past admits a compact sufficient statistic. State-space models are strongest when the answer is yes. Attention remains valuable when future queries need many independently addressable facts whose relevance was impossible to predict when they first arrived.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-su2024roformer" class="csl-entry" role="listitem">
-Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024. <span>“RoFormer: Enhanced Transformer with Rotary Position Embedding.”</span> <em>Neurocomputing</em> 568: 127063. <a href="https://doi.org/10.1016/j.neucom.2023.127063">https://doi.org/10.1016/j.neucom.2023.127063</a>.
+<div id="ref-choromanski2021performer" class="csl-entry" role="listitem">
+Choromanski, Krzysztof, Valerii Likhosherstov, David Dohan, et al. 2021. <span>“Rethinking Attention with Performers.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2009.14794">https://arxiv.org/abs/2009.14794</a>.
+</div>
+<div id="ref-dao2024transformers" class="csl-entry" role="listitem">
+Dao, Tri, and Albert Gu. 2024. <span>“Transformers Are SSMs: Generalized Models and Efficient Algorithms Through Structured State Space Duality.”</span> <em>Proceedings of the 41st International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/2405.21060">https://arxiv.org/abs/2405.21060</a>.
+</div>
+<div id="ref-gu2023mamba" class="csl-entry" role="listitem">
+Gu, Albert, and Tri Dao. 2023. <span>“Mamba: Linear-Time Sequence Modeling with Selective State Spaces.”</span> <em>arXiv Preprint arXiv:2312.00752</em>. <a href="https://arxiv.org/abs/2312.00752">https://arxiv.org/abs/2312.00752</a>.
+</div>
+<div id="ref-lieber2024jamba" class="csl-entry" role="listitem">
+<span class="nocase">Lieber, Opher, Barak Lenz, Hofit Bata, et al.</span> 2024. <span>“Jamba: A Hybrid Transformer-Mamba Language Model.”</span> <em>arXiv Preprint arXiv:2403.19887</em>. <a href="https://arxiv.org/abs/2403.19887">https://arxiv.org/abs/2403.19887</a>.
+</div>
+<div id="ref-peng2023rwkv" class="csl-entry" role="listitem">
+<span class="nocase">Peng, Bo, Eric Alcaide, Quentin Anthony, et al.</span> 2023. <span>“RWKV: Reinventing RNNs for the Transformer Era.”</span> <em>Findings of the Association for Computational Linguistics: EMNLP 2023</em>. <a href="https://arxiv.org/abs/2305.13048">https://arxiv.org/abs/2305.13048</a>.
+</div>
+<div id="ref-poli2023hyena" class="csl-entry" role="listitem">
+Poli, Michael, Stefano Massaroli, Eric Nguyen, et al. 2023. <span>“Hyena Hierarchy: Towards Larger Convolutional Language Models.”</span> <em>Proceedings of the 40th International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/2302.10866">https://arxiv.org/abs/2302.10866</a>.
+</div>
+<div id="ref-ramsauer2021hopfield" class="csl-entry" role="listitem">
+<span class="nocase">Ramsauer, Hubert, Bernhard Schafl, Johannes Lehner, et al.</span> 2021. <span>“Hopfield Networks Is All You Need.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2008.02217">https://arxiv.org/abs/2008.02217</a>.
 </div>
 </div>
 
@@ -630,14 +709,14 @@ Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
   author = {Marino, Diego Filippo},
-  title = {The {Geometry} of {Rotary} {Position} {Embeddings}},
-  date = {2026-08-13},
-  url = {https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/},
+  title = {The {Rank} of {Memory}},
+  date = {2026-08-14},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Marino, Diego Filippo. 2026. <span>“The Geometry of Rotary Position
-Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/">https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/</a>.
+Marino, Diego Filippo. 2026. <span>“The Rank of Memory.”</span> August
+14. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/">https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1099,7 +1178,7 @@ Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/E
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rank-of-memory/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>
