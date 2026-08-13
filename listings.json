@@ -2,16 +2,21 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/new-article/index.html",
-      "/posts/first-technical-post/index.html"
+      "/posts/rope-geometry/index.html",
+      "/posts/attention-from-logits-to-context/index.html",
+      "/posts/flashattention-io-aware/index.html"
+    ]
+  },
+  {
+    "listing": "/projects/index.html",
+    "items": [
+      "/projects/paged-kv-cache-simulator/index.html"
     ]
   },
   {
     "listing": "/notes/index.html",
-    "items": []
-  },
-  {
-    "listing": "/projects/index.html",
-    "items": []
+    "items": [
+      "/notes/speculative-sampling/index.html"
+    ]
   }
 ]

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -40,14 +43,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-203cd6cfb07eb23d94ccac5e123ebbf5.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-b74e64cffdc1c3519890ddf72401242d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-9a658483228b3dcbfeaf3545aa0d1487.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-b74e64cffdc1c3519890ddf72401242d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -326,7 +329,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Eigenholm is an independent technical website and research notebook maintained by Diego Filippo Marino.</p>
 <section id="purpose" class="level2">
 <h2 class="anchored" data-anchor-id="purpose">Purpose</h2>
-<p>This site publishes research notes, paper analyses, implementation details, and technical experiments. The goal is to think carefully about problems in machine learning, mathematics, and scientific computing — and to document what is learned along the way.</p>
+<p>This site publishes research notes, paper analyses, implementation details, and technical experiments. The goal is to think carefully about problems in machine learning, mathematics, and scientific computing, then document what is learned along the way.</p>
 <p>Articles here are written for a technical audience. They aim to be precise, reproducible, and useful.</p>
 </section>
 <section id="tools" class="level2">
@@ -336,11 +339,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="typography" class="level2">
 <h2 class="anchored" data-anchor-id="typography">Typography</h2>
-<p>Headings use <a href="https://rsms.me/inter/">Inter</a>, a typeface designed for computer screens. Body text uses the browser’s default serif stack. Code is set in the system monospace font.</p>
+<p>Headings use <a href="https://fonts.google.com/specimen/Source+Serif+4">Source Serif 4</a>. Body text uses <a href="https://rsms.me/inter/">Inter</a>, a typeface designed for computer screens. Code uses a system-oriented monospace stack headed by Cascadia Code and JetBrains Mono.</p>
 </section>
 <section id="design" class="level2">
 <h2 class="anchored" data-anchor-id="design">Design</h2>
-<p>The visual identity is intentionally restrained: generous whitespace, a muted teal accent, uppercase headings with wide tracking, and minimal decoration. The coordinate-dot motif references the mathematical meaning of <em>eigen</em> — characteristic values, fixed points, structure.</p>
+<p>The visual identity is intentionally restrained: generous whitespace, a muted teal accent, clear hierarchy, and minimal decoration. The coordinate-dot motif references the mathematical meaning of <em>eigen</em>: characteristic values, fixed points, and structure.</p>
 </section>
 <section id="citing-articles" class="level2">
 <h2 class="anchored" data-anchor-id="citing-articles">Citing articles</h2>
@@ -348,7 +351,6 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="contact" class="level2">
 <h2 class="anchored" data-anchor-id="contact">Contact</h2>
-<!-- Replace with your preferred contact method -->
 <p>For questions, corrections, or collaboration, open an issue on the <a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues">GitHub repository</a>.</p>
 
 

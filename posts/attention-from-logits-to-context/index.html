@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Diego Filippo Marino">
+<meta name="dcterms.date" content="2026-08-13">
+<meta name="description" content="A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.">
 
-<title>Projects – Eigenholm</title>
+<title>Attention, from Logits to Context – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,33 +29,85 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../favicon.svg" rel="icon" type="image/svg+xml">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -80,35 +135,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-projects-list .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description','listing-author','listing-date','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-projects-list'] = new List('listing-projects-list', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -154,12 +180,18 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="Projects – Eigenholm">
-<meta property="og:description" content="Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing.">
+<meta property="og:title" content="Attention, from Logits to Context – Eigenholm">
+<meta property="og:description" content="A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index_files/figure-html/fig-scaling-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta name="twitter:title" content="Projects – Eigenholm">
-<meta name="twitter:description" content="Research notes, paper analyses, implementations, and technical projects in machine learning, mathematics, and scientific computing.">
-<meta name="twitter:card" content="summary">
+<meta property="og:image:height" content="670">
+<meta property="og:image:width" content="1326">
+<meta name="twitter:title" content="Attention, from Logits to Context – Eigenholm">
+<meta name="twitter:description" content="A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index_files/figure-html/fig-scaling-output-1.png">
+<meta name="twitter:image-height" content="670">
+<meta name="twitter:image-width" content="1326">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -331,7 +363,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Eigenholm</span>
     </a>
   </div>
@@ -342,19 +374,19 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Writing</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects/index.html" aria-current="page"> 
+    <a class="nav-link" href="../../projects/index.html"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../notes/index.html"> 
+    <a class="nav-link" href="../../notes/index.html"> 
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about/index.html"> 
+    <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -373,25 +405,61 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TExNJTIwU2VydmluZw==">LLM Serving <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWVtb3J5JTIwTWFuYWdlbWVudA==">Memory Management <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UHl0aG9u">Python <span class="quarto-category-count">(1)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-operation-and-its-shapes" id="toc-the-operation-and-its-shapes" class="nav-link active" data-scroll-target="#the-operation-and-its-shapes">The operation and its shapes</a></li>
+  <li><a href="#why-divide-by-sqrtd_k" id="toc-why-divide-by-sqrtd_k" class="nav-link" data-scroll-target="#why-divide-by-sqrtd_k">Why divide by <span class="math inline">\sqrt{d_k}</span>?</a></li>
+  <li><a href="#the-softmax-jacobian" id="toc-the-softmax-jacobian" class="nav-link" data-scroll-target="#the-softmax-jacobian">The softmax Jacobian</a></li>
+  <li><a href="#multi-head-attention-is-a-structured-factorization" id="toc-multi-head-attention-is-a-structured-factorization" class="nav-link" data-scroll-target="#multi-head-attention-is-a-structured-factorization">Multi-head attention is a structured factorization</a></li>
+  <li><a href="#memory-is-not-the-same-as-arithmetic" id="toc-memory-is-not-the-same-as-arithmetic" class="nav-link" data-scroll-target="#memory-is-not-the-same-as-arithmetic">Memory is not the same as arithmetic</a></li>
+  <li><a href="#what-the-equation-does-not-guarantee" id="toc-what-the-equation-does-not-guarantee" class="nav-link" data-scroll-target="#what-the-equation-does-not-guarantee">What the equation does not guarantee</a></li>
+  <li><a href="#practical-checks" id="toc-practical-checks" class="nav-link" data-scroll-target="#practical-checks">Practical checks</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/attention-from-logits-to-context/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
 <!-- main -->
-<main class="content column-page-left" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Projects</h1>
+<h1 class="title">Attention, from Logits to Context</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Transformers</div>
+    <div class="quarto-category">Attention</div>
+    <div class="quarto-category">Mathematics</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.
+  </div>
 </div>
 
 
+<div class="quarto-title-meta">
 
-<div class="quarto-title-meta column-page-left">
-
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Diego Filippo Marino </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 13, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -401,46 +469,152 @@ window.Quarto = {
 </header>
 
 
-<p>Technical projects, implementations, and research experiments.</p>
-<div id="listing-projects-list" class="quarto-listing quarto-listing-container-default">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="TExNJTIwU2VydmluZyUyQ01lbW9yeSUyME1hbmFnZW1lbnQlMkNQeXRob24=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786657838110" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1165">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../projects/paged-kv-cache-simulator/index.html" class="no-external">A Paged KV-Cache Allocator, Built from First Principles</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('TExNJTIwU2VydmluZw=='); return false;">LLM Serving</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('TWVtb3J5JTIwTWFuYWdlbWVudA=='); return false;">Memory Management</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('UHl0aG9u'); return false;">Python</div>
-
+<p>The compact formula for attention hides three separate operations: a learned similarity metric, a row-wise probability model, and a content lookup. Pulling those pieces apart is useful because most later improvements change only one of them.</p>
+<section id="the-operation-and-its-shapes" class="level2">
+<h2 class="anchored" data-anchor-id="the-operation-and-its-shapes">The operation and its shapes</h2>
+<p>Let a sequence be represented by <span class="math inline">X\in\mathbb{R}^{n\times d_{\text{model}}}</span>. A single head forms</p>
+<p><span class="math display">
+Q=XW^Q,\qquad K=XW^K,\qquad V=XW^V,
+</span></p>
+<p>where <span class="math inline">Q,K\in\mathbb{R}^{n\times d_k}</span> and <span class="math inline">V\in\mathbb{R}^{n\times d_v}</span>. Scaled dot-product attention is <span class="citation" data-cites="vaswani2017attention">(<a href="#ref-vaswani2017attention" role="doc-biblioref">Vaswani et al. 2017</a>)</span></p>
+<p><span id="eq-attention"><span class="math display">
+S=\frac{QK^\top}{\sqrt{d_k}},\qquad
+P=\operatorname{softmax}_{\text{row}}(S+M),\qquad
+O=PV. \tag{1}
+\tag{1}</span></span></p>
+<p>The score <span class="math inline">S_{ij}</span> measures how strongly query position <span class="math inline">i</span> selects key position <span class="math inline">j</span>. Each row of <span class="math inline">P</span> is a categorical distribution. The output <span class="math inline">o_i</span> is therefore a data-dependent convex combination of value vectors.</p>
+<p>For causal self-attention, the mask is</p>
+<p><span class="math display">
+M_{ij}=\begin{cases}
+0,&amp;j\le i,\\
+-\infty,&amp;j&gt;i.
+\end{cases}
+</span></p>
+<p>Adding the mask before softmax makes every illegal probability exactly zero in ideal arithmetic. In finite precision, implementations use either negative infinity or a sufficiently negative representable value.</p>
+</section>
+<section id="why-divide-by-sqrtd_k" class="level2">
+<h2 class="anchored" data-anchor-id="why-divide-by-sqrtd_k">Why divide by <span class="math inline">\sqrt{d_k}</span>?</h2>
+<p>Suppose the components of <span class="math inline">q</span> and <span class="math inline">k</span> are independent, centered, and have unit variance. Then</p>
+<p><span class="math display">
+\operatorname{Var}(q^\top k)
+=\operatorname{Var}\left(\sum_{r=1}^{d_k}q_rk_r\right)
+=d_k.
+</span></p>
+<p>The unscaled logit has standard deviation <span class="math inline">\sqrt{d_k}</span>. As the head dimension grows, the largest logit tends to dominate the softmax, reducing its entropy and concentrating the Jacobian near zero. Scaling restores an order-one logit variance.</p>
+<div id="cell-fig-scaling" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>dims <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>])</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>entropy_scaled, entropy_raw <span class="op">=</span> [], []</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, d))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">64</span>, d))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> np.einsum(<span class="st">"bd,bnd-&gt;bn"</span>, q, k)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> values, scale <span class="kw">in</span> ((entropy_raw, <span class="fl">1.0</span>), (entropy_scaled, np.sqrt(d))):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> logits <span class="op">/</span> scale</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        z <span class="op">-=</span> z.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> np.exp(z)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        p <span class="op">/=</span> p.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        values.append(np.mean(<span class="op">-</span>np.<span class="bu">sum</span>(p <span class="op">*</span> np.log(p <span class="op">+</span> <span class="fl">1e-30</span>), axis<span class="op">=</span><span class="dv">1</span>)))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_raw, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"unscaled"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_scaled, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"scaled by </span><span class="dv">$\s</span><span class="vs">qrt{d_k}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ax.axhline(np.log(<span class="dv">64</span>), color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="dv">1</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"uniform entropy"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>, ylabel<span class="op">=</span><span class="st">"entropy (nats)"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-scaling" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-scaling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-scaling-output-1.png" width="663" height="335" class="figure-img">
 </div>
-<div class="delink listing-description"><a href="../projects/paged-kv-cache-simulator/index.html" class="no-external">
-<p>An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../projects/paged-kv-cache-simulator/index.html" class="no-external">
-<div class="listing-date">
-Aug 13, 2026
-</div>
-<div class="listing-author">
-Diego Filippo Marino
-</div>
-</a>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-scaling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Mean attention entropy with and without the square-root scaling. Each point averages 400 random attention rows over 64 keys.
+</figcaption>
+</figure>
 </div>
 </div>
 </div>
-<div class="listing-no-matching d-none">No matching items</div>
+<p>The experiment is deliberately distributional rather than model-specific. It isolates the argument behind the normalization in <a href="#eq-attention" class="quarto-xref">Equation&nbsp;1</a>: without it, increasing width changes the effective temperature of attention.</p>
+</section>
+<section id="the-softmax-jacobian" class="level2">
+<h2 class="anchored" data-anchor-id="the-softmax-jacobian">The softmax Jacobian</h2>
+<p>For one row <span class="math inline">p=\operatorname{softmax}(s)</span>,</p>
+<p><span class="math display">
+\frac{\partial p_i}{\partial s_j}=p_i(\delta_{ij}-p_j),
+\qquad
+J_{\text{softmax}}=\operatorname{diag}(p)-pp^\top.
+</span></p>
+<p>This matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution. The same invariance explains the standard stable implementation</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax(x, axis<span class="op">=-</span><span class="dv">1</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    shifted <span class="op">=</span> x <span class="op">-</span> x.<span class="bu">max</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> np.exp(shifted)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> weights <span class="op">/</span> weights.<span class="bu">sum</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Subtracting the maximum changes neither <span class="math inline">P</span> nor the gradient, but prevents overflow in the exponential.</p>
+</section>
+<section id="multi-head-attention-is-a-structured-factorization" class="level2">
+<h2 class="anchored" data-anchor-id="multi-head-attention-is-a-structured-factorization">Multi-head attention is a structured factorization</h2>
+<p>With <span class="math inline">h</span> heads,</p>
+<p><span class="math display">
+\operatorname{MHA}(X)
+=\operatorname{Concat}(O_1,\ldots,O_h)W^O,
+</span></p>
+<p>where each <span class="math inline">O_r</span> has its own projected queries, keys, and values. For the common choice <span class="math inline">d_k=d_v=d_{\text{model}}/h</span>, the projection and attention FLOP counts remain approximately constant as <span class="math inline">h</span> changes:</p>
+<p><span class="math display">
+\underbrace{4nd_{\text{model}}^2}_{Q,K,V,O\text{ projections}}
++\underbrace{2n^2d_{\text{model}}}_{QK^\top\text{ and }PV}.
+</span></p>
+<p>Heads do not provide free capacity. They partition the channel dimension into several learned similarity spaces. Very small <span class="math inline">d_k</span> constrains each compatibility function, while a single wide head forces one attention distribution to serve every subspace.</p>
+</section>
+<section id="memory-is-not-the-same-as-arithmetic" class="level2">
+<h2 class="anchored" data-anchor-id="memory-is-not-the-same-as-arithmetic">Memory is not the same as arithmetic</h2>
+<p>The two matrix multiplications require <span class="math inline">O(n^2d)</span> arithmetic. A literal implementation also writes <span class="math inline">S</span> and <span class="math inline">P</span>, each with <span class="math inline">n^2</span> entries. At sequence length 16,384, one FP16 matrix for one batch-head pair occupies 512 MiB. The quadratic intermediate, not only the quadratic FLOP count, is the systems problem.</p>
+<p>This distinction leads directly to IO-aware kernels such as FlashAttention: equation <a href="#eq-attention" class="quarto-xref">Equation&nbsp;1</a> stays unchanged, but its evaluation order is reorganized so that <span class="math inline">S</span> and <span class="math inline">P</span> never reside in high-bandwidth memory as complete matrices.</p>
+</section>
+<section id="what-the-equation-does-not-guarantee" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-equation-does-not-guarantee">What the equation does not guarantee</h2>
+<p>Attention weights are conditional routing coefficients, not a causal explanation. A high value of <span class="math inline">P_{ij}</span> says that value <span class="math inline">v_j</span> contributes strongly to output <span class="math inline">o_i</span> under the current parameterization. Residual connections, value projections, later layers, and correlated features complicate any interpretation beyond that statement.</p>
+<p>The normalization also creates competition. Increasing one logit decreases other probabilities in the row, even when those keys are unrelated. This coupling is useful for selection, but it means that attention is not a set of independent relevance scores.</p>
+</section>
+<section id="practical-checks" class="level2">
+<h2 class="anchored" data-anchor-id="practical-checks">Practical checks</h2>
+<p>A minimal implementation should satisfy three invariants:</p>
+<ol type="1">
+<li>Every unmasked row sums to one within numerical tolerance.</li>
+<li>Masked probabilities are zero.</li>
+<li>Shifting a complete score row by any scalar leaves the output unchanged.</li>
+</ol>
+<p>Those tests catch axis errors and many masking mistakes before they become training pathologies.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-vaswani2017attention" class="csl-entry" role="listitem">
+Vaswani, Ashish, Noam Shazeer, Niki Parmar, et al. 2017. <span>“Attention Is All You Need.”</span> <em>Advances in Neural Information Processing Systems</em> 30. <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a>.
+</div>
 </div>
 
 
+</section>
 
-
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
+  author = {Marino, Diego Filippo},
+  title = {Attention, from {Logits} to {Context}},
+  date = {2026-08-13},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Marino, Diego Filippo. 2026. <span>“Attention, from Logits to
+Context.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/">https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/</a>.
+</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -861,15 +1035,47 @@ Diego Filippo Marino
     }
   });
   </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "DiegoFilippoMarino/Eigenholm";
+    script.dataset.repoId = "R_kgDOTEzjQw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOTEzjQ84C_3sV";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2026 Eigenholm · <a href="../colophon/">Colophon</a></p>
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/projects/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/attention-from-logits-to-context/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>

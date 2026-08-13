@@ -2,23 +2,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Diego Filippo Marino">
-<meta name="dcterms.date" content="2026-06-25">
-<meta name="description" content="A test article with mathematics, Python code, and a generated plot.">
+<meta name="dcterms.date" content="2026-08-13">
+<meta name="description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
 
-<title>My First Technical Post – Eigenholm</title>
+<title>The Geometry of Rotary Position Embeddings – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -61,7 +64,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -78,14 +100,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-203cd6cfb07eb23d94ccac5e123ebbf5.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-277854b2b7e1342fc0099984d259e089.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-8f7fb6d7711e0ad48f4f53bf2ecba958.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-277854b2b7e1342fc0099984d259e089.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -158,17 +180,17 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="My First Technical Post – Eigenholm">
-<meta property="og:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
+<meta property="og:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
+<meta property="og:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="900">
-<meta property="og:image:width" content="1153">
-<meta name="twitter:title" content="My First Technical Post – Eigenholm">
-<meta name="twitter:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
-<meta name="twitter:image-height" content="900">
-<meta name="twitter:image-width" content="1153">
+<meta property="og:image:height" content="938">
+<meta property="og:image:width" content="1519">
+<meta name="twitter:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
+<meta name="twitter:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
+<meta name="twitter:image-height" content="938">
+<meta name="twitter:image-width" content="1519">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -391,12 +413,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#a-mathematical-example" id="toc-a-mathematical-example" class="nav-link" data-scroll-target="#a-mathematical-example">A mathematical example</a></li>
-  <li><a href="#a-python-example" id="toc-a-python-example" class="nav-link" data-scroll-target="#a-python-example">A Python example</a></li>
-  <li><a href="#repository" id="toc-repository" class="nav-link" data-scroll-target="#repository">Repository</a></li>
+  <li><a href="#a-two-dimensional-representation-of-position" id="toc-a-two-dimensional-representation-of-position" class="nav-link active" data-scroll-target="#a-two-dimensional-representation-of-position">A two-dimensional representation of position</a></li>
+  <li><a href="#complex-notation-exposes-the-mechanism" id="toc-complex-notation-exposes-the-mechanism" class="nav-link" data-scroll-target="#complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</a></li>
+  <li><a href="#a-vectorized-implementation" id="toc-a-vectorized-implementation" class="nav-link" data-scroll-target="#a-vectorized-implementation">A vectorized implementation</a></li>
+  <li><a href="#why-extrapolation-is-difficult" id="toc-why-extrapolation-is-difficult" class="nav-link" data-scroll-target="#why-extrapolation-is-difficult">Why extrapolation is difficult</a></li>
+  <li><a href="#numerical-and-implementation-details" id="toc-numerical-and-implementation-details" class="nav-link" data-scroll-target="#numerical-and-implementation-details">Numerical and implementation details</a></li>
+  <li><a href="#what-rope-buys" id="toc-what-rope-buys" class="nav-link" data-scroll-target="#what-rope-buys">What RoPE buys</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -404,17 +429,17 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">My First Technical Post</h1>
+<h1 class="title">The Geometry of Rotary Position Embeddings</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Python</div>
+    <div class="quarto-category">Transformers</div>
+    <div class="quarto-category">Positional Encoding</div>
     <div class="quarto-category">Mathematics</div>
-    <div class="quarto-category">Test</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    A test article with mathematics, Python code, and a generated plot.
+    RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.
   </div>
 </div>
 
@@ -431,7 +456,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 25, 2026</p>
+      <p class="date">August 13, 2026</p>
     </div>
   </div>
   
@@ -443,70 +468,176 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This is the first article published on my technical blog.</p>
-<p>The purpose of this post is to verify that Quarto correctly renders:</p>
-<ul>
-<li>mathematical equations;</li>
-<li>Python code;</li>
-<li>Jupyter output;</li>
-<li>figures;</li>
-<li>links to external repositories.</li>
-</ul>
-</section>
-<section id="a-mathematical-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-mathematical-example">A mathematical example</h2>
-<p>Consider the mean squared error:</p>
-<p><span id="eq-mse"><span class="math display">
-\mathcal{L}(\theta)
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left(f_\theta(x_i)-y_i\right)^2
+<p>Self-attention is permutation equivariant. If the rows of <span class="math inline">Q</span>, <span class="math inline">K</span>, and <span class="math inline">V</span> are permuted together, the output rows are permuted in the same way. A language model therefore needs an additional structure that distinguishes token order.</p>
+<p>Rotary position embedding, usually called RoPE, inserts that structure by rotating query and key coordinates <span class="citation" data-cites="su2024roformer">(<a href="#ref-su2024roformer" role="doc-biblioref">Su et al. 2024</a>)</span>. The construction is small enough to fit in a few lines of code, but its real value is algebraic: absolute positions become relative offsets inside the attention dot product.</p>
+<section id="a-two-dimensional-representation-of-position" class="level2">
+<h2 class="anchored" data-anchor-id="a-two-dimensional-representation-of-position">A two-dimensional representation of position</h2>
+<p>For one coordinate pair, define</p>
+<p><span class="math display">
+R(m\theta)=
+\begin{bmatrix}
+\cos(m\theta)&amp;-\sin(m\theta)\\
+\sin(m\theta)&amp; \cos(m\theta)
+\end{bmatrix}.
+</span></p>
+<p>At position <span class="math inline">m</span>, RoPE maps <span class="math inline">q\mapsto R(m\theta)q</span> and <span class="math inline">k\mapsto R(m\theta)k</span>. Orthogonality and the group law <span class="math inline">R(a)^\top R(b)=R(b-a)</span> give</p>
+<p><span id="eq-relative"><span class="math display">
+\langle R(m\theta)q,R(n\theta)k\rangle
+=q^\top R((n-m)\theta)k. \tag{1}
 \tag{1}</span></span></p>
-<p>Equation <a href="#eq-mse" class="quarto-xref">Equation&nbsp;1</a> measures the average squared difference between predictions and targets.</p>
-</section>
-<section id="a-python-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-python-example">A Python example</h2>
-<div id="bade00e3" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<p>The inputs carry absolute angles, but the logit depends only on <span class="math inline">n-m</span>. Equation <a href="#eq-relative" class="quarto-xref">Equation&nbsp;1</a> is the core of RoPE.</p>
+<p>For even dimension <span class="math inline">d</span>, the complete operator is block diagonal:</p>
+<p><span class="math display">
+R_{\Theta,m}=\operatorname{diag}
+\left(R(m\theta_0),R(m\theta_1),\ldots,R(m\theta_{d/2-1})\right),
+</span></p>
+<p>with the conventional schedule</p>
+<p><span class="math display">
+\theta_i=b^{-2i/d},\qquad b=10{,}000.
+</span></p>
+<p>The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.</p>
+<div id="cell-fig-rope-frequencies" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">200</span>) </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>plt.plot(x, y) </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"x"</span>) </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"x²"</span>) </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Quadratic function"</span>) </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">24</span>])</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair_ids <span class="op">/</span> d)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">4097</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, i, frequency <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, pair_ids, theta):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    ax.plot(offset, np.cos(offset <span class="op">*</span> frequency), lw<span class="op">=</span><span class="fl">1.1</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="vs">fr"pair </span><span class="dv">$</span><span class="vs">i=</span><span class="sc">{</span>i<span class="sc">}</span><span class="dv">$</span><span class="vs">, period </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">pprox </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>np<span class="sc">.</span>pi<span class="op">/</span>frequency<span class="sc">:.0f}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"relative offset"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[:, <span class="dv">0</span>]:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"cosine phase"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-2-output-1.png" width="577" height="450" class="figure-img"></p>
+<div id="fig-rope-frequencies" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-rope-frequencies-output-1.png" width="760" height="469" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>The schedule is not a collection of position counters. Each pair is periodic and therefore ambiguous on its own. Position is represented by the joint phase across all pairs.</p>
 </section>
-<section id="repository" class="level2">
-<h2 class="anchored" data-anchor-id="repository">Repository</h2>
-<p>The complete source code for future projects will be available on GitHub. <a href="https://github.com/">View my GitHub profile</a></p>
+<section id="complex-notation-exposes-the-mechanism" class="level2">
+<h2 class="anchored" data-anchor-id="complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</h2>
+<p>Identify a coordinate pair <span class="math inline">(x_{2i},x_{2i+1})</span> with the complex number <span class="math inline">z_i=x_{2i}+\mathrm{i}x_{2i+1}</span>. Rotation becomes multiplication:</p>
+<p><span class="math display">
+z_i^{(m)}=z_i e^{\mathrm{i}m\theta_i}.
+</span></p>
+<p>The real part of the Hermitian product between a rotated query and key contains</p>
+<p><span class="math display">
+\operatorname{Re}\left(q_i\overline{k_i}e^{\mathrm{i}(m-n)\theta_i}\right).
+</span></p>
+<p>This makes two facts visible. First, relative position modulates content similarity rather than adding an independent bias. Second, the model can learn how much each frequency matters by shaping <span class="math inline">q_i\overline{k_i}</span> through the projection matrices.</p>
+</section>
+<section id="a-vectorized-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="a-vectorized-implementation">A vectorized implementation</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_rope(x: np.ndarray, positions: np.ndarray, base: <span class="bu">float</span> <span class="op">=</span> <span class="fl">10_000.0</span>):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Rotate x with shape [sequence, heads, head_dim]."""</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> x.shape[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> d <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span>np.arange(<span class="dv">0</span>, d, <span class="dv">2</span>) <span class="op">/</span> d)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> positions[:, <span class="va">None</span>] <span class="op">*</span> inv_freq[<span class="va">None</span>, :]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    cos, sin <span class="op">=</span> np.cos(angle)[:, <span class="va">None</span>, :], np.sin(angle)[:, <span class="va">None</span>, :]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    even, odd <span class="op">=</span> x[..., <span class="dv">0</span>::<span class="dv">2</span>], x[..., <span class="dv">1</span>::<span class="dv">2</span>]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(x)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> cos <span class="op">-</span> odd <span class="op">*</span> sin</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> sin <span class="op">+</span> odd <span class="op">*</span> cos</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Real kernels often use a <code>rotate_half</code> formulation or interleave dimensions differently. The pairing convention may vary, but queries and keys must use the same convention.</p>
+</section>
+<section id="why-extrapolation-is-difficult" class="level2">
+<h2 class="anchored" data-anchor-id="why-extrapolation-is-difficult">Why extrapolation is difficult</h2>
+<p>RoPE defines angles at every integer position, so it is mechanically valid beyond the training length. That does not imply reliable extrapolation. At longer contexts, the model encounters phase combinations and attention distances absent during training.</p>
+<p>For a training limit <span class="math inline">L</span>, frequency pair <span class="math inline">i</span> completes</p>
+<p><span class="math display">
+c_i(L)=\frac{L\theta_i}{2\pi}
+</span></p>
+<p>cycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.</p>
+<div id="cell-fig-rope-cycles" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> np.arange(d <span class="op">//</span> <span class="dv">2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair <span class="op">/</span> d)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> length <span class="kw">in</span> (<span class="dv">2048</span>, <span class="dv">32768</span>):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(pair, length <span class="op">*</span> inv_freq <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> np.pi), marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>length<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">1</span>, color<span class="op">=</span><span class="st">"0.5"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"coordinate-pair index"</span>, ylabel<span class="op">=</span><span class="st">"completed rotations"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-rope-cycles" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-rope-cycles-output-1.png" width="661" height="336" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Changing the base <span class="math inline">b</span> stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.</p>
+</section>
+<section id="numerical-and-implementation-details" class="level2">
+<h2 class="anchored" data-anchor-id="numerical-and-implementation-details">Numerical and implementation details</h2>
+<p>RoPE preserves vector norms in exact arithmetic because every block is orthogonal. This provides a useful unit test:</p>
+<p><span class="math display">
+\|R_{\Theta,m}x\|_2=\|x\|_2.
+</span></p>
+<p>It also preserves a strict relative-position identity. For random <span class="math inline">q,k,m,n</span>, the following quantities should agree:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> np.dot(rotate(q, m), rotate(k, n))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> np.dot(q, rotate(k, n <span class="op">-</span> m))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>np.testing.assert_allclose(left, right, rtol<span class="op">=</span><span class="fl">1e-6</span>, atol<span class="op">=</span><span class="fl">1e-6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For long contexts, compute the trigonometric tables with care. Low-precision angle formation can lose phase accuracy before the final vectors are cast to the model dtype. Many implementations form frequencies or angles in FP32 even when attention runs in BF16 or FP16.</p>
+</section>
+<section id="what-rope-buys" class="level2">
+<h2 class="anchored" data-anchor-id="what-rope-buys">What RoPE buys</h2>
+<p>RoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate <span class="math inline">Q</span> and <span class="math inline">K</span>, leave <span class="math inline">V</span> unchanged, and preserve the rest of the attention kernel.</p>
+<p>The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-su2024roformer" class="csl-entry" role="listitem">
+Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024. <span>“RoFormer: Enhanced Transformer with Rotary Position Embedding.”</span> <em>Neurocomputing</em> 568: 127063. <a href="https://doi.org/10.1016/j.neucom.2023.127063">https://doi.org/10.1016/j.neucom.2023.127063</a>.
+</div>
+</div>
 
 
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
   author = {Marino, Diego Filippo},
-  title = {My {First} {Technical} {Post}},
-  date = {2026-06-25},
-  url = {https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/},
+  title = {The {Geometry} of {Rotary} {Position} {Embeddings}},
+  date = {2026-08-13},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Marino, Diego Filippo. 2026. <span>“My First Technical Post.”</span>
-June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/">https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</a>.
+Marino, Diego Filippo. 2026. <span>“The Geometry of Rotary Position
+Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/">https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -964,11 +1095,11 @@ June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-tec
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2026 Eigenholm · <a href="../..\colophon/">Colophon</a></p>
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>

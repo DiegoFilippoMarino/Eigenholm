@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/speculative-sampling/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.109Z</lastmod>
+  </url>
+  <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.611Z</lastmod>
+    <lastmod>2026-08-13T21:50:38.108Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.109Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/colophon/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.611Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.612Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.612Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/new-article/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.612Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/about/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.611Z</lastmod>
+    <lastmod>2026-08-13T21:50:38.108Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/projects/index.html</loc>
-    <lastmod>2026-06-25T16:44:49.612Z</lastmod>
+    <lastmod>2026-08-13T21:50:38.110Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.110Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/about/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.108Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.110Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.109Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/index.html</loc>
+    <lastmod>2026-08-13T21:50:38.109Z</lastmod>
   </url>
 </urlset>

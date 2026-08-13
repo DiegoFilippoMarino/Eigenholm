@@ -2,23 +2,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Diego Filippo Marino">
-<meta name="dcterms.date" content="2026-06-25">
-<meta name="description" content="A test article with mathematics, Python code, and a generated plot.">
+<meta name="dcterms.date" content="2026-08-13">
+<meta name="description" content="An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.">
 
-<title>My First Technical Post – Eigenholm</title>
+<title>A Paged KV-Cache Allocator, Built from First Principles – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -61,7 +64,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -78,14 +100,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-203cd6cfb07eb23d94ccac5e123ebbf5.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-277854b2b7e1342fc0099984d259e089.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-8f7fb6d7711e0ad48f4f53bf2ecba958.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-277854b2b7e1342fc0099984d259e089.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -158,17 +180,17 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="My First Technical Post – Eigenholm">
-<meta property="og:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
+<meta property="og:title" content="A Paged KV-Cache Allocator, Built from First Principles – Eigenholm">
+<meta property="og:description" content="An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index_files/figure-html/fig-kv-capacity-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="900">
-<meta property="og:image:width" content="1153">
-<meta name="twitter:title" content="My First Technical Post – Eigenholm">
-<meta name="twitter:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
-<meta name="twitter:image-height" content="900">
-<meta name="twitter:image-width" content="1153">
+<meta property="og:image:height" content="709">
+<meta property="og:image:width" content="1325">
+<meta name="twitter:title" content="A Paged KV-Cache Allocator, Built from First Principles – Eigenholm">
+<meta name="twitter:description" content="An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index_files/figure-html/fig-kv-capacity-output-1.png">
+<meta name="twitter:image-height" content="709">
+<meta name="twitter:image-width" content="1325">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -391,12 +413,17 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#a-mathematical-example" id="toc-a-mathematical-example" class="nav-link" data-scroll-target="#a-mathematical-example">A mathematical example</a></li>
-  <li><a href="#a-python-example" id="toc-a-python-example" class="nav-link" data-scroll-target="#a-python-example">A Python example</a></li>
-  <li><a href="#repository" id="toc-repository" class="nav-link" data-scroll-target="#repository">Repository</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#cache-size" id="toc-cache-size" class="nav-link" data-scroll-target="#cache-size">Cache size</a></li>
+  <li><a href="#allocation-model" id="toc-allocation-model" class="nav-link" data-scroll-target="#allocation-model">Allocation model</a></li>
+  <li><a href="#a-workload-experiment" id="toc-a-workload-experiment" class="nav-link" data-scroll-target="#a-workload-experiment">A workload experiment</a></li>
+  <li><a href="#prefix-sharing-and-copy-on-write" id="toc-prefix-sharing-and-copy-on-write" class="nav-link" data-scroll-target="#prefix-sharing-and-copy-on-write">Prefix sharing and copy-on-write</a></li>
+  <li><a href="#scheduling-consequences" id="toc-scheduling-consequences" class="nav-link" data-scroll-target="#scheduling-consequences">Scheduling consequences</a></li>
+  <li><a href="#verification-targets" id="toc-verification-targets" class="nav-link" data-scroll-target="#verification-targets">Verification targets</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/projects/paged-kv-cache-simulator/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -404,17 +431,17 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">My First Technical Post</h1>
+<h1 class="title">A Paged KV-Cache Allocator, Built from First Principles</h1>
   <div class="quarto-categories">
+    <div class="quarto-category">LLM Serving</div>
+    <div class="quarto-category">Memory Management</div>
     <div class="quarto-category">Python</div>
-    <div class="quarto-category">Mathematics</div>
-    <div class="quarto-category">Test</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    A test article with mathematics, Python code, and a generated plot.
+    An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.
   </div>
 </div>
 
@@ -431,7 +458,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 25, 2026</p>
+      <p class="date">August 13, 2026</p>
     </div>
   </div>
   
@@ -443,70 +470,203 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This is the first article published on my technical blog.</p>
-<p>The purpose of this post is to verify that Quarto correctly renders:</p>
-<ul>
-<li>mathematical equations;</li>
-<li>Python code;</li>
-<li>Jupyter output;</li>
-<li>figures;</li>
-<li>links to external repositories.</li>
-</ul>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Autoregressive decoding reuses the keys and values of every previous token. Caching them avoids a full prefix recomputation, but turns serving capacity into a memory-allocation problem: request lengths are unknown, sequences arrive and finish at different times, and branching decoders share long prefixes.</p>
+<p>This project builds a small simulator for two allocation policies:</p>
+<ol type="1">
+<li><strong>Contiguous reservation:</strong> reserve each request’s declared maximum length.</li>
+<li><strong>Paged allocation:</strong> allocate fixed-size token blocks only when needed.</li>
+</ol>
+<p>The model is intentionally compact. It does not benchmark a GPU kernel. It isolates the allocator mechanism behind PagedAttention and vLLM <span class="citation" data-cites="kwon2023pagedattention">(<a href="#ref-kwon2023pagedattention" role="doc-biblioref">Kwon et al. 2023</a>)</span>.</p>
 </section>
-<section id="a-mathematical-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-mathematical-example">A mathematical example</h2>
-<p>Consider the mean squared error:</p>
-<p><span id="eq-mse"><span class="math display">
-\mathcal{L}(\theta)
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left(f_\theta(x_i)-y_i\right)^2
+<section id="cache-size" class="level2">
+<h2 class="anchored" data-anchor-id="cache-size">Cache size</h2>
+<p>For a decoder with <span class="math inline">L</span> layers, <span class="math inline">h_{kv}</span> key/value heads, head dimension <span class="math inline">d_h</span>, element size <span class="math inline">b</span> bytes, and <span class="math inline">T</span> cached tokens, the cache occupies</p>
+<p><span id="eq-kv-size"><span class="math display">
+B_{KV}=2Lh_{kv}d_hTb. \tag{1}
 \tag{1}</span></span></p>
-<p>Equation <a href="#eq-mse" class="quarto-xref">Equation&nbsp;1</a> measures the average squared difference between predictions and targets.</p>
-</section>
-<section id="a-python-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-python-example">A Python example</h2>
-<div id="bade00e3" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<p>The factor two accounts for keys and values. For conventional multi-head attention, <span class="math inline">h_{kv}</span> equals the query-head count. Multi-query and grouped-query attention reduce <span class="math inline">h_{kv}</span>, which directly reduces the persistent cache.</p>
+<div id="cell-fig-kv-capacity" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">200</span>) </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>plt.plot(x, y) </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"x"</span>) </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"x²"</span>) </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Quadratic function"</span>) </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">32769</span>, <span class="dv">512</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>configs <span class="op">=</span> {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"32L, 32 KV heads, d=128"</span>: (<span class="dv">32</span>, <span class="dv">32</span>, <span class="dv">128</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"32L, 8 KV heads, d=128"</span>: (<span class="dv">32</span>, <span class="dv">8</span>, <span class="dv">128</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"80L, 8 KV heads, d=128"</span>: (<span class="dv">80</span>, <span class="dv">8</span>, <span class="dv">128</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, (layers, kv_heads, head_dim) <span class="kw">in</span> configs.items():</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    gib <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> layers <span class="op">*</span> kv_heads <span class="op">*</span> head_dim <span class="op">*</span> tokens <span class="op">*</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span><span class="op">**</span><span class="dv">30</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.plot(tokens, gib, label<span class="op">=</span>label)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"cached tokens"</span>, ylabel<span class="op">=</span><span class="st">"KV cache per request (GiB)"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-2-output-1.png" width="577" height="450" class="figure-img"></p>
+<div id="fig-kv-capacity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kv-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-kv-capacity-output-1.png" width="663" height="355" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kv-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: KV-cache memory per request for three decoder configurations in FP16. Model labels describe layers, KV heads, and head dimension.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>Equation <a href="#eq-kv-size" class="quarto-xref">Equation&nbsp;1</a> is linear in context length and batch size. That is better than storing a quadratic attention matrix, but it becomes the dominant dynamic allocation in a serving engine.</p>
 </section>
-<section id="repository" class="level2">
-<h2 class="anchored" data-anchor-id="repository">Repository</h2>
-<p>The complete source code for future projects will be available on GitHub. <a href="https://github.com/">View my GitHub profile</a></p>
+<section id="allocation-model" class="level2">
+<h2 class="anchored" data-anchor-id="allocation-model">Allocation model</h2>
+<p>A contiguous allocator needs one extent large enough for the request. Reserving the declared maximum avoids relocation while decoding, but unused future slots waste memory. Variable extents also create external fragmentation.</p>
+<p>A paged allocator divides the cache into equal physical blocks. Each request owns a logical block table:</p>
+<p><span class="math display">
+\text{logical block }j\longmapsto\text{physical block }\pi_r(j).
+</span></p>
+<p>The attention kernel follows this mapping when reading keys and values. Since physical blocks have equal size, they can be taken from a free list and need not be adjacent.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass, field</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> ceil</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Request:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    request_id: <span class="bu">int</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    prompt_tokens: <span class="bu">int</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    max_tokens: <span class="bu">int</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    generated: <span class="bu">int</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    blocks: <span class="bu">list</span>[<span class="bu">int</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> live_tokens(<span class="va">self</span>):</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.prompt_tokens <span class="op">+</span> <span class="va">self</span>.generated</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PagedAllocator:</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, block_count: <span class="bu">int</span>, block_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">16</span>):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.block_tokens <span class="op">=</span> block_tokens</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.free <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(block_count))</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ensure_capacity(<span class="va">self</span>, request: Request):</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        required <span class="op">=</span> ceil(request.live_tokens <span class="op">/</span> <span class="va">self</span>.block_tokens)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        missing <span class="op">=</span> required <span class="op">-</span> <span class="bu">len</span>(request.blocks)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> missing <span class="op">&gt;</span> <span class="bu">len</span>(<span class="va">self</span>.free):</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">MemoryError</span>(<span class="st">"KV cache exhausted"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(missing):</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            request.blocks.append(<span class="va">self</span>.free.pop())</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> release(<span class="va">self</span>, request: Request):</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.free.extend(request.blocks)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        request.blocks.clear()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Only the final block of a request can be partially empty. If the block contains <span class="math inline">B</span> token slots, internal waste is bounded by <span class="math inline">B-1</span> slots per live sequence, independent of maximum generation length.</p>
+</section>
+<section id="a-workload-experiment" class="level2">
+<h2 class="anchored" data-anchor-id="a-workload-experiment">A workload experiment</h2>
+<p>The following experiment samples 2,000 concurrent requests. Prompt lengths follow a log-normal distribution, maximum generation budgets are deliberately conservative, and actual completions vary. The comparison measures reserved token slots rather than allocator metadata.</p>
+<div id="cell-fig-fragmentation" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>requests <span class="op">=</span> <span class="dv">2_000</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> np.clip(rng.lognormal(mean<span class="op">=</span><span class="fl">5.2</span>, sigma<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>requests).astype(<span class="bu">int</span>), <span class="dv">16</span>, <span class="dv">4096</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>budget <span class="op">=</span> rng.choice([<span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>, <span class="dv">1024</span>], size<span class="op">=</span>requests, p<span class="op">=</span>[<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.3</span>, <span class="fl">0.15</span>])</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> np.array([rng.integers(<span class="dv">1</span>, limit <span class="op">+</span> <span class="dv">1</span>) <span class="cf">for</span> limit <span class="kw">in</span> budget])</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>live <span class="op">=</span> prompt <span class="op">+</span> actual</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>block_sizes <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>contiguous_reserved <span class="op">=</span> prompt <span class="op">+</span> budget</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>contiguous_efficiency <span class="op">=</span> live.<span class="bu">sum</span>() <span class="op">/</span> contiguous_reserved.<span class="bu">sum</span>()</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>paged_efficiency <span class="op">=</span> np.array([</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    live.<span class="bu">sum</span>() <span class="op">/</span> (np.ceil(live <span class="op">/</span> block) <span class="op">*</span> block).<span class="bu">sum</span>()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> block <span class="kw">in</span> block_sizes</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.7</span>))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>ax.plot(block_sizes, <span class="dv">100</span> <span class="op">*</span> paged_efficiency, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"paged"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">100</span> <span class="op">*</span> contiguous_efficiency, color<span class="op">=</span><span class="st">"0.35"</span>, ls<span class="op">=</span><span class="st">"--"</span>,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="st">"contiguous reservation"</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"block size (token slots)"</span>, ylabel<span class="op">=</span><span class="st">"live-token efficiency (%)"</span>, ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">102</span>))</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-fragmentation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-fragmentation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-fragmentation-output-1.png" width="663" height="345" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fragmentation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>These values are simulator outputs, not measurements from the vLLM paper. The qualitative trade-off is real: smaller blocks reduce internal fragmentation but increase block-table entries and kernel address-translation work.</p>
+</section>
+<section id="prefix-sharing-and-copy-on-write" class="level2">
+<h2 class="anchored" data-anchor-id="prefix-sharing-and-copy-on-write">Prefix sharing and copy-on-write</h2>
+<p>Paging makes sharing natural. Parallel samples from one prompt can point their logical prefix blocks to the same physical blocks. Maintain a reference count <span class="math inline">c_b</span> for every physical block. A fork increments counts; releasing a request decrements them.</p>
+<p>Appending to a shared partially filled block requires copy-on-write:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> append_with_cow(request, refcount, free_blocks, block_tokens):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    last <span class="op">=</span> request.blocks[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> request.live_tokens <span class="op">%</span> block_tokens</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> offset <span class="kw">and</span> refcount[last] <span class="op">&gt;</span> <span class="dv">1</span>:</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        replacement <span class="op">=</span> free_blocks.pop()</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        copy_block(last, replacement)  <span class="co"># device-to-device copy</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        refcount[last] <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        refcount[replacement] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        request.blocks[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> replacement</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    append_token_kv(request.blocks[<span class="op">-</span><span class="dv">1</span>], offset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Full shared prefix blocks never need copying. Only the block currently being extended can trigger copy-on-write. This supports parallel sampling, beam search, and shared system prompts with the same mechanism.</p>
+</section>
+<section id="scheduling-consequences" class="level2">
+<h2 class="anchored" data-anchor-id="scheduling-consequences">Scheduling consequences</h2>
+<p>Better allocation increases the feasible batch size, but a production server must also decide which requests enter a batch and how to recover under pressure. Swapping cache blocks to host memory preserves work but consumes interconnect bandwidth. Recomputation discards blocks and rebuilds them with a prefill pass, trading compute for storage.</p>
+<p>The vLLM paper reports near-zero KV-cache waste and 2 to 4 times higher throughput at comparable latency than the evaluated baselines <span class="citation" data-cites="kwon2023pagedattention">(<a href="#ref-kwon2023pagedattention" role="doc-biblioref">Kwon et al. 2023</a>)</span>. The gain comes from the system built around the allocator, not address translation alone. Larger effective batches improve GPU utilization, while prefix sharing avoids duplicate storage.</p>
+</section>
+<section id="verification-targets" class="level2">
+<h2 class="anchored" data-anchor-id="verification-targets">Verification targets</h2>
+<p>A serious allocator test suite should exercise:</p>
+<ul>
+<li>allocation across non-contiguous physical blocks;</li>
+<li>release and reuse without stale references;</li>
+<li>forked prefixes with correct reference counts;</li>
+<li>copy-on-write only for a shared writable tail;</li>
+<li>out-of-memory behavior that leaves existing tables unchanged;</li>
+<li>block-table translation against a contiguous reference implementation.</li>
+</ul>
+<p>The last test is especially important. PagedAttention changes where tensors live, not the mathematical output of attention.</p>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<p>This simulator counts token slots. Real systems allocate per layer, shard tensors across devices, align blocks for kernels, and synchronize allocator state with asynchronous execution. Kernel layout can also favor a block size that is not optimal under a pure fragmentation metric.</p>
+<p>Still, the model captures the essential systems insight: once persistent state has irregular lifetimes, a tensor is not only a numerical object. It is also a dynamically allocated resource.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-kwon2023pagedattention" class="csl-entry" role="listitem">
+Kwon, Woosuk, Zhuohan Li, Siyuan Zhuang, et al. 2023. <span>“Efficient Memory Management for Large Language Model Serving with <span>PagedAttention</span>.”</span> <em>Proceedings of the 29th Symposium on Operating Systems Principles</em>, 611–26. <a href="https://doi.org/10.1145/3600006.3613165">https://doi.org/10.1145/3600006.3613165</a>.
+</div>
+</div>
 
 
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
   author = {Marino, Diego Filippo},
-  title = {My {First} {Technical} {Post}},
-  date = {2026-06-25},
-  url = {https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/},
+  title = {A {Paged} {KV-Cache} {Allocator,} {Built} from {First}
+    {Principles}},
+  date = {2026-08-13},
+  url = {https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Marino, Diego Filippo. 2026. <span>“My First Technical Post.”</span>
-June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/">https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</a>.
+Marino, Diego Filippo. 2026. <span>“A Paged KV-Cache Allocator, Built
+from First Principles.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/">https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -964,11 +1124,11 @@ June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-tec
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2026 Eigenholm · <a href="../..\colophon/">Colophon</a></p>
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/projects/paged-kv-cache-simulator/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>

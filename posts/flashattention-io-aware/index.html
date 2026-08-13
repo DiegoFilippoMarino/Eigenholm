@@ -2,23 +2,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Diego Filippo Marino">
-<meta name="dcterms.date" content="2026-06-25">
-<meta name="description" content="A test article with mathematics, Python code, and a generated plot.">
+<meta name="dcterms.date" content="2026-08-13">
+<meta name="description" content="How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.">
 
-<title>My First Technical Post – Eigenholm</title>
+<title>FlashAttention Is an IO Algorithm – Eigenholm</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -61,7 +64,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -78,14 +100,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-203cd6cfb07eb23d94ccac5e123ebbf5.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-277854b2b7e1342fc0099984d259e089.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-8f7fb6d7711e0ad48f4f53bf2ecba958.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-277854b2b7e1342fc0099984d259e089.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -158,17 +180,17 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="My First Technical Post – Eigenholm">
-<meta property="og:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
+<meta property="og:title" content="FlashAttention Is an IO Algorithm – Eigenholm">
+<meta property="og:description" content="How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-attention-memory-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="900">
-<meta property="og:image:width" content="1153">
-<meta name="twitter:title" content="My First Technical Post – Eigenholm">
-<meta name="twitter:description" content="A test article with mathematics, Python code, and a generated plot.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/index_files/figure-html/cell-2-output-1.png">
-<meta name="twitter:image-height" content="900">
-<meta name="twitter:image-width" content="1153">
+<meta property="og:image:height" content="708">
+<meta property="og:image:width" content="1322">
+<meta name="twitter:title" content="FlashAttention Is an IO Algorithm – Eigenholm">
+<meta name="twitter:description" content="How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-attention-memory-output-1.png">
+<meta name="twitter:image-height" content="708">
+<meta name="twitter:image-width" content="1322">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -391,12 +413,16 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#a-mathematical-example" id="toc-a-mathematical-example" class="nav-link" data-scroll-target="#a-mathematical-example">A mathematical example</a></li>
-  <li><a href="#a-python-example" id="toc-a-python-example" class="nav-link" data-scroll-target="#a-python-example">A Python example</a></li>
-  <li><a href="#repository" id="toc-repository" class="nav-link" data-scroll-target="#repository">Repository</a></li>
+  <li><a href="#the-traffic-in-a-literal-implementation" id="toc-the-traffic-in-a-literal-implementation" class="nav-link active" data-scroll-target="#the-traffic-in-a-literal-implementation">The traffic in a literal implementation</a></li>
+  <li><a href="#softmax-can-be-streamed-exactly" id="toc-softmax-can-be-streamed-exactly" class="nav-link" data-scroll-target="#softmax-can-be-streamed-exactly">Softmax can be streamed exactly</a></li>
+  <li><a href="#tiling-the-full-matrix" id="toc-tiling-the-full-matrix" class="nav-link" data-scroll-target="#tiling-the-full-matrix">Tiling the full matrix</a></li>
+  <li><a href="#backward-by-recomputation" id="toc-backward-by-recomputation" class="nav-link" data-scroll-target="#backward-by-recomputation">Backward by recomputation</a></li>
+  <li><a href="#flashattention-2-changes-the-work-partition" id="toc-flashattention-2-changes-the-work-partition" class="nav-link" data-scroll-target="#flashattention-2-changes-the-work-partition">FlashAttention-2 changes the work partition</a></li>
+  <li><a href="#arithmetic-intensity-and-the-roofline" id="toc-arithmetic-intensity-and-the-roofline" class="nav-link" data-scroll-target="#arithmetic-intensity-and-the-roofline">Arithmetic intensity and the roofline</a></li>
+  <li><a href="#boundaries" id="toc-boundaries" class="nav-link" data-scroll-target="#boundaries">Boundaries</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/flashattention-io-aware/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -404,17 +430,17 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">My First Technical Post</h1>
+<h1 class="title">FlashAttention Is an IO Algorithm</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">Python</div>
-    <div class="quarto-category">Mathematics</div>
-    <div class="quarto-category">Test</div>
+    <div class="quarto-category">GPU</div>
+    <div class="quarto-category">Attention</div>
+    <div class="quarto-category">Performance Engineering</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    A test article with mathematics, Python code, and a generated plot.
+    How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.
   </div>
 </div>
 
@@ -431,7 +457,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 25, 2026</p>
+      <p class="date">August 13, 2026</p>
     </div>
   </div>
   
@@ -443,70 +469,173 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This is the first article published on my technical blog.</p>
-<p>The purpose of this post is to verify that Quarto correctly renders:</p>
-<ul>
-<li>mathematical equations;</li>
-<li>Python code;</li>
-<li>Jupyter output;</li>
-<li>figures;</li>
-<li>links to external repositories.</li>
-</ul>
-</section>
-<section id="a-mathematical-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-mathematical-example">A mathematical example</h2>
-<p>Consider the mean squared error:</p>
-<p><span id="eq-mse"><span class="math display">
-\mathcal{L}(\theta)
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left(f_\theta(x_i)-y_i\right)^2
-\tag{1}</span></span></p>
-<p>Equation <a href="#eq-mse" class="quarto-xref">Equation&nbsp;1</a> measures the average squared difference between predictions and targets.</p>
-</section>
-<section id="a-python-example" class="level2">
-<h2 class="anchored" data-anchor-id="a-python-example">A Python example</h2>
-<div id="bade00e3" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<p>The standard account of attention starts with an <span class="math inline">n\times n</span> matrix. That is mathematically convenient and computationally misleading. A GPU does not pay only for arithmetic. It also pays to move every intermediate between high-bandwidth memory, caches, registers, and on-chip SRAM.</p>
+<p>FlashAttention keeps the exact attention function but changes its evaluation schedule so the quadratic score and probability matrices are never written to high-bandwidth memory <span class="citation" data-cites="dao2022flashattention">(<a href="#ref-dao2022flashattention" role="doc-biblioref">Dao et al. 2022</a>)</span>. The central technique is an online softmax that can be updated one tile at a time.</p>
+<section id="the-traffic-in-a-literal-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="the-traffic-in-a-literal-implementation">The traffic in a literal implementation</h2>
+<p>For one head,</p>
+<p><span class="math display">
+S=QK^\top,\qquad P=\operatorname{softmax}(S),\qquad O=PV.
+</span></p>
+<p>A conventional sequence of kernels writes <span class="math inline">S</span> to HBM, reads it for softmax, writes <span class="math inline">P</span>, then reads <span class="math inline">P</span> for the second matrix multiplication. Both intermediates contain <span class="math inline">n^2</span> elements. Kernel fusion can remove some round trips, but <span class="math inline">S</span> and <span class="math inline">P</span> still exceed on-chip capacity at useful sequence lengths.</p>
+<div id="cell-fig-attention-memory" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">200</span>) </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>plt.plot(x, y) </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"x"</span>) </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"x²"</span>) </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Quadratic function"</span>) </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> np.arange(<span class="dv">8</span>, <span class="dv">18</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">128</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>score_mib <span class="op">=</span> n<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span><span class="op">**</span><span class="dv">20</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>qkv_mib <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> n <span class="op">*</span> d <span class="op">*</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span><span class="op">**</span><span class="dv">20</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax.loglog(n, score_mib, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"one </span><span class="dv">$</span><span class="vs">n</span><span class="ch">\t</span><span class="vs">imes n</span><span class="dv">$</span><span class="vs"> matrix"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ax.loglog(n, qkv_mib, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"</span><span class="dv">$</span><span class="vs">Q,K,V</span><span class="dv">$</span><span class="vs"> at </span><span class="dv">$</span><span class="vs">d=128</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"sequence length"</span>, ylabel<span class="op">=</span><span class="st">"storage (MiB)"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ax.grid(which<span class="op">=</span><span class="st">"both"</span>, alpha<span class="op">=</span><span class="fl">0.18</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-2-output-1.png" width="577" height="450" class="figure-img"></p>
+<div id="fig-attention-memory" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-attention-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-attention-memory-output-1.png" width="661" height="354" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-attention-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Storage for one materialized attention matrix at FP16, compared with one linear-size QKV working set at head dimension 128.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>At <span class="math inline">n=16{,}384</span>, a single FP16 score matrix for one head and one batch element occupies 512 MiB. A model with many heads cannot retain all such matrices without aggressive memory management.</p>
 </section>
-<section id="repository" class="level2">
-<h2 class="anchored" data-anchor-id="repository">Repository</h2>
-<p>The complete source code for future projects will be available on GitHub. <a href="https://github.com/">View my GitHub profile</a></p>
+<section id="softmax-can-be-streamed-exactly" class="level2">
+<h2 class="anchored" data-anchor-id="softmax-can-be-streamed-exactly">Softmax can be streamed exactly</h2>
+<p>For a row of logits <span class="math inline">x_1,\ldots,x_j</span>, maintain the running maximum and exponential sum</p>
+<p><span class="math display">
+m_j=\max_{i\le j}x_i,
+\qquad
+\ell_j=\sum_{i\le j}e^{x_i-m_j}.
+</span></p>
+<p>When a new block <span class="math inline">B</span> arrives, let</p>
+<p><span class="math display">
+m_B=\max_{x\in B}x,qquad
+\ell_B=\sum_{x\in B}e^{x-m_B},qquad
+m'=\max(m_j,m_B).
+</span></p>
+<p>The combined normalizer is</p>
+<p><span id="eq-online-normalizer"><span class="math display">
+\ell'=e^{m_j-m'}\ell_j+e^{m_B-m'}\ell_B. \tag{1}
+\tag{1}</span></span></p>
+<p>For attention, maintain an unnormalized value accumulator</p>
+<p><span class="math display">
+\widetilde{o}_j=\sum_{i\le j}e^{x_i-m_j}v_i.
+</span></p>
+<p>It updates by the same rescaling:</p>
+<p><span id="eq-online-output"><span class="math display">
+\widetilde{o}'=e^{m_j-m'}\widetilde{o}_j
++e^{m_B-m'}\sum_{x_i\in B}e^{x_i-m_B}v_i,
+\qquad o=\frac{\widetilde{o}'}{\ell'}. \tag{2}
+\tag{2}</span></span></p>
+<p>Equations <a href="#eq-online-normalizer" class="quarto-xref">Equation&nbsp;1</a> and <a href="#eq-online-output" class="quarto-xref">Equation&nbsp;2</a> are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tiled_attention(q, k, v, block<span class="op">=</span><span class="dv">64</span>):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Reference implementation for one query vector, not a fast kernel."""</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    scale <span class="op">=</span> q.shape[<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> <span class="op">-</span>np.inf</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ell <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    acc <span class="op">=</span> np.zeros(v.shape[<span class="op">-</span><span class="dv">1</span>], dtype<span class="op">=</span>np.float64)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(k), block):</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        kb <span class="op">=</span> k[start:start <span class="op">+</span> block]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        vb <span class="op">=</span> v[start:start <span class="op">+</span> block]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        logits <span class="op">=</span> kb <span class="op">@</span> q <span class="op">*</span> scale</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        block_max <span class="op">=</span> logits.<span class="bu">max</span>()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        new_max <span class="op">=</span> <span class="bu">max</span>(m, block_max)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        old_scale <span class="op">=</span> np.exp(m <span class="op">-</span> new_max)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.exp(logits <span class="op">-</span> new_max)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        acc <span class="op">=</span> old_scale <span class="op">*</span> acc <span class="op">+</span> weights <span class="op">@</span> vb</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        ell <span class="op">=</span> old_scale <span class="op">*</span> ell <span class="op">+</span> weights.<span class="bu">sum</span>()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        m <span class="op">=</span> new_max</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> acc <span class="op">/</span> ell</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This Python version exposes the recurrence but does not provide the speedup. Performance comes from mapping tiles to GPU thread blocks and using tensor-core matrix multiplications while intermediates remain in SRAM or registers.</p>
+</section>
+<section id="tiling-the-full-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="tiling-the-full-matrix">Tiling the full matrix</h2>
+<p>Partition <span class="math inline">Q</span> into row tiles <span class="math inline">Q_i</span> and <span class="math inline">K,V</span> into column tiles <span class="math inline">K_j,V_j</span>. For each <span class="math inline">Q_i</span>:</p>
+<ol type="1">
+<li>Load <span class="math inline">Q_i</span> once into on-chip memory.</li>
+<li>Stream through <span class="math inline">(K_j,V_j)</span> pairs.</li>
+<li>Compute <span class="math inline">Q_iK_j^\top</span> as a small tile.</li>
+<li>Update each row’s <span class="math inline">(m,\ell,\widetilde{o})</span> state.</li>
+<li>Write the final <span class="math inline">O_i</span> and log-sum-exp statistics.</li>
+</ol>
+<p>The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions. The original analysis gives an HBM access complexity of</p>
+<p><span class="math display">
+\Theta\!\left(\frac{n^2d^2}{M}\right),
+</span></p>
+<p>for SRAM capacity <span class="math inline">M</span>, over the relevant range of tile sizes, compared with quadratic intermediate traffic in the standard schedule <span class="citation" data-cites="dao2022flashattention">(<a href="#ref-dao2022flashattention" role="doc-biblioref">Dao et al. 2022</a>)</span>.</p>
+</section>
+<section id="backward-by-recomputation" class="level2">
+<h2 class="anchored" data-anchor-id="backward-by-recomputation">Backward by recomputation</h2>
+<p>Ordinary autodiff saves <span class="math inline">S</span> or <span class="math inline">P</span> because the backward pass needs probabilities. FlashAttention stores the output and row-wise log-sum-exp, then recomputes score tiles during backward.</p>
+<p>Recomputation adds FLOPs but removes the quadratic saved activation. On modern accelerators, this trade can be faster because matrix multiplication is efficient while repeated HBM traffic is expensive. This is a selective checkpointing strategy guided by the memory hierarchy.</p>
+</section>
+<section id="flashattention-2-changes-the-work-partition" class="level2">
+<h2 class="anchored" data-anchor-id="flashattention-2-changes-the-work-partition">FlashAttention-2 changes the work partition</h2>
+<p>The first algorithm removed the primary IO bottleneck but reached only 25 to 40 percent of A100 peak throughput. FlashAttention-2 targets utilization <span class="citation" data-cites="dao2023flashattention2">(<a href="#ref-dao2023flashattention2" role="doc-biblioref">Dao 2023</a>)</span>:</p>
+<ul>
+<li>It delays output normalization to reduce non-matrix FLOPs.</li>
+<li>It parallelizes over sequence tiles in addition to batch and heads, improving occupancy when batch size or head count is small.</li>
+<li>It partitions <span class="math inline">Q</span> across warps while sharing <span class="math inline">K</span> and <span class="math inline">V</span>, avoiding the shared-memory reductions induced by splitting <span class="math inline">K</span>.</li>
+</ul>
+<p>The paper reports 50 to 73 percent of theoretical A100 peak and up to 225 TFLOP/s for GPT-style training <span class="citation" data-cites="dao2023flashattention2">(<a href="#ref-dao2023flashattention2" role="doc-biblioref">Dao 2023</a>)</span>. Those numbers depend on model shape and hardware. They are not a universal speed multiplier.</p>
+</section>
+<section id="arithmetic-intensity-and-the-roofline" class="level2">
+<h2 class="anchored" data-anchor-id="arithmetic-intensity-and-the-roofline">Arithmetic intensity and the roofline</h2>
+<p>A roofline model bounds performance by</p>
+<p><span class="math display">
+\text{throughput}\le
+\min\left(\text{peak FLOP/s},\;
+\text{bandwidth}\times\frac{\text{FLOPs}}{\text{bytes moved}}\right).
+</span></p>
+<p>Changing the evaluation order raises arithmetic intensity by doing more useful work per byte transferred from HBM. Once the kernel crosses into the compute-bound regime, further reductions in traffic yield less benefit and work partitioning becomes decisive.</p>
+<p>This explains an apparently paradoxical result: an algorithm may execute more arithmetic through recomputation and still finish sooner.</p>
+</section>
+<section id="boundaries" class="level2">
+<h2 class="anchored" data-anchor-id="boundaries">Boundaries</h2>
+<p>FlashAttention does not make dense attention asymptotically linear in compute. It makes memory usage linear and reduces IO. Dense arithmetic remains quadratic in sequence length. It also does not replace the KV cache during autoregressive decoding. FlashAttention optimizes the attention kernel; KV-cache paging manages persistent state across requests.</p>
+<p>That distinction is worth keeping. Similar words such as memory-efficient can refer to activation memory, persistent cache capacity, allocator fragmentation, or bandwidth traffic. These are different constraints with different remedies.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-dao2023flashattention2" class="csl-entry" role="listitem">
+Dao, Tri. 2023. <span>“<span>FlashAttention-2</span>: Faster Attention with Better Parallelism and Work Partitioning.”</span> <em>arXiv Preprint arXiv:2307.08691</em>. <a href="https://arxiv.org/abs/2307.08691">https://arxiv.org/abs/2307.08691</a>.
+</div>
+<div id="ref-dao2022flashattention" class="csl-entry" role="listitem">
+Dao, Tri, Daniel Y. Fu, Stefano Ermon, Atri Rudra, and Christopher Ré. 2022. <span>“<span>FlashAttention</span>: Fast and Memory-Efficient Exact Attention with <span>IO</span>-Awareness.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 16344–59. <a href="https://arxiv.org/abs/2205.14135">https://arxiv.org/abs/2205.14135</a>.
+</div>
+</div>
 
 
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
   author = {Marino, Diego Filippo},
-  title = {My {First} {Technical} {Post}},
-  date = {2026-06-25},
-  url = {https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/},
+  title = {FlashAttention {Is} an {IO} {Algorithm}},
+  date = {2026-08-13},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Marino, Diego Filippo. 2026. <span>“My First Technical Post.”</span>
-June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/">https://diegofilippomarino.github.io/Eigenholm/posts/first-technical-post/</a>.
+Marino, Diego Filippo. 2026. <span>“FlashAttention Is an IO
+Algorithm.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/">https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -964,11 +1093,11 @@ June 25. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/first-tec
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2026 Eigenholm · <a href="../..\colophon/">Colophon</a></p>
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/first-technical-post/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/flashattention-io-aware/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Built with <a href="https://quarto.org">Quarto</a></p>
 </div>

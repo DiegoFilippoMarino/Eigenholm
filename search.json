@@ -1,10 +1,143 @@
 [
   {
+    "objectID": "notes/speculative-sampling/index.html",
+    "href": "notes/speculative-sampling/index.html",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "",
+    "text": "Autoregressive generation normally emits one token per target-model invocation. Speculative decoding asks a cheaper draft model to propose several tokens, scores the proposed continuation with one parallel target pass, and accepts the longest valid prefix (Leviathan et al. 2023).\nThe speed argument is architectural. The correctness argument is probabilistic. The latter is easy to state incorrectly, so this note derives it from the probability mass assigned by the target p and draft q."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#context",
+    "href": "notes/speculative-sampling/index.html#context",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "",
+    "text": "Autoregressive generation normally emits one token per target-model invocation. Speculative decoding asks a cheaper draft model to propose several tokens, scores the proposed continuation with one parallel target pass, and accepts the longest valid prefix (Leviathan et al. 2023).\nThe speed argument is architectural. The correctness argument is probabilistic. The latter is easy to state incorrectly, so this note derives it from the probability mass assigned by the target p and draft q."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#one-token-acceptance-rule",
+    "href": "notes/speculative-sampling/index.html#one-token-acceptance-rule",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "One-token acceptance rule",
+    "text": "One-token acceptance rule\nDraw a candidate x\\sim q. Accept it with probability\n\na(x)=\\min\\left(1,\\frac{p(x)}{q(x)}\\right).\n\nIf it is rejected, sample a replacement from\n\nr(x)=\\frac{[p(x)-q(x)]_+}{Z},\n\\qquad\nZ=\\sum_y[p(y)-q(y)]_+,\n\\tag{1}\nwhere [z]_+=\\max(0,z). The accepted candidate contributes mass\n\nq(x)a(x)=\\min(q(x),p(x)). \\tag{1}\n\\tag{2}\nThe probability of rejection is\n\n1-\\sum_x\\min(p(x),q(x))\n=\\sum_x[p(x)-q(x)]_+\n=Z. \\tag{2}\n\\tag{3}\nTherefore the final mass at token x is\n\n\\underbrace{\\min(p(x),q(x))}_{\\text{accepted draft}}\n+\\underbrace{Zr(x)}_{\\text{replacement}}\n=\\min(p(x),q(x))+[p(x)-q(x)]_+\n=p(x).\n\nThe output is exactly distributed as the target for any draft distribution. A poor draft reduces speed through more rejections, but it does not bias the sample if the residual correction in Equation 1 is implemented correctly."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#acceptance-is-distribution-overlap",
+    "href": "notes/speculative-sampling/index.html#acceptance-is-distribution-overlap",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "Acceptance is distribution overlap",
+    "text": "Acceptance is distribution overlap\nThe expected acceptance probability is\n\n\\alpha=\\sum_xq(x)a(x)=\\sum_x\\min(p(x),q(x)). \\tag{3}\n\\tag{4}\nUsing \\sum_x p(x)=\\sum_xq(x)=1,\n\n\\alpha=1-\\frac{1}{2}\\|p-q\\|_1.\n\nSpeculative performance is controlled by total-variation distance, not by whether the draft has the same argmax alone.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\np = np.array([0.36, 0.25, 0.17, 0.10, 0.08, 0.04])\nq = np.array([0.20, 0.35, 0.10, 0.18, 0.05, 0.12])\naccepted = np.minimum(p, q)\nresidual_mass = np.maximum(p - q, 0)\nx = np.arange(len(p))\n\nfig, ax = plt.subplots(figsize=(7, 3.7))\nax.bar(x, accepted, label=\"accepted draft mass\")\nax.bar(x, residual_mass, bottom=accepted, label=\"residual correction\")\nax.plot(x, p, \"ko\", label=\"target probability\")\nax.set(xlabel=\"token id\", ylabel=\"probability mass\", xticks=x)\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 1: Accepted draft mass and residual correction for a six-token example. The two components sum exactly to the target distribution."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#verifying-a-block-of-draft-tokens",
+    "href": "notes/speculative-sampling/index.html#verifying-a-block-of-draft-tokens",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "Verifying a block of draft tokens",
+    "text": "Verifying a block of draft tokens\nLet the draft propose \\gamma tokens. The target scores every position in one pass because teacher-forced evaluation is parallel across the proposed sequence. Verification proceeds left to right. At the first rejection, the rejected token and every later draft token are discarded, a correction token is sampled, and a new round begins.\nIf every proposal is accepted, the target distribution at the next position is already available, so the round can emit one extra target token. Each round therefore produces between 1 and \\gamma+1 tokens.\nUnder the simplifying assumption that acceptances are independent with constant probability \\alpha, the expected number of emitted tokens is\n\nE[N]=1+\\alpha+\\alpha^2+\\cdots+\\alpha^\\gamma\n=\\frac{1-\\alpha^{\\gamma+1}}{1-\\alpha}. \\tag{4}\n\\tag{5}\nIf one draft step costs a fraction c of one target verification, an idealized throughput improvement is\n\nS(\\alpha,\\gamma,c)\n=\\frac{1-\\alpha^{\\gamma+1}}\n{(1-\\alpha)(1+\\gamma c)}. \\tag{5}\n\\tag{6}\n\ngamma = np.arange(1, 17)\nc = 0.05\n\nfig, ax = plt.subplots(figsize=(7, 3.8))\nfor alpha in (0.4, 0.6, 0.8, 0.9):\n    speedup = (1 - alpha ** (gamma + 1)) / ((1 - alpha) * (1 + gamma * c))\n    ax.plot(gamma, speedup, \"o-\", ms=3, label=fr\"$\\alpha={alpha}$\")\nax.axhline(1, color=\"0.55\", lw=1, ls=\":\")\nax.set(xlabel=r\"draft length $\\gamma$\", ylabel=\"idealized speedup\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 2: Idealized speedup from Equation 5 as speculation length changes. The draft cost is 5 percent of a target invocation.\n\n\n\n\n\nLonger speculation is not automatically better. When \\alpha is modest, the probability of reaching late draft positions falls geometrically while their generation cost remains. The useful \\gamma depends jointly on overlap, draft cost, target batch shape, and hardware."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#a-reference-sampler",
+    "href": "notes/speculative-sampling/index.html#a-reference-sampler",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "A reference sampler",
+    "text": "A reference sampler\n\nimport numpy as np\n\ndef speculative_sample(p, q, rng):\n    \"\"\"Return one exact sample from categorical target p using proposal q.\"\"\"\n    candidate = rng.choice(len(q), p=q)\n    acceptance = min(1.0, p[candidate] / q[candidate])\n    if rng.random() &lt; acceptance:\n        return candidate\n\n    residual = np.maximum(p - q, 0.0)\n    residual /= residual.sum()\n    return rng.choice(len(p), p=residual)\n\nNumerical implementations need additional care. Probabilities may be derived from temperature-scaled or truncated logits. The target and draft must apply the same sampling transformation before the acceptance ratio is formed. The residual should be clamped before normalization to remove small negative values caused by rounding."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#empirical-sanity-check",
+    "href": "notes/speculative-sampling/index.html#empirical-sanity-check",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "Empirical sanity check",
+    "text": "Empirical sanity check\n\nrng = np.random.default_rng(23)\ndraws = 300_000\ncounts = np.zeros(len(p), dtype=int)\n\nfor _ in range(draws):\n    counts[speculative_sample(p, q, rng)] += 1\n\nestimate = counts / draws\nstderr = np.sqrt(p * (1 - p) / draws)\n\nfig, ax = plt.subplots(figsize=(7, 3.7))\nax.errorbar(x, estimate, yerr=3 * stderr, fmt=\"o\", capsize=3,\n            label=\"speculative estimate\")\nax.plot(x, p, \"x\", ms=8, label=\"target\")\nax.set(xlabel=\"token id\", ylabel=\"probability\", xticks=x)\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 3: Monte Carlo check with 300,000 speculative samples. Error bars show three standard errors under the target multinomial model.\n\n\n\n\n\nThe Monte Carlo test is not a proof, but it is an effective regression test for sign errors, reversed ratios, and incorrect residual normalization."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#where-the-speedup-comes-from",
+    "href": "notes/speculative-sampling/index.html#where-the-speedup-comes-from",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "Where the speedup comes from",
+    "text": "Where the speedup comes from\nSpeculative decoding generally performs more arithmetic than ordinary decoding. It wins when target inference is limited by serial execution or memory bandwidth and the verification pass can score several positions efficiently. The target’s weights and cache state are amortized across multiple accepted tokens.\nThe original work reports 2 to 3 times acceleration on T5-XXL with identical outputs (Leviathan et al. 2023). That result does not imply the same gain for every model or serving regime. Speculation can lose when the draft is expensive, distributions have low overlap, verification is compute-bound, or the extra temporary state reduces useful batching.\n\n\n\n\n\n\nImportantExactness has a boundary\n\n\n\nThe guarantee applies to the acceptance and residual rule above. Heuristic acceptance thresholds, lenience, or replacing the residual distribution with the unmodified target distribution change the sampler unless separately proved correct."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#takeaway",
+    "href": "notes/speculative-sampling/index.html#takeaway",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "Takeaway",
+    "text": "Takeaway\nThe draft model is a performance hint. Equations Equation 2 and Equation 3 show why it has no authority over the final distribution: accepted overlap plus rejected residual reconstructs the target exactly."
+  },
+  {
+    "objectID": "notes/speculative-sampling/index.html#references",
+    "href": "notes/speculative-sampling/index.html#references",
+    "title": "Speculative Sampling Preserves the Target Distribution",
+    "section": "References",
+    "text": "References\n\n\nLeviathan, Yaniv, Matan Kalman, and Yossi Matias. 2023. “Fast Inference from Transformers via Speculative Decoding.” Proceedings of the 40th International Conference on Machine Learning, Proceedings of machine learning research, vol. 202: 19274–86. https://proceedings.mlr.press/v202/leviathan23a.html."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Eigenholm",
     "section": "",
-    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nArticle Title Here\n\n\n\nMachine Learning\n\nMathematics\n\n\n\nA one-line summary for listings and social sharing.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n4 min\n\n\n\n\n\n\nMy First Technical Post\n\n\n\nPython\n\nMathematics\n\nTest\n\n\n\nA test article with mathematics, Python code, and a generated plot.\n\n\n\n\n\nJun 25, 2026\n\n\nDiego Filippo Marino\n\n1 min\n\n\n\n\nNo matching items"
+    "text": "Eigenholm\nResearch notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.\n\nMachine Learning Deep Learning Mathematics Scientific Computing Paper Replications\n\n\nLatest Writing\n\n\n\n\n\nThe Geometry of Rotary Position Embeddings\n\n\n\nTransformers\n\nPositional Encoding\n\nMathematics\n\n\n\nRoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.\n\n\n\n\n\nAug 13, 2026\n\n\nDiego Filippo Marino\n\n5 min\n\n\n\n\n\n\nAttention, from Logits to Context\n\n\n\nTransformers\n\nAttention\n\nMathematics\n\n\n\nA derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.\n\n\n\n\n\nAug 13, 2026\n\n\nDiego Filippo Marino\n\n4 min\n\n\n\n\n\n\nFlashAttention Is an IO Algorithm\n\n\n\nGPU\n\nAttention\n\nPerformance Engineering\n\n\n\nHow tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.\n\n\n\n\n\nAug 13, 2026\n\n\nDiego Filippo Marino\n\n5 min\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html",
+    "href": "posts/attention-from-logits-to-context/index.html",
+    "title": "Attention, from Logits to Context",
+    "section": "",
+    "text": "The compact formula for attention hides three separate operations: a learned similarity metric, a row-wise probability model, and a content lookup. Pulling those pieces apart is useful because most later improvements change only one of them."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#the-operation-and-its-shapes",
+    "href": "posts/attention-from-logits-to-context/index.html#the-operation-and-its-shapes",
+    "title": "Attention, from Logits to Context",
+    "section": "The operation and its shapes",
+    "text": "The operation and its shapes\nLet a sequence be represented by X\\in\\mathbb{R}^{n\\times d_{\\text{model}}}. A single head forms\n\nQ=XW^Q,\\qquad K=XW^K,\\qquad V=XW^V,\n\nwhere Q,K\\in\\mathbb{R}^{n\\times d_k} and V\\in\\mathbb{R}^{n\\times d_v}. Scaled dot-product attention is (Vaswani et al. 2017)\n\nS=\\frac{QK^\\top}{\\sqrt{d_k}},\\qquad\nP=\\operatorname{softmax}_{\\text{row}}(S+M),\\qquad\nO=PV. \\tag{1}\n\\tag{1}\nThe score S_{ij} measures how strongly query position i selects key position j. Each row of P is a categorical distribution. The output o_i is therefore a data-dependent convex combination of value vectors.\nFor causal self-attention, the mask is\n\nM_{ij}=\\begin{cases}\n0,&j\\le i,\\\\\n-\\infty,&j&gt;i.\n\\end{cases}\n\nAdding the mask before softmax makes every illegal probability exactly zero in ideal arithmetic. In finite precision, implementations use either negative infinity or a sufficiently negative representable value."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#why-divide-by-sqrtd_k",
+    "href": "posts/attention-from-logits-to-context/index.html#why-divide-by-sqrtd_k",
+    "title": "Attention, from Logits to Context",
+    "section": "Why divide by \\sqrt{d_k}?",
+    "text": "Why divide by \\sqrt{d_k}?\nSuppose the components of q and k are independent, centered, and have unit variance. Then\n\n\\operatorname{Var}(q^\\top k)\n=\\operatorname{Var}\\left(\\sum_{r=1}^{d_k}q_rk_r\\right)\n=d_k.\n\nThe unscaled logit has standard deviation \\sqrt{d_k}. As the head dimension grows, the largest logit tends to dominate the softmax, reducing its entropy and concentrating the Jacobian near zero. Scaling restores an order-one logit variance.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nrng = np.random.default_rng(7)\ndims = np.array([8, 16, 32, 64, 128, 256, 512])\nentropy_scaled, entropy_raw = [], []\n\nfor d in dims:\n    q = rng.normal(size=(400, d))\n    k = rng.normal(size=(400, 64, d))\n    logits = np.einsum(\"bd,bnd-&gt;bn\", q, k)\n    for values, scale in ((entropy_raw, 1.0), (entropy_scaled, np.sqrt(d))):\n        z = logits / scale\n        z -= z.max(axis=1, keepdims=True)\n        p = np.exp(z)\n        p /= p.sum(axis=1, keepdims=True)\n        values.append(np.mean(-np.sum(p * np.log(p + 1e-30), axis=1)))\n\nfig, ax = plt.subplots(figsize=(7, 3.6))\nax.plot(dims, entropy_raw, \"o-\", label=\"unscaled\")\nax.plot(dims, entropy_scaled, \"o-\", label=r\"scaled by $\\sqrt{d_k}$\")\nax.axhline(np.log(64), color=\"0.55\", lw=1, ls=\":\", label=\"uniform entropy\")\nax.set(xscale=\"log\", xlabel=r\"head dimension $d_k$\", ylabel=\"entropy (nats)\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 1: Mean attention entropy with and without the square-root scaling. Each point averages 400 random attention rows over 64 keys.\n\n\n\n\n\nThe experiment is deliberately distributional rather than model-specific. It isolates the argument behind the normalization in Equation 1: without it, increasing width changes the effective temperature of attention."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#the-softmax-jacobian",
+    "href": "posts/attention-from-logits-to-context/index.html#the-softmax-jacobian",
+    "title": "Attention, from Logits to Context",
+    "section": "The softmax Jacobian",
+    "text": "The softmax Jacobian\nFor one row p=\\operatorname{softmax}(s),\n\n\\frac{\\partial p_i}{\\partial s_j}=p_i(\\delta_{ij}-p_j),\n\\qquad\nJ_{\\text{softmax}}=\\operatorname{diag}(p)-pp^\\top.\n\nThis matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution. The same invariance explains the standard stable implementation\ndef softmax(x, axis=-1):\n    shifted = x - x.max(axis=axis, keepdims=True)\n    weights = np.exp(shifted)\n    return weights / weights.sum(axis=axis, keepdims=True)\nSubtracting the maximum changes neither P nor the gradient, but prevents overflow in the exponential."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#multi-head-attention-is-a-structured-factorization",
+    "href": "posts/attention-from-logits-to-context/index.html#multi-head-attention-is-a-structured-factorization",
+    "title": "Attention, from Logits to Context",
+    "section": "Multi-head attention is a structured factorization",
+    "text": "Multi-head attention is a structured factorization\nWith h heads,\n\n\\operatorname{MHA}(X)\n=\\operatorname{Concat}(O_1,\\ldots,O_h)W^O,\n\nwhere each O_r has its own projected queries, keys, and values. For the common choice d_k=d_v=d_{\\text{model}}/h, the projection and attention FLOP counts remain approximately constant as h changes:\n\n\\underbrace{4nd_{\\text{model}}^2}_{Q,K,V,O\\text{ projections}}\n+\\underbrace{2n^2d_{\\text{model}}}_{QK^\\top\\text{ and }PV}.\n\nHeads do not provide free capacity. They partition the channel dimension into several learned similarity spaces. Very small d_k constrains each compatibility function, while a single wide head forces one attention distribution to serve every subspace."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#memory-is-not-the-same-as-arithmetic",
+    "href": "posts/attention-from-logits-to-context/index.html#memory-is-not-the-same-as-arithmetic",
+    "title": "Attention, from Logits to Context",
+    "section": "Memory is not the same as arithmetic",
+    "text": "Memory is not the same as arithmetic\nThe two matrix multiplications require O(n^2d) arithmetic. A literal implementation also writes S and P, each with n^2 entries. At sequence length 16,384, one FP16 matrix for one batch-head pair occupies 512 MiB. The quadratic intermediate, not only the quadratic FLOP count, is the systems problem.\nThis distinction leads directly to IO-aware kernels such as FlashAttention: equation Equation 1 stays unchanged, but its evaluation order is reorganized so that S and P never reside in high-bandwidth memory as complete matrices."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#what-the-equation-does-not-guarantee",
+    "href": "posts/attention-from-logits-to-context/index.html#what-the-equation-does-not-guarantee",
+    "title": "Attention, from Logits to Context",
+    "section": "What the equation does not guarantee",
+    "text": "What the equation does not guarantee\nAttention weights are conditional routing coefficients, not a causal explanation. A high value of P_{ij} says that value v_j contributes strongly to output o_i under the current parameterization. Residual connections, value projections, later layers, and correlated features complicate any interpretation beyond that statement.\nThe normalization also creates competition. Increasing one logit decreases other probabilities in the row, even when those keys are unrelated. This coupling is useful for selection, but it means that attention is not a set of independent relevance scores."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#practical-checks",
+    "href": "posts/attention-from-logits-to-context/index.html#practical-checks",
+    "title": "Attention, from Logits to Context",
+    "section": "Practical checks",
+    "text": "Practical checks\nA minimal implementation should satisfy three invariants:\n\nEvery unmasked row sums to one within numerical tolerance.\nMasked probabilities are zero.\nShifting a complete score row by any scalar leaves the output unchanged.\n\nThose tests catch axis errors and many masking mistakes before they become training pathologies."
+  },
+  {
+    "objectID": "posts/attention-from-logits-to-context/index.html#references",
+    "href": "posts/attention-from-logits-to-context/index.html#references",
+    "title": "Attention, from Logits to Context",
+    "section": "References",
+    "text": "References\n\n\nVaswani, Ashish, Noam Shazeer, Niki Parmar, et al. 2017. “Attention Is All You Need.” Advances in Neural Information Processing Systems 30. https://arxiv.org/abs/1706.03762."
   },
   {
     "objectID": "colophon/index.html",
@@ -18,7 +151,7 @@
     "href": "colophon/index.html#purpose",
     "title": "Colophon",
     "section": "Purpose",
-    "text": "Purpose\nThis site publishes research notes, paper analyses, implementation details, and technical experiments. The goal is to think carefully about problems in machine learning, mathematics, and scientific computing — and to document what is learned along the way.\nArticles here are written for a technical audience. They aim to be precise, reproducible, and useful."
+    "text": "Purpose\nThis site publishes research notes, paper analyses, implementation details, and technical experiments. The goal is to think carefully about problems in machine learning, mathematics, and scientific computing, then document what is learned along the way.\nArticles here are written for a technical audience. They aim to be precise, reproducible, and useful."
   },
   {
     "objectID": "colophon/index.html#tools",
@@ -32,14 +165,14 @@
     "href": "colophon/index.html#typography",
     "title": "Colophon",
     "section": "Typography",
-    "text": "Typography\nHeadings use Inter, a typeface designed for computer screens. Body text uses the browser’s default serif stack. Code is set in the system monospace font."
+    "text": "Typography\nHeadings use Source Serif 4. Body text uses Inter, a typeface designed for computer screens. Code uses a system-oriented monospace stack headed by Cascadia Code and JetBrains Mono."
   },
   {
     "objectID": "colophon/index.html#design",
     "href": "colophon/index.html#design",
     "title": "Colophon",
     "section": "Design",
-    "text": "Design\nThe visual identity is intentionally restrained: generous whitespace, a muted teal accent, uppercase headings with wide tracking, and minimal decoration. The coordinate-dot motif references the mathematical meaning of eigen — characteristic values, fixed points, structure."
+    "text": "Design\nThe visual identity is intentionally restrained: generous whitespace, a muted teal accent, clear hierarchy, and minimal decoration. The coordinate-dot motif references the mathematical meaning of eigen: characteristic values, fixed points, and structure."
   },
   {
     "objectID": "colophon/index.html#citing-articles",
@@ -53,174 +186,237 @@
     "href": "colophon/index.html#contact",
     "title": "Colophon",
     "section": "Contact",
-    "text": "Contact\n\nFor questions, corrections, or collaboration, open an issue on the GitHub repository."
-  },
-  {
-    "objectID": "posts/first-technical-post/index.html",
-    "href": "posts/first-technical-post/index.html",
-    "title": "My First Technical Post",
-    "section": "",
-    "text": "This is the first article published on my technical blog.\nThe purpose of this post is to verify that Quarto correctly renders:\n\nmathematical equations;\nPython code;\nJupyter output;\nfigures;\nlinks to external repositories."
-  },
-  {
-    "objectID": "posts/first-technical-post/index.html#introduction",
-    "href": "posts/first-technical-post/index.html#introduction",
-    "title": "My First Technical Post",
-    "section": "",
-    "text": "This is the first article published on my technical blog.\nThe purpose of this post is to verify that Quarto correctly renders:\n\nmathematical equations;\nPython code;\nJupyter output;\nfigures;\nlinks to external repositories."
-  },
-  {
-    "objectID": "posts/first-technical-post/index.html#a-mathematical-example",
-    "href": "posts/first-technical-post/index.html#a-mathematical-example",
-    "title": "My First Technical Post",
-    "section": "A mathematical example",
-    "text": "A mathematical example\nConsider the mean squared error:\n\n\\mathcal{L}(\\theta)\n=\n\\frac{1}{N}\n\\sum_{i=1}^{N}\n\\left(f_\\theta(x_i)-y_i\\right)^2\n\\tag{1}\nEquation Equation 1 measures the average squared difference between predictions and targets."
-  },
-  {
-    "objectID": "posts/first-technical-post/index.html#a-python-example",
-    "href": "posts/first-technical-post/index.html#a-python-example",
-    "title": "My First Technical Post",
-    "section": "A Python example",
-    "text": "A Python example\n\nimport numpy as np \nimport matplotlib.pyplot as plt\n\nx = np.linspace(-3, 3, 200) \ny = x**2\n\nplt.plot(x, y) \nplt.xlabel(\"x\") \nplt.ylabel(\"x²\") \nplt.title(\"Quadratic function\") \nplt.show()"
-  },
-  {
-    "objectID": "posts/first-technical-post/index.html#repository",
-    "href": "posts/first-technical-post/index.html#repository",
-    "title": "My First Technical Post",
-    "section": "Repository",
-    "text": "Repository\nThe complete source code for future projects will be available on GitHub. View my GitHub profile"
-  },
-  {
-    "objectID": "notes/index.html",
-    "href": "notes/index.html",
-    "title": "Notes",
-    "section": "",
-    "text": "Short-form research notes, reading logs, and work-in-progress observations.\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/new-article/index.html",
-    "href": "posts/new-article/index.html",
-    "title": "Article Title Here",
-    "section": "",
-    "text": "Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.\nThis article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to index.qmd, remove draft: true, and replace the content."
-  },
-  {
-    "objectID": "posts/new-article/index.html#introduction",
-    "href": "posts/new-article/index.html#introduction",
-    "title": "Article Title Here",
-    "section": "",
-    "text": "Opening paragraph. State the problem, the motivation, and what this article covers. Keep it concise — the reader should know within two sentences whether this is relevant to them.\nThis article demonstrates every content element available in Quarto. Use it as a starting point: copy this file into a new directory, rename it to index.qmd, remove draft: true, and replace the content."
-  },
-  {
-    "objectID": "posts/new-article/index.html#mathematical-content",
-    "href": "posts/new-article/index.html#mathematical-content",
-    "title": "Article Title Here",
-    "section": "Mathematical content",
-    "text": "Mathematical content\nInline math uses single dollars: the loss function \\mathcal{L}(\\theta) measures model error.\nDisplay equations use double dollars:\n\\nabla_\\theta \\mathcal{L}(\\theta) = -\\frac{1}{N} \\sum_{i=1}^{N} \\nabla_\\theta \\log p_\\theta(x_i) {#eq-gradient}\nReference equations with @eq-label: see ?@eq-gradient above.\nA matrix example:\nA = \\begin{bmatrix}\na_{11} & a_{12} \\\\\na_{21} & a_{22}\n\\end{bmatrix}, \\quad\n\\lambda \\in \\sigma(A)"
-  },
-  {
-    "objectID": "posts/new-article/index.html#code",
-    "href": "posts/new-article/index.html#code",
-    "title": "Article Title Here",
-    "section": "Code",
-    "text": "Code\n\nStatic code block (not executed)\nimport torch\nimport torch.nn as nn\n\nclass ResidualBlock(nn.Module):\n    def __init__(self, dim: int):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(dim, dim),\n            nn.GELU(),\n            nn.Linear(dim, dim),\n        )\n\n    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:\n        return x + self.net(x)\n\n\nExecutable code block\nUncomment jupyter: python3 in the YAML header to enable execution.\n```{python}\n#| label: fig-example\n#| fig-cap: \"Example plot generated from code.\"\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nx = np.linspace(-2 * np.pi, 2 * np.pi, 300)\ny = np.sin(x) * np.exp(-0.1 * x**2)\n\nfig, ax = plt.subplots(figsize=(7, 3))\nax.plot(x, y, color=\"#2a6e6e\", linewidth=1.5)\nax.set_xlabel(\"x\")\nax.set_ylabel(\"f(x)\")\nax.set_title(\"Damped sine wave\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nplt.tight_layout()\nplt.show()\n```\n\n\nInline code\nUse backticks for inline code: the Adam optimizer with lr=3e-4."
-  },
-  {
-    "objectID": "posts/new-article/index.html#text-formatting",
-    "href": "posts/new-article/index.html#text-formatting",
-    "title": "Article Title Here",
-    "section": "Text formatting",
-    "text": "Text formatting\nRegular paragraph with bold text, italic text, and bold italic. Use inline code for function names and variables. Add a hyperlink or an internal link.\n\nUnordered list\n\nFirst item with some detail\nSecond item\n\nNested item\nAnother nested item\n\nThird item\n\n\n\nOrdered list\n\nFirst step\nSecond step\nThird step\n\n\n\nBlockquote\n\nThe purpose of computing is insight, not numbers.\n— Richard Hamming"
-  },
-  {
-    "objectID": "posts/new-article/index.html#callouts",
-    "href": "posts/new-article/index.html#callouts",
-    "title": "Article Title Here",
-    "section": "Callouts",
-    "text": "Callouts\n\n\n\n\n\n\nNoteNote\n\n\n\nUse notes for supplementary information that supports the main text.\n\n\n\n\n\n\n\n\nWarningWarning\n\n\n\nUse warnings for common pitfalls or important caveats.\n\n\n\n\n\n\n\n\nTipTip\n\n\n\nUse tips for practical recommendations or shortcuts.\n\n\n\n\n\n\n\n\nImportantImportant\n\n\n\nUse important callouts for critical information the reader must not miss."
-  },
-  {
-    "objectID": "posts/new-article/index.html#figures-and-images",
-    "href": "posts/new-article/index.html#figures-and-images",
-    "title": "Article Title Here",
-    "section": "Figures and images",
-    "text": "Figures and images\n\n\n\n\n\n\nFigure 1: Placeholder for a figure. Replace with your own image.\n\n\n\nReference figures with @fig-label: see Figure 1."
-  },
-  {
-    "objectID": "posts/new-article/index.html#tables",
-    "href": "posts/new-article/index.html#tables",
-    "title": "Article Title Here",
-    "section": "Tables",
-    "text": "Tables\n\nComparison of methods on the benchmark dataset.\n\n\nMethod\nAccuracy\nParameters\nTraining time\n\n\n\n\nBaseline\n72.3%\n1.2M\n2h\n\n\nProposed\n78.1%\n1.4M\n3h\n\n\nEnsemble\n80.5%\n4.2M\n8h\n\n\n\nReference tables with @tbl-label: see ?@tbl-results."
-  },
-  {
-    "objectID": "posts/new-article/index.html#tabbed-content",
-    "href": "posts/new-article/index.html#tabbed-content",
-    "title": "Article Title Here",
-    "section": "Tabbed content",
-    "text": "Tabbed content\n\nPyTorchJAX\n\n\nloss = F.cross_entropy(logits, targets)\nloss.backward()\noptimizer.step()\n\n\nloss, grads = jax.value_and_grad(loss_fn)(params, batch)\nupdates, opt_state = optimizer.update(grads, opt_state)\nparams = optax.apply_updates(params, updates)"
-  },
-  {
-    "objectID": "posts/new-article/index.html#footnotes",
-    "href": "posts/new-article/index.html#footnotes",
-    "title": "Article Title Here",
-    "section": "Footnotes",
-    "text": "Footnotes\n\n\nSource or explanation for the first claim.↩︎\nSource or explanation for the second claim.↩︎"
-  },
-  {
-    "objectID": "posts/new-article/index.html#definitions-and-terminology",
-    "href": "posts/new-article/index.html#definitions-and-terminology",
-    "title": "Article Title Here",
-    "section": "Definitions and terminology",
-    "text": "Definitions and terminology\n\nTerm\n\nDefinition of the term. Use definition lists for glossary-style entries.\n\nEigenvalue\n\nA scalar \\lambda such that Av = \\lambda v for some nonzero vector v."
-  },
-  {
-    "objectID": "posts/new-article/index.html#horizontal-rule",
-    "href": "posts/new-article/index.html#horizontal-rule",
-    "title": "Article Title Here",
-    "section": "Horizontal rule",
-    "text": "Horizontal rule\nUse three dashes for a thematic break:"
-  },
-  {
-    "objectID": "posts/new-article/index.html#conclusion",
-    "href": "posts/new-article/index.html#conclusion",
-    "title": "Article Title Here",
-    "section": "Conclusion",
-    "text": "Conclusion\nSummarize the key findings. State limitations. Suggest directions for future work."
-  },
-  {
-    "objectID": "posts/new-article/index.html#references",
-    "href": "posts/new-article/index.html#references",
-    "title": "Article Title Here",
-    "section": "References",
-    "text": "References"
-  },
-  {
-    "objectID": "about/index.html",
-    "href": "about/index.html",
-    "title": "About",
-    "section": "",
-    "text": "Eigenholm is a personal technical site and research notebook focused on machine learning, deep learning, mathematics, and scientific computing.\nThe writing here covers paper analyses, implementation notes, reproductions of published results, and documentation of technical projects. The goal is to think carefully, build from first principles, and share what is learned along the way."
-  },
-  {
-    "objectID": "about/index.html#background",
-    "href": "about/index.html#background",
-    "title": "About",
-    "section": "Background",
-    "text": "Background\nAdd a short introduction about yourself here — your background, current work, and research interests."
-  },
-  {
-    "objectID": "about/index.html#interests",
-    "href": "about/index.html#interests",
-    "title": "About",
-    "section": "Interests",
-    "text": "Interests\n\nMachine learning and deep learning theory\nMathematical foundations of AI\nPaper replications and reproducibility\nScientific computing and numerical methods\nSoftware engineering for research"
+    "text": "Contact\nFor questions, corrections, or collaboration, open an issue on the GitHub repository."
   },
   {
     "objectID": "projects/index.html",
     "href": "projects/index.html",
     "title": "Projects",
     "section": "",
-    "text": "Technical projects, implementations, and research experiments.\n\n\n\n\nNo matching items"
+    "text": "Technical projects, implementations, and research experiments.\n\n\n\n\n\nA Paged KV-Cache Allocator, Built from First Principles\n\n\n\nLLM Serving\n\nMemory Management\n\nPython\n\n\n\nAn executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.\n\n\n\n\n\nAug 13, 2026\n\n\nDiego Filippo Marino\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html",
+    "href": "projects/paged-kv-cache-simulator/index.html",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "",
+    "text": "Autoregressive decoding reuses the keys and values of every previous token. Caching them avoids a full prefix recomputation, but turns serving capacity into a memory-allocation problem: request lengths are unknown, sequences arrive and finish at different times, and branching decoders share long prefixes.\nThis project builds a small simulator for two allocation policies:\n\nContiguous reservation: reserve each request’s declared maximum length.\nPaged allocation: allocate fixed-size token blocks only when needed.\n\nThe model is intentionally compact. It does not benchmark a GPU kernel. It isolates the allocator mechanism behind PagedAttention and vLLM (Kwon et al. 2023)."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#overview",
+    "href": "projects/paged-kv-cache-simulator/index.html#overview",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "",
+    "text": "Autoregressive decoding reuses the keys and values of every previous token. Caching them avoids a full prefix recomputation, but turns serving capacity into a memory-allocation problem: request lengths are unknown, sequences arrive and finish at different times, and branching decoders share long prefixes.\nThis project builds a small simulator for two allocation policies:\n\nContiguous reservation: reserve each request’s declared maximum length.\nPaged allocation: allocate fixed-size token blocks only when needed.\n\nThe model is intentionally compact. It does not benchmark a GPU kernel. It isolates the allocator mechanism behind PagedAttention and vLLM (Kwon et al. 2023)."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#cache-size",
+    "href": "projects/paged-kv-cache-simulator/index.html#cache-size",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "Cache size",
+    "text": "Cache size\nFor a decoder with L layers, h_{kv} key/value heads, head dimension d_h, element size b bytes, and T cached tokens, the cache occupies\n\nB_{KV}=2Lh_{kv}d_hTb. \\tag{1}\n\\tag{1}\nThe factor two accounts for keys and values. For conventional multi-head attention, h_{kv} equals the query-head count. Multi-query and grouped-query attention reduce h_{kv}, which directly reduces the persistent cache.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\ntokens = np.arange(0, 32769, 512)\nconfigs = {\n    \"32L, 32 KV heads, d=128\": (32, 32, 128),\n    \"32L, 8 KV heads, d=128\": (32, 8, 128),\n    \"80L, 8 KV heads, d=128\": (80, 8, 128),\n}\n\nfig, ax = plt.subplots(figsize=(7, 3.8))\nfor label, (layers, kv_heads, head_dim) in configs.items():\n    gib = 2 * layers * kv_heads * head_dim * tokens * 2 / 2**30\n    ax.plot(tokens, gib, label=label)\nax.set(xlabel=\"cached tokens\", ylabel=\"KV cache per request (GiB)\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False, fontsize=8)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 1: KV-cache memory per request for three decoder configurations in FP16. Model labels describe layers, KV heads, and head dimension.\n\n\n\n\n\nEquation Equation 1 is linear in context length and batch size. That is better than storing a quadratic attention matrix, but it becomes the dominant dynamic allocation in a serving engine."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#allocation-model",
+    "href": "projects/paged-kv-cache-simulator/index.html#allocation-model",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "Allocation model",
+    "text": "Allocation model\nA contiguous allocator needs one extent large enough for the request. Reserving the declared maximum avoids relocation while decoding, but unused future slots waste memory. Variable extents also create external fragmentation.\nA paged allocator divides the cache into equal physical blocks. Each request owns a logical block table:\n\n\\text{logical block }j\\longmapsto\\text{physical block }\\pi_r(j).\n\nThe attention kernel follows this mapping when reading keys and values. Since physical blocks have equal size, they can be taken from a free list and need not be adjacent.\nfrom dataclasses import dataclass, field\nfrom math import ceil\n\n@dataclass\nclass Request:\n    request_id: int\n    prompt_tokens: int\n    max_tokens: int\n    generated: int = 0\n    blocks: list[int] = field(default_factory=list)\n\n    @property\n    def live_tokens(self):\n        return self.prompt_tokens + self.generated\n\nclass PagedAllocator:\n    def __init__(self, block_count: int, block_tokens: int = 16):\n        self.block_tokens = block_tokens\n        self.free = list(range(block_count))\n\n    def ensure_capacity(self, request: Request):\n        required = ceil(request.live_tokens / self.block_tokens)\n        missing = required - len(request.blocks)\n        if missing &gt; len(self.free):\n            raise MemoryError(\"KV cache exhausted\")\n        for _ in range(missing):\n            request.blocks.append(self.free.pop())\n\n    def release(self, request: Request):\n        self.free.extend(request.blocks)\n        request.blocks.clear()\nOnly the final block of a request can be partially empty. If the block contains B token slots, internal waste is bounded by B-1 slots per live sequence, independent of maximum generation length."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#a-workload-experiment",
+    "href": "projects/paged-kv-cache-simulator/index.html#a-workload-experiment",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "A workload experiment",
+    "text": "A workload experiment\nThe following experiment samples 2,000 concurrent requests. Prompt lengths follow a log-normal distribution, maximum generation budgets are deliberately conservative, and actual completions vary. The comparison measures reserved token slots rather than allocator metadata.\n\nrng = np.random.default_rng(11)\nrequests = 2_000\nprompt = np.clip(rng.lognormal(mean=5.2, sigma=0.8, size=requests).astype(int), 16, 4096)\nbudget = rng.choice([128, 256, 512, 1024], size=requests, p=[0.2, 0.35, 0.3, 0.15])\nactual = np.array([rng.integers(1, limit + 1) for limit in budget])\nlive = prompt + actual\nblock_sizes = np.array([8, 16, 32, 64, 128])\n\ncontiguous_reserved = prompt + budget\ncontiguous_efficiency = live.sum() / contiguous_reserved.sum()\npaged_efficiency = np.array([\n    live.sum() / (np.ceil(live / block) * block).sum()\n    for block in block_sizes\n])\n\nfig, ax = plt.subplots(figsize=(7, 3.7))\nax.plot(block_sizes, 100 * paged_efficiency, \"o-\", label=\"paged\")\nax.axhline(100 * contiguous_efficiency, color=\"0.35\", ls=\"--\",\n           label=\"contiguous reservation\")\nax.set(xlabel=\"block size (token slots)\", ylabel=\"live-token efficiency (%)\", ylim=(0, 102))\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 2: Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks.\n\n\n\n\n\nThese values are simulator outputs, not measurements from the vLLM paper. The qualitative trade-off is real: smaller blocks reduce internal fragmentation but increase block-table entries and kernel address-translation work."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#prefix-sharing-and-copy-on-write",
+    "href": "projects/paged-kv-cache-simulator/index.html#prefix-sharing-and-copy-on-write",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "Prefix sharing and copy-on-write",
+    "text": "Prefix sharing and copy-on-write\nPaging makes sharing natural. Parallel samples from one prompt can point their logical prefix blocks to the same physical blocks. Maintain a reference count c_b for every physical block. A fork increments counts; releasing a request decrements them.\nAppending to a shared partially filled block requires copy-on-write:\ndef append_with_cow(request, refcount, free_blocks, block_tokens):\n    last = request.blocks[-1]\n    offset = request.live_tokens % block_tokens\n    if offset and refcount[last] &gt; 1:\n        replacement = free_blocks.pop()\n        copy_block(last, replacement)  # device-to-device copy\n        refcount[last] -= 1\n        refcount[replacement] = 1\n        request.blocks[-1] = replacement\n    append_token_kv(request.blocks[-1], offset)\nFull shared prefix blocks never need copying. Only the block currently being extended can trigger copy-on-write. This supports parallel sampling, beam search, and shared system prompts with the same mechanism."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#scheduling-consequences",
+    "href": "projects/paged-kv-cache-simulator/index.html#scheduling-consequences",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "Scheduling consequences",
+    "text": "Scheduling consequences\nBetter allocation increases the feasible batch size, but a production server must also decide which requests enter a batch and how to recover under pressure. Swapping cache blocks to host memory preserves work but consumes interconnect bandwidth. Recomputation discards blocks and rebuilds them with a prefill pass, trading compute for storage.\nThe vLLM paper reports near-zero KV-cache waste and 2 to 4 times higher throughput at comparable latency than the evaluated baselines (Kwon et al. 2023). The gain comes from the system built around the allocator, not address translation alone. Larger effective batches improve GPU utilization, while prefix sharing avoids duplicate storage."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#verification-targets",
+    "href": "projects/paged-kv-cache-simulator/index.html#verification-targets",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "Verification targets",
+    "text": "Verification targets\nA serious allocator test suite should exercise:\n\nallocation across non-contiguous physical blocks;\nrelease and reuse without stale references;\nforked prefixes with correct reference counts;\ncopy-on-write only for a shared writable tail;\nout-of-memory behavior that leaves existing tables unchanged;\nblock-table translation against a contiguous reference implementation.\n\nThe last test is especially important. PagedAttention changes where tensors live, not the mathematical output of attention."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#limitations",
+    "href": "projects/paged-kv-cache-simulator/index.html#limitations",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "Limitations",
+    "text": "Limitations\nThis simulator counts token slots. Real systems allocate per layer, shard tensors across devices, align blocks for kernels, and synchronize allocator state with asynchronous execution. Kernel layout can also favor a block size that is not optimal under a pure fragmentation metric.\nStill, the model captures the essential systems insight: once persistent state has irregular lifetimes, a tensor is not only a numerical object. It is also a dynamically allocated resource."
+  },
+  {
+    "objectID": "projects/paged-kv-cache-simulator/index.html#references",
+    "href": "projects/paged-kv-cache-simulator/index.html#references",
+    "title": "A Paged KV-Cache Allocator, Built from First Principles",
+    "section": "References",
+    "text": "References\n\n\nKwon, Woosuk, Zhuohan Li, Siyuan Zhuang, et al. 2023. “Efficient Memory Management for Large Language Model Serving with PagedAttention.” Proceedings of the 29th Symposium on Operating Systems Principles, 611–26. https://doi.org/10.1145/3600006.3613165."
+  },
+  {
+    "objectID": "about/index.html",
+    "href": "about/index.html",
+    "title": "About",
+    "section": "",
+    "text": "I am Diego Filippo Marino. Eigenholm is where I work through the mathematics and engineering of modern machine learning systems in public.\nThe site sits between a research notebook and a technical journal. I use it to reconstruct papers from their central equations, test implementation details in small experiments, and connect model design to the hardware and numerical constraints that shape it."
+  },
+  {
+    "objectID": "about/index.html#what-i-write-about",
+    "href": "about/index.html#what-i-write-about",
+    "title": "About",
+    "section": "What I write about",
+    "text": "What I write about\nMy main subject is deep learning, with a particular interest in language models, efficient training and inference, representation learning, and the mathematical structure behind optimization. Scientific computing and numerical methods appear whenever they are the right tools for making an argument concrete.\nArticles are long-form explanations. Projects turn an idea into an executable model or simulator. Notes are narrower investigations, derivations, and results that are useful before they grow into a full article."
+  },
+  {
+    "objectID": "about/index.html#method",
+    "href": "about/index.html#method",
+    "title": "About",
+    "section": "Method",
+    "text": "Method\nI prefer primary sources and explicit assumptions. When a result comes from a paper, the page cites it. When a graph comes from code, the code is included or described closely enough to reproduce it. When a number is illustrative rather than measured on real hardware, it is labelled as such.\nThe aim is not to compress a topic into a list of facts. It is to expose the mechanism: what is computed, why the equation has that form, where the memory goes, and under which conditions the method stops helping."
+  },
+  {
+    "objectID": "about/index.html#contact-and-source",
+    "href": "about/index.html#contact-and-source",
+    "title": "About",
+    "section": "Contact and source",
+    "text": "Contact and source\nThe source for this site is available on GitHub. For professional context, see LinkedIn."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html",
+    "href": "posts/rope-geometry/index.html",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "",
+    "text": "Self-attention is permutation equivariant. If the rows of Q, K, and V are permuted together, the output rows are permuted in the same way. A language model therefore needs an additional structure that distinguishes token order.\nRotary position embedding, usually called RoPE, inserts that structure by rotating query and key coordinates (Su et al. 2024). The construction is small enough to fit in a few lines of code, but its real value is algebraic: absolute positions become relative offsets inside the attention dot product."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#a-two-dimensional-representation-of-position",
+    "href": "posts/rope-geometry/index.html#a-two-dimensional-representation-of-position",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "A two-dimensional representation of position",
+    "text": "A two-dimensional representation of position\nFor one coordinate pair, define\n\nR(m\\theta)=\n\\begin{bmatrix}\n\\cos(m\\theta)&-\\sin(m\\theta)\\\\\n\\sin(m\\theta)& \\cos(m\\theta)\n\\end{bmatrix}.\n\nAt position m, RoPE maps q\\mapsto R(m\\theta)q and k\\mapsto R(m\\theta)k. Orthogonality and the group law R(a)^\\top R(b)=R(b-a) give\n\n\\langle R(m\\theta)q,R(n\\theta)k\\rangle\n=q^\\top R((n-m)\\theta)k. \\tag{1}\n\\tag{1}\nThe inputs carry absolute angles, but the logit depends only on n-m. Equation Equation 1 is the core of RoPE.\nFor even dimension d, the complete operator is block diagonal:\n\nR_{\\Theta,m}=\\operatorname{diag}\n\\left(R(m\\theta_0),R(m\\theta_1),\\ldots,R(m\\theta_{d/2-1})\\right),\n\nwith the conventional schedule\n\n\\theta_i=b^{-2i/d},\\qquad b=10{,}000.\n\nThe first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nd = 64\nbase = 10_000\npair_ids = np.array([0, 8, 16, 24])\ntheta = base ** (-2 * pair_ids / d)\noffset = np.arange(0, 4097)\n\nfig, axes = plt.subplots(2, 2, figsize=(8, 5), sharex=True, sharey=True)\nfor ax, i, frequency in zip(axes.flat, pair_ids, theta):\n    ax.plot(offset, np.cos(offset * frequency), lw=1.1)\n    ax.set_title(fr\"pair $i={i}$, period $\\approx {2*np.pi/frequency:.0f}$\")\n    ax.spines[[\"top\", \"right\"]].set_visible(False)\nfor ax in axes[-1]:\n    ax.set_xlabel(\"relative offset\")\nfor ax in axes[:, 0]:\n    ax.set_ylabel(\"cosine phase\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 1: Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64.\n\n\n\n\n\nThe schedule is not a collection of position counters. Each pair is periodic and therefore ambiguous on its own. Position is represented by the joint phase across all pairs."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#complex-notation-exposes-the-mechanism",
+    "href": "posts/rope-geometry/index.html#complex-notation-exposes-the-mechanism",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "Complex notation exposes the mechanism",
+    "text": "Complex notation exposes the mechanism\nIdentify a coordinate pair (x_{2i},x_{2i+1}) with the complex number z_i=x_{2i}+\\mathrm{i}x_{2i+1}. Rotation becomes multiplication:\n\nz_i^{(m)}=z_i e^{\\mathrm{i}m\\theta_i}.\n\nThe real part of the Hermitian product between a rotated query and key contains\n\n\\operatorname{Re}\\left(q_i\\overline{k_i}e^{\\mathrm{i}(m-n)\\theta_i}\\right).\n\nThis makes two facts visible. First, relative position modulates content similarity rather than adding an independent bias. Second, the model can learn how much each frequency matters by shaping q_i\\overline{k_i} through the projection matrices."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#a-vectorized-implementation",
+    "href": "posts/rope-geometry/index.html#a-vectorized-implementation",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "A vectorized implementation",
+    "text": "A vectorized implementation\nimport numpy as np\n\ndef apply_rope(x: np.ndarray, positions: np.ndarray, base: float = 10_000.0):\n    \"\"\"Rotate x with shape [sequence, heads, head_dim].\"\"\"\n    d = x.shape[-1]\n    assert d % 2 == 0\n    inv_freq = base ** (-np.arange(0, d, 2) / d)\n    angle = positions[:, None] * inv_freq[None, :]\n    cos, sin = np.cos(angle)[:, None, :], np.sin(angle)[:, None, :]\n\n    even, odd = x[..., 0::2], x[..., 1::2]\n    out = np.empty_like(x)\n    out[..., 0::2] = even * cos - odd * sin\n    out[..., 1::2] = even * sin + odd * cos\n    return out\nReal kernels often use a rotate_half formulation or interleave dimensions differently. The pairing convention may vary, but queries and keys must use the same convention."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#why-extrapolation-is-difficult",
+    "href": "posts/rope-geometry/index.html#why-extrapolation-is-difficult",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "Why extrapolation is difficult",
+    "text": "Why extrapolation is difficult\nRoPE defines angles at every integer position, so it is mechanically valid beyond the training length. That does not imply reliable extrapolation. At longer contexts, the model encounters phase combinations and attention distances absent during training.\nFor a training limit L, frequency pair i completes\n\nc_i(L)=\\frac{L\\theta_i}{2\\pi}\n\ncycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.\n\npair = np.arange(d // 2)\ninv_freq = base ** (-2 * pair / d)\n\nfig, ax = plt.subplots(figsize=(7, 3.6))\nfor length in (2048, 32768):\n    ax.semilogy(pair, length * inv_freq / (2 * np.pi), marker=\"o\", ms=3,\n                label=f\"context {length:,}\")\nax.axhline(1, color=\"0.5\", ls=\":\", lw=1)\nax.set(xlabel=\"coordinate-pair index\", ylabel=\"completed rotations\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 2: Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768.\n\n\n\n\n\nChanging the base b stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#numerical-and-implementation-details",
+    "href": "posts/rope-geometry/index.html#numerical-and-implementation-details",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "Numerical and implementation details",
+    "text": "Numerical and implementation details\nRoPE preserves vector norms in exact arithmetic because every block is orthogonal. This provides a useful unit test:\n\n\\|R_{\\Theta,m}x\\|_2=\\|x\\|_2.\n\nIt also preserves a strict relative-position identity. For random q,k,m,n, the following quantities should agree:\nleft = np.dot(rotate(q, m), rotate(k, n))\nright = np.dot(q, rotate(k, n - m))\nnp.testing.assert_allclose(left, right, rtol=1e-6, atol=1e-6)\nFor long contexts, compute the trigonometric tables with care. Low-precision angle formation can lose phase accuracy before the final vectors are cast to the model dtype. Many implementations form frequencies or angles in FP32 even when attention runs in BF16 or FP16."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#what-rope-buys",
+    "href": "posts/rope-geometry/index.html#what-rope-buys",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "What RoPE buys",
+    "text": "What RoPE buys\nRoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate Q and K, leave V unchanged, and preserve the rest of the attention kernel.\nThe price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound."
+  },
+  {
+    "objectID": "posts/rope-geometry/index.html#references",
+    "href": "posts/rope-geometry/index.html#references",
+    "title": "The Geometry of Rotary Position Embeddings",
+    "section": "References",
+    "text": "References\n\n\nSu, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024. “RoFormer: Enhanced Transformer with Rotary Position Embedding.” Neurocomputing 568: 127063. https://doi.org/10.1016/j.neucom.2023.127063."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html",
+    "href": "posts/flashattention-io-aware/index.html",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "",
+    "text": "The standard account of attention starts with an n\\times n matrix. That is mathematically convenient and computationally misleading. A GPU does not pay only for arithmetic. It also pays to move every intermediate between high-bandwidth memory, caches, registers, and on-chip SRAM.\nFlashAttention keeps the exact attention function but changes its evaluation schedule so the quadratic score and probability matrices are never written to high-bandwidth memory (Dao et al. 2022). The central technique is an online softmax that can be updated one tile at a time."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#the-traffic-in-a-literal-implementation",
+    "href": "posts/flashattention-io-aware/index.html#the-traffic-in-a-literal-implementation",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "The traffic in a literal implementation",
+    "text": "The traffic in a literal implementation\nFor one head,\n\nS=QK^\\top,\\qquad P=\\operatorname{softmax}(S),\\qquad O=PV.\n\nA conventional sequence of kernels writes S to HBM, reads it for softmax, writes P, then reads P for the second matrix multiplication. Both intermediates contain n^2 elements. Kernel fusion can remove some round trips, but S and P still exceed on-chip capacity at useful sequence lengths.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nn = 2 ** np.arange(8, 18)\nd = 128\nscore_mib = n**2 * 2 / 2**20\nqkv_mib = 3 * n * d * 2 / 2**20\n\nfig, ax = plt.subplots(figsize=(7, 3.8))\nax.loglog(n, score_mib, \"o-\", label=r\"one $n\\times n$ matrix\")\nax.loglog(n, qkv_mib, \"o-\", label=r\"$Q,K,V$ at $d=128$\")\nax.set(xlabel=\"sequence length\", ylabel=\"storage (MiB)\")\nax.spines[[\"top\", \"right\"]].set_visible(False)\nax.grid(which=\"both\", alpha=0.18)\nax.legend(frameon=False)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\nFigure 1: Storage for one materialized attention matrix at FP16, compared with one linear-size QKV working set at head dimension 128.\n\n\n\n\n\nAt n=16{,}384, a single FP16 score matrix for one head and one batch element occupies 512 MiB. A model with many heads cannot retain all such matrices without aggressive memory management."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#softmax-can-be-streamed-exactly",
+    "href": "posts/flashattention-io-aware/index.html#softmax-can-be-streamed-exactly",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "Softmax can be streamed exactly",
+    "text": "Softmax can be streamed exactly\nFor a row of logits x_1,\\ldots,x_j, maintain the running maximum and exponential sum\n\nm_j=\\max_{i\\le j}x_i,\n\\qquad\n\\ell_j=\\sum_{i\\le j}e^{x_i-m_j}.\n\nWhen a new block B arrives, let\n\nm_B=\\max_{x\\in B}x,qquad\n\\ell_B=\\sum_{x\\in B}e^{x-m_B},qquad\nm'=\\max(m_j,m_B).\n\nThe combined normalizer is\n\n\\ell'=e^{m_j-m'}\\ell_j+e^{m_B-m'}\\ell_B. \\tag{1}\n\\tag{1}\nFor attention, maintain an unnormalized value accumulator\n\n\\widetilde{o}_j=\\sum_{i\\le j}e^{x_i-m_j}v_i.\n\nIt updates by the same rescaling:\n\n\\widetilde{o}'=e^{m_j-m'}\\widetilde{o}_j\n+e^{m_B-m'}\\sum_{x_i\\in B}e^{x_i-m_B}v_i,\n\\qquad o=\\frac{\\widetilde{o}'}{\\ell'}. \\tag{2}\n\\tag{2}\nEquations Equation 1 and Equation 2 are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.\nimport numpy as np\n\ndef tiled_attention(q, k, v, block=64):\n    \"\"\"Reference implementation for one query vector, not a fast kernel.\"\"\"\n    scale = q.shape[-1] ** -0.5\n    m = -np.inf\n    ell = 0.0\n    acc = np.zeros(v.shape[-1], dtype=np.float64)\n\n    for start in range(0, len(k), block):\n        kb = k[start:start + block]\n        vb = v[start:start + block]\n        logits = kb @ q * scale\n        block_max = logits.max()\n        new_max = max(m, block_max)\n\n        old_scale = np.exp(m - new_max)\n        weights = np.exp(logits - new_max)\n        acc = old_scale * acc + weights @ vb\n        ell = old_scale * ell + weights.sum()\n        m = new_max\n\n    return acc / ell\nThis Python version exposes the recurrence but does not provide the speedup. Performance comes from mapping tiles to GPU thread blocks and using tensor-core matrix multiplications while intermediates remain in SRAM or registers."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#tiling-the-full-matrix",
+    "href": "posts/flashattention-io-aware/index.html#tiling-the-full-matrix",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "Tiling the full matrix",
+    "text": "Tiling the full matrix\nPartition Q into row tiles Q_i and K,V into column tiles K_j,V_j. For each Q_i:\n\nLoad Q_i once into on-chip memory.\nStream through (K_j,V_j) pairs.\nCompute Q_iK_j^\\top as a small tile.\nUpdate each row’s (m,\\ell,\\widetilde{o}) state.\nWrite the final O_i and log-sum-exp statistics.\n\nThe algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions. The original analysis gives an HBM access complexity of\n\n\\Theta\\!\\left(\\frac{n^2d^2}{M}\\right),\n\nfor SRAM capacity M, over the relevant range of tile sizes, compared with quadratic intermediate traffic in the standard schedule (Dao et al. 2022)."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#backward-by-recomputation",
+    "href": "posts/flashattention-io-aware/index.html#backward-by-recomputation",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "Backward by recomputation",
+    "text": "Backward by recomputation\nOrdinary autodiff saves S or P because the backward pass needs probabilities. FlashAttention stores the output and row-wise log-sum-exp, then recomputes score tiles during backward.\nRecomputation adds FLOPs but removes the quadratic saved activation. On modern accelerators, this trade can be faster because matrix multiplication is efficient while repeated HBM traffic is expensive. This is a selective checkpointing strategy guided by the memory hierarchy."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#flashattention-2-changes-the-work-partition",
+    "href": "posts/flashattention-io-aware/index.html#flashattention-2-changes-the-work-partition",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "FlashAttention-2 changes the work partition",
+    "text": "FlashAttention-2 changes the work partition\nThe first algorithm removed the primary IO bottleneck but reached only 25 to 40 percent of A100 peak throughput. FlashAttention-2 targets utilization (Dao 2023):\n\nIt delays output normalization to reduce non-matrix FLOPs.\nIt parallelizes over sequence tiles in addition to batch and heads, improving occupancy when batch size or head count is small.\nIt partitions Q across warps while sharing K and V, avoiding the shared-memory reductions induced by splitting K.\n\nThe paper reports 50 to 73 percent of theoretical A100 peak and up to 225 TFLOP/s for GPT-style training (Dao 2023). Those numbers depend on model shape and hardware. They are not a universal speed multiplier."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#arithmetic-intensity-and-the-roofline",
+    "href": "posts/flashattention-io-aware/index.html#arithmetic-intensity-and-the-roofline",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "Arithmetic intensity and the roofline",
+    "text": "Arithmetic intensity and the roofline\nA roofline model bounds performance by\n\n\\text{throughput}\\le\n\\min\\left(\\text{peak FLOP/s},\\;\n\\text{bandwidth}\\times\\frac{\\text{FLOPs}}{\\text{bytes moved}}\\right).\n\nChanging the evaluation order raises arithmetic intensity by doing more useful work per byte transferred from HBM. Once the kernel crosses into the compute-bound regime, further reductions in traffic yield less benefit and work partitioning becomes decisive.\nThis explains an apparently paradoxical result: an algorithm may execute more arithmetic through recomputation and still finish sooner."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#boundaries",
+    "href": "posts/flashattention-io-aware/index.html#boundaries",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "Boundaries",
+    "text": "Boundaries\nFlashAttention does not make dense attention asymptotically linear in compute. It makes memory usage linear and reduces IO. Dense arithmetic remains quadratic in sequence length. It also does not replace the KV cache during autoregressive decoding. FlashAttention optimizes the attention kernel; KV-cache paging manages persistent state across requests.\nThat distinction is worth keeping. Similar words such as memory-efficient can refer to activation memory, persistent cache capacity, allocator fragmentation, or bandwidth traffic. These are different constraints with different remedies."
+  },
+  {
+    "objectID": "posts/flashattention-io-aware/index.html#references",
+    "href": "posts/flashattention-io-aware/index.html#references",
+    "title": "FlashAttention Is an IO Algorithm",
+    "section": "References",
+    "text": "References\n\n\nDao, Tri. 2023. “FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning.” arXiv Preprint arXiv:2307.08691. https://arxiv.org/abs/2307.08691.\n\n\nDao, Tri, Daniel Y. Fu, Stefano Ermon, Atri Rudra, and Christopher Ré. 2022. “FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness.” Advances in Neural Information Processing Systems 35: 16344–59. https://arxiv.org/abs/2205.14135."
+  },
+  {
+    "objectID": "notes/index.html",
+    "href": "notes/index.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Short-form research notes, reading logs, and work-in-progress observations.\n\n\n\n\n\nSpeculative Sampling Preserves the Target Distribution\n\n\n\nInference\n\nProbability\n\nDecoding\n\n\n\nA proof of the draft-and-verify acceptance rule, plus a quantitative model for choosing speculation length.\n\n\n\n\n\nAug 13, 2026\n\n\n\n\n\nNo matching items"
   }
 ]

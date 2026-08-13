@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -42,14 +45,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-203cd6cfb07eb23d94ccac5e123ebbf5.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-19d1a24a194e895c5f2d4aee429e784f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-b74e64cffdc1c3519890ddf72401242d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-9a658483228b3dcbfeaf3545aa0d1487.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-b74e64cffdc1c3519890ddf72401242d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -374,7 +377,7 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="TWFjaGluZSUyMExlYXJuaW5n">Machine Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWF0aGVtYXRpY3M=">Mathematics <span class="quarto-category-count">(2)</span></div><div class="category" data-category="UHl0aG9u">Python <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VGVzdA==">Test <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(3)</span></div><div class="category" data-category="QXR0ZW50aW9u">Attention <span class="quarto-category-count">(2)</span></div><div class="category" data-category="R1BV">GPU <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWF0aGVtYXRpY3M=">Mathematics <span class="quarto-category-count">(2)</span></div><div class="category" data-category="UGVyZm9ybWFuY2UlMjBFbmdpbmVlcmluZw==">Performance Engineering <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UG9zaXRpb25hbCUyMEVuY29kaW5n">Positional Encoding <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VHJhbnNmb3JtZXJz">Transformers <span class="quarto-category-count">(2)</span></div></div></div>
 <!-- main -->
 <main class="content column-page-left" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
@@ -392,26 +395,58 @@ window.Quarto = {
 <p><span class="eigenholm-section-header">Latest Writing</span></p>
 <div id="listing-latest-posts" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1782345600000" data-listing-file-modified-sort="1782405889612" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="601">
+<div class="quarto-post image-right" data-index="0" data-categories="VHJhbnNmb3JtZXJzJTJDUG9zaXRpb25hbCUyMEVuY29kaW5nJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786657838110" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="870">
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/new-article/index.html" class="no-external">Article Title Here</a>
+<a href="./posts/rope-geometry/index.html" class="no-external">The Geometry of Rotary Position Embeddings</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VHJhbnNmb3JtZXJz'); return false;">Transformers</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('UG9zaXRpb25hbCUyMEVuY29kaW5n'); return false;">Positional Encoding</div>
 
 <div class="listing-category" onclick="window.quartoListingCategory('TWF0aGVtYXRpY3M='); return false;">Mathematics</div>
 
 </div>
-<div class="delink listing-description"><a href="./posts/new-article/index.html" class="no-external">
-<p>A one-line summary for listings and social sharing.</p>
+<div class="delink listing-description"><a href="./posts/rope-geometry/index.html" class="no-external">
+<p>RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.</p>
 </a></div>
 </div>
 <div class="metadata">
-<a href="./posts/new-article/index.html" class="no-external">
+<a href="./posts/rope-geometry/index.html" class="no-external">
 <div class="listing-date">
-Jun 25, 2026
+Aug 13, 2026
+</div>
+<div class="listing-author">
+Diego Filippo Marino
+</div>
+<div class="listing-reading-time">5 min</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="VHJhbnNmb3JtZXJzJTJDQXR0ZW50aW9uJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786657838109" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="736">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/attention-from-logits-to-context/index.html" class="no-external">Attention, from Logits to Context</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHJhbnNmb3JtZXJz'); return false;">Transformers</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('QXR0ZW50aW9u'); return false;">Attention</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TWF0aGVtYXRpY3M='); return false;">Mathematics</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/attention-from-logits-to-context/index.html" class="no-external">
+<p>A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/attention-from-logits-to-context/index.html" class="no-external">
+<div class="listing-date">
+Aug 13, 2026
 </div>
 <div class="listing-author">
 Diego Filippo Marino
@@ -420,33 +455,33 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="UHl0aG9uJTJDTWF0aGVtYXRpY3MlMkNUZXN0" data-listing-date-sort="1782345600000" data-listing-file-modified-sort="1782405889612" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="88">
+<div class="quarto-post image-right" data-index="2" data-categories="R1BVJTJDQXR0ZW50aW9uJTJDUGVyZm9ybWFuY2UlMjBFbmdpbmVlcmluZw==" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786657838109" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="940">
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/first-technical-post/index.html" class="no-external">My First Technical Post</a>
+<a href="./posts/flashattention-io-aware/index.html" class="no-external">FlashAttention Is an IO Algorithm</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('UHl0aG9u'); return false;">Python</div>
+<div class="listing-category" onclick="window.quartoListingCategory('R1BV'); return false;">GPU</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWF0aGVtYXRpY3M='); return false;">Mathematics</div>
+<div class="listing-category" onclick="window.quartoListingCategory('QXR0ZW50aW9u'); return false;">Attention</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('VGVzdA=='); return false;">Test</div>
+<div class="listing-category" onclick="window.quartoListingCategory('UGVyZm9ybWFuY2UlMjBFbmdpbmVlcmluZw=='); return false;">Performance Engineering</div>
 
 </div>
-<div class="delink listing-description"><a href="./posts/first-technical-post/index.html" class="no-external">
-<p>A test article with mathematics, Python code, and a generated plot.</p>
+<div class="delink listing-description"><a href="./posts/flashattention-io-aware/index.html" class="no-external">
+<p>How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.</p>
 </a></div>
 </div>
 <div class="metadata">
-<a href="./posts/first-technical-post/index.html" class="no-external">
+<a href="./posts/flashattention-io-aware/index.html" class="no-external">
 <div class="listing-date">
-Jun 25, 2026
+Aug 13, 2026
 </div>
 <div class="listing-author">
 Diego Filippo Marino
 </div>
-<div class="listing-reading-time">1 min</div>
+<div class="listing-reading-time">5 min</div>
 </a>
 </div>
 </div>
