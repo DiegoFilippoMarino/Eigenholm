@@ -4,9 +4,6 @@ image: profile.jpg
 about:
   template: solana
   links:
-    - icon: bluesky
-      text: Bluesky
-      href: https://bsky.app/
     - icon: linkedin
       text: LinkedIn
       href: https://www.linkedin.com/in/dfmarino/
@@ -18,20 +15,22 @@ comments: false
 citation: false
 ---
 
-Eigenholm is a personal technical site and research notebook focused on machine learning, deep learning, mathematics, and scientific computing.
+I am Diego Filippo Marino. Eigenholm is where I work through the mathematics and engineering of modern machine learning systems in public.
 
-The writing here covers paper analyses, implementation notes, reproductions of published results, and documentation of technical projects. The goal is to think carefully, build from first principles, and share what is learned along the way.
+The site sits between a research notebook and a technical journal. I use it to reconstruct papers from their central equations, test implementation details in small experiments, and connect model design to the hardware and numerical constraints that shape it.
 
-<!-- Replace the sections below with your own background and interests -->
+## What I write about
 
-## Background
+My main subject is deep learning, with a particular interest in language models, efficient training and inference, representation learning, and the mathematical structure behind optimization. Scientific computing and numerical methods appear whenever they are the right tools for making an argument concrete.
 
-*Add a short introduction about yourself here — your background, current work, and research interests.*
+Articles are long-form explanations. Projects turn an idea into an executable model or simulator. Notes are narrower investigations, derivations, and results that are useful before they grow into a full article.
 
-## Interests
+## Method
 
-- Machine learning and deep learning theory
-- Mathematical foundations of AI
-- Paper replications and reproducibility
-- Scientific computing and numerical methods
-- Software engineering for research
+I prefer primary sources and explicit assumptions. When a result comes from a paper, the page cites it. When a graph comes from code, the code is included or described closely enough to reproduce it. When a number is illustrative rather than measured on real hardware, it is labelled as such.
+
+The aim is not to compress a topic into a list of facts. It is to expose the mechanism: what is computed, why the equation has that form, where the memory goes, and under which conditions the method stops helping.
+
+## Contact and source
+
+The source for this site is available on [GitHub](https://github.com/DiegoFilippoMarino/Eigenholm). For professional context, see [LinkedIn](https://www.linkedin.com/in/dfmarino/).

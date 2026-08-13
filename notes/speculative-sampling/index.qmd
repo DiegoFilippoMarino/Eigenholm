@@ -1,0 +1,217 @@
+---
+title: "Speculative Sampling Preserves the Target Distribution"
+description: "A proof of the draft-and-verify acceptance rule, plus a quantitative model for choosing speculation length."
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
+date: "2026-08-13"
+categories: [Inference, Probability, Decoding]
+bibliography: references.bib
+jupyter: python3
+draft: false
+---
+
+## Context
+
+Autoregressive generation normally emits one token per target-model invocation. Speculative decoding asks a cheaper draft model to propose several tokens, scores the proposed continuation with one parallel target pass, and accepts the longest valid prefix [@leviathan2023speculative].
+
+The speed argument is architectural. The correctness argument is probabilistic. The latter is easy to state incorrectly, so this note derives it from the probability mass assigned by the target $p$ and draft $q$.
+
+## One-token acceptance rule
+
+Draw a candidate $x\sim q$. Accept it with probability
+
+$$
+a(x)=\min\left(1,\frac{p(x)}{q(x)}\right).
+$$
+
+If it is rejected, sample a replacement from
+
+$$
+r(x)=\frac{[p(x)-q(x)]_+}{Z},
+\qquad
+Z=\sum_y[p(y)-q(y)]_+,
+$$ {#eq-residual}
+
+where $[z]_+=\max(0,z)$. The accepted candidate contributes mass
+
+$$
+q(x)a(x)=\min(q(x),p(x)). \tag{1}
+$$ {#eq-accepted-mass}
+
+The probability of rejection is
+
+$$
+1-\sum_x\min(p(x),q(x))
+=\sum_x[p(x)-q(x)]_+
+=Z. \tag{2}
+$$ {#eq-rejection}
+
+Therefore the final mass at token $x$ is
+
+$$
+\underbrace{\min(p(x),q(x))}_{\text{accepted draft}}
++\underbrace{Zr(x)}_{\text{replacement}}
+=\min(p(x),q(x))+[p(x)-q(x)]_+
+=p(x).
+$$
+
+The output is exactly distributed as the target for any draft distribution. A poor draft reduces speed through more rejections, but it does not bias the sample if the residual correction in @eq-residual is implemented correctly.
+
+## Acceptance is distribution overlap
+
+The expected acceptance probability is
+
+$$
+\alpha=\sum_xq(x)a(x)=\sum_x\min(p(x),q(x)). \tag{3}
+$$ {#eq-overlap}
+
+Using $\sum_x p(x)=\sum_xq(x)=1$,
+
+$$
+\alpha=1-\frac{1}{2}\|p-q\|_1.
+$$
+
+Speculative performance is controlled by total-variation distance, not by whether the draft has the same argmax alone.
+
+```{python}
+#| label: fig-speculative-mass
+#| fig-cap: "Accepted draft mass and residual correction for a six-token example. The two components sum exactly to the target distribution."
+#| echo: true
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+p = np.array([0.36, 0.25, 0.17, 0.10, 0.08, 0.04])
+q = np.array([0.20, 0.35, 0.10, 0.18, 0.05, 0.12])
+accepted = np.minimum(p, q)
+residual_mass = np.maximum(p - q, 0)
+x = np.arange(len(p))
+
+fig, ax = plt.subplots(figsize=(7, 3.7))
+ax.bar(x, accepted, label="accepted draft mass")
+ax.bar(x, residual_mass, bottom=accepted, label="residual correction")
+ax.plot(x, p, "ko", label="target probability")
+ax.set(xlabel="token id", ylabel="probability mass", xticks=x)
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False)
+plt.tight_layout()
+plt.show()
+```
+
+## Verifying a block of draft tokens
+
+Let the draft propose $\gamma$ tokens. The target scores every position in one pass because teacher-forced evaluation is parallel across the proposed sequence. Verification proceeds left to right. At the first rejection, the rejected token and every later draft token are discarded, a correction token is sampled, and a new round begins.
+
+If every proposal is accepted, the target distribution at the next position is already available, so the round can emit one extra target token. Each round therefore produces between 1 and $\gamma+1$ tokens.
+
+Under the simplifying assumption that acceptances are independent with constant probability $\alpha$, the expected number of emitted tokens is
+
+$$
+E[N]=1+\alpha+\alpha^2+\cdots+\alpha^\gamma
+=\frac{1-\alpha^{\gamma+1}}{1-\alpha}. \tag{4}
+$$ {#eq-expected-tokens}
+
+If one draft step costs a fraction $c$ of one target verification, an idealized throughput improvement is
+
+$$
+S(\alpha,\gamma,c)
+=\frac{1-\alpha^{\gamma+1}}
+{(1-\alpha)(1+\gamma c)}. \tag{5}
+$$ {#eq-speedup}
+
+```{python}
+#| label: fig-speculation-length
+#| fig-cap: "Idealized speedup from Equation 5 as speculation length changes. The draft cost is 5 percent of a target invocation."
+#| echo: true
+
+gamma = np.arange(1, 17)
+c = 0.05
+
+fig, ax = plt.subplots(figsize=(7, 3.8))
+for alpha in (0.4, 0.6, 0.8, 0.9):
+    speedup = (1 - alpha ** (gamma + 1)) / ((1 - alpha) * (1 + gamma * c))
+    ax.plot(gamma, speedup, "o-", ms=3, label=fr"$\alpha={alpha}$")
+ax.axhline(1, color="0.55", lw=1, ls=":")
+ax.set(xlabel=r"draft length $\gamma$", ylabel="idealized speedup")
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False)
+plt.tight_layout()
+plt.show()
+```
+
+Longer speculation is not automatically better. When $\alpha$ is modest, the probability of reaching late draft positions falls geometrically while their generation cost remains. The useful $\gamma$ depends jointly on overlap, draft cost, target batch shape, and hardware.
+
+## A reference sampler
+
+```{python}
+#| label: speculative-sampler
+#| echo: true
+
+import numpy as np
+
+def speculative_sample(p, q, rng):
+    """Return one exact sample from categorical target p using proposal q."""
+    candidate = rng.choice(len(q), p=q)
+    acceptance = min(1.0, p[candidate] / q[candidate])
+    if rng.random() < acceptance:
+        return candidate
+
+    residual = np.maximum(p - q, 0.0)
+    residual /= residual.sum()
+    return rng.choice(len(p), p=residual)
+```
+
+Numerical implementations need additional care. Probabilities may be derived from temperature-scaled or truncated logits. The target and draft must apply the same sampling transformation before the acceptance ratio is formed. The residual should be clamped before normalization to remove small negative values caused by rounding.
+
+## Empirical sanity check
+
+```{python}
+#| label: fig-sampling-check
+#| fig-cap: "Monte Carlo check with 300,000 speculative samples. Error bars show three standard errors under the target multinomial model."
+#| echo: true
+
+rng = np.random.default_rng(23)
+draws = 300_000
+counts = np.zeros(len(p), dtype=int)
+
+for _ in range(draws):
+    counts[speculative_sample(p, q, rng)] += 1
+
+estimate = counts / draws
+stderr = np.sqrt(p * (1 - p) / draws)
+
+fig, ax = plt.subplots(figsize=(7, 3.7))
+ax.errorbar(x, estimate, yerr=3 * stderr, fmt="o", capsize=3,
+            label="speculative estimate")
+ax.plot(x, p, "x", ms=8, label="target")
+ax.set(xlabel="token id", ylabel="probability", xticks=x)
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False)
+plt.tight_layout()
+plt.show()
+```
+
+The Monte Carlo test is not a proof, but it is an effective regression test for sign errors, reversed ratios, and incorrect residual normalization.
+
+## Where the speedup comes from
+
+Speculative decoding generally performs more arithmetic than ordinary decoding. It wins when target inference is limited by serial execution or memory bandwidth and the verification pass can score several positions efficiently. The target's weights and cache state are amortized across multiple accepted tokens.
+
+The original work reports 2 to 3 times acceleration on T5-XXL with identical outputs [@leviathan2023speculative]. That result does not imply the same gain for every model or serving regime. Speculation can lose when the draft is expensive, distributions have low overlap, verification is compute-bound, or the extra temporary state reduces useful batching.
+
+::: {.callout-important}
+## Exactness has a boundary
+
+The guarantee applies to the acceptance and residual rule above. Heuristic acceptance thresholds, lenience, or replacing the residual distribution with the unmodified target distribution change the sampler unless separately proved correct.
+:::
+
+## Takeaway
+
+The draft model is a performance hint. Equations @eq-accepted-mass and @eq-rejection show why it has no authority over the final distribution: accepted overlap plus rejected residual reconstructs the target exactly.
+
+## References
+
+::: {#refs}
+:::

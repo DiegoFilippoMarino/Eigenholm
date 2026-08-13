@@ -1,0 +1,183 @@
+---
+title: "The Geometry of Rotary Position Embeddings"
+description: "RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes."
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
+date: "2026-08-13"
+categories: [Transformers, Positional Encoding, Mathematics]
+bibliography: references.bib
+jupyter: python3
+draft: false
+---
+
+Self-attention is permutation equivariant. If the rows of $Q$, $K$, and $V$ are permuted together, the output rows are permuted in the same way. A language model therefore needs an additional structure that distinguishes token order.
+
+Rotary position embedding, usually called RoPE, inserts that structure by rotating query and key coordinates [@su2024roformer]. The construction is small enough to fit in a few lines of code, but its real value is algebraic: absolute positions become relative offsets inside the attention dot product.
+
+## A two-dimensional representation of position
+
+For one coordinate pair, define
+
+$$
+R(m\theta)=
+\begin{bmatrix}
+\cos(m\theta)&-\sin(m\theta)\\
+\sin(m\theta)& \cos(m\theta)
+\end{bmatrix}.
+$$
+
+At position $m$, RoPE maps $q\mapsto R(m\theta)q$ and $k\mapsto R(m\theta)k$. Orthogonality and the group law $R(a)^\top R(b)=R(b-a)$ give
+
+$$
+\langle R(m\theta)q,R(n\theta)k\rangle
+=q^\top R((n-m)\theta)k. \tag{1}
+$$ {#eq-relative}
+
+The inputs carry absolute angles, but the logit depends only on $n-m$. Equation @eq-relative is the core of RoPE.
+
+For even dimension $d$, the complete operator is block diagonal:
+
+$$
+R_{\Theta,m}=\operatorname{diag}
+\left(R(m\theta_0),R(m\theta_1),\ldots,R(m\theta_{d/2-1})\right),
+$$
+
+with the conventional schedule
+
+$$
+\theta_i=b^{-2i/d},\qquad b=10{,}000.
+$$
+
+The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.
+
+```{python}
+#| label: fig-rope-frequencies
+#| fig-cap: "Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64."
+#| echo: true
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+d = 64
+base = 10_000
+pair_ids = np.array([0, 8, 16, 24])
+theta = base ** (-2 * pair_ids / d)
+offset = np.arange(0, 4097)
+
+fig, axes = plt.subplots(2, 2, figsize=(8, 5), sharex=True, sharey=True)
+for ax, i, frequency in zip(axes.flat, pair_ids, theta):
+    ax.plot(offset, np.cos(offset * frequency), lw=1.1)
+    ax.set_title(fr"pair $i={i}$, period $\approx {2*np.pi/frequency:.0f}$")
+    ax.spines[["top", "right"]].set_visible(False)
+for ax in axes[-1]:
+    ax.set_xlabel("relative offset")
+for ax in axes[:, 0]:
+    ax.set_ylabel("cosine phase")
+plt.tight_layout()
+plt.show()
+```
+
+The schedule is not a collection of position counters. Each pair is periodic and therefore ambiguous on its own. Position is represented by the joint phase across all pairs.
+
+## Complex notation exposes the mechanism
+
+Identify a coordinate pair $(x_{2i},x_{2i+1})$ with the complex number $z_i=x_{2i}+\mathrm{i}x_{2i+1}$. Rotation becomes multiplication:
+
+$$
+z_i^{(m)}=z_i e^{\mathrm{i}m\theta_i}.
+$$
+
+The real part of the Hermitian product between a rotated query and key contains
+
+$$
+\operatorname{Re}\left(q_i\overline{k_i}e^{\mathrm{i}(m-n)\theta_i}\right).
+$$
+
+This makes two facts visible. First, relative position modulates content similarity rather than adding an independent bias. Second, the model can learn how much each frequency matters by shaping $q_i\overline{k_i}$ through the projection matrices.
+
+## A vectorized implementation
+
+```python
+import numpy as np
+
+def apply_rope(x: np.ndarray, positions: np.ndarray, base: float = 10_000.0):
+    """Rotate x with shape [sequence, heads, head_dim]."""
+    d = x.shape[-1]
+    assert d % 2 == 0
+    inv_freq = base ** (-np.arange(0, d, 2) / d)
+    angle = positions[:, None] * inv_freq[None, :]
+    cos, sin = np.cos(angle)[:, None, :], np.sin(angle)[:, None, :]
+
+    even, odd = x[..., 0::2], x[..., 1::2]
+    out = np.empty_like(x)
+    out[..., 0::2] = even * cos - odd * sin
+    out[..., 1::2] = even * sin + odd * cos
+    return out
+```
+
+Real kernels often use a `rotate_half` formulation or interleave dimensions differently. The pairing convention may vary, but queries and keys must use the same convention.
+
+## Why extrapolation is difficult
+
+RoPE defines angles at every integer position, so it is mechanically valid beyond the training length. That does not imply reliable extrapolation. At longer contexts, the model encounters phase combinations and attention distances absent during training.
+
+For a training limit $L$, frequency pair $i$ completes
+
+$$
+c_i(L)=\frac{L\theta_i}{2\pi}
+$$
+
+cycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.
+
+```{python}
+#| label: fig-rope-cycles
+#| fig-cap: "Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768."
+#| echo: true
+
+pair = np.arange(d // 2)
+inv_freq = base ** (-2 * pair / d)
+
+fig, ax = plt.subplots(figsize=(7, 3.6))
+for length in (2048, 32768):
+    ax.semilogy(pair, length * inv_freq / (2 * np.pi), marker="o", ms=3,
+                label=f"context {length:,}")
+ax.axhline(1, color="0.5", ls=":", lw=1)
+ax.set(xlabel="coordinate-pair index", ylabel="completed rotations")
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False)
+plt.tight_layout()
+plt.show()
+```
+
+Changing the base $b$ stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.
+
+## Numerical and implementation details
+
+RoPE preserves vector norms in exact arithmetic because every block is orthogonal. This provides a useful unit test:
+
+$$
+\|R_{\Theta,m}x\|_2=\|x\|_2.
+$$
+
+It also preserves a strict relative-position identity. For random $q,k,m,n$, the following quantities should agree:
+
+```python
+left = np.dot(rotate(q, m), rotate(k, n))
+right = np.dot(q, rotate(k, n - m))
+np.testing.assert_allclose(left, right, rtol=1e-6, atol=1e-6)
+```
+
+For long contexts, compute the trigonometric tables with care. Low-precision angle formation can lose phase accuracy before the final vectors are cast to the model dtype. Many implementations form frequencies or angles in FP32 even when attention runs in BF16 or FP16.
+
+## What RoPE buys
+
+RoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate $Q$ and $K$, leave $V$ unchanged, and preserve the rest of the attention kernel.
+
+The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.
+
+## References
+
+::: {#refs}
+:::

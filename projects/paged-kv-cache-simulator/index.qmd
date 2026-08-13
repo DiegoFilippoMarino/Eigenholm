@@ -1,0 +1,198 @@
+---
+title: "A Paged KV-Cache Allocator, Built from First Principles"
+description: "An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis."
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
+date: "2026-08-13"
+categories: [LLM Serving, Memory Management, Python]
+bibliography: references.bib
+jupyter: python3
+draft: false
+---
+
+## Overview
+
+Autoregressive decoding reuses the keys and values of every previous token. Caching them avoids a full prefix recomputation, but turns serving capacity into a memory-allocation problem: request lengths are unknown, sequences arrive and finish at different times, and branching decoders share long prefixes.
+
+This project builds a small simulator for two allocation policies:
+
+1. **Contiguous reservation:** reserve each request's declared maximum length.
+2. **Paged allocation:** allocate fixed-size token blocks only when needed.
+
+The model is intentionally compact. It does not benchmark a GPU kernel. It isolates the allocator mechanism behind PagedAttention and vLLM [@kwon2023pagedattention].
+
+## Cache size
+
+For a decoder with $L$ layers, $h_{kv}$ key/value heads, head dimension $d_h$, element size $b$ bytes, and $T$ cached tokens, the cache occupies
+
+$$
+B_{KV}=2Lh_{kv}d_hTb. \tag{1}
+$$ {#eq-kv-size}
+
+The factor two accounts for keys and values. For conventional multi-head attention, $h_{kv}$ equals the query-head count. Multi-query and grouped-query attention reduce $h_{kv}$, which directly reduces the persistent cache.
+
+```{python}
+#| label: fig-kv-capacity
+#| fig-cap: "KV-cache memory per request for three decoder configurations in FP16. Model labels describe layers, KV heads, and head dimension."
+#| echo: true
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+tokens = np.arange(0, 32769, 512)
+configs = {
+    "32L, 32 KV heads, d=128": (32, 32, 128),
+    "32L, 8 KV heads, d=128": (32, 8, 128),
+    "80L, 8 KV heads, d=128": (80, 8, 128),
+}
+
+fig, ax = plt.subplots(figsize=(7, 3.8))
+for label, (layers, kv_heads, head_dim) in configs.items():
+    gib = 2 * layers * kv_heads * head_dim * tokens * 2 / 2**30
+    ax.plot(tokens, gib, label=label)
+ax.set(xlabel="cached tokens", ylabel="KV cache per request (GiB)")
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False, fontsize=8)
+plt.tight_layout()
+plt.show()
+```
+
+Equation @eq-kv-size is linear in context length and batch size. That is better than storing a quadratic attention matrix, but it becomes the dominant dynamic allocation in a serving engine.
+
+## Allocation model
+
+A contiguous allocator needs one extent large enough for the request. Reserving the declared maximum avoids relocation while decoding, but unused future slots waste memory. Variable extents also create external fragmentation.
+
+A paged allocator divides the cache into equal physical blocks. Each request owns a logical block table:
+
+$$
+\text{logical block }j\longmapsto\text{physical block }\pi_r(j).
+$$
+
+The attention kernel follows this mapping when reading keys and values. Since physical blocks have equal size, they can be taken from a free list and need not be adjacent.
+
+```python
+from dataclasses import dataclass, field
+from math import ceil
+
+@dataclass
+class Request:
+    request_id: int
+    prompt_tokens: int
+    max_tokens: int
+    generated: int = 0
+    blocks: list[int] = field(default_factory=list)
+
+    @property
+    def live_tokens(self):
+        return self.prompt_tokens + self.generated
+
+class PagedAllocator:
+    def __init__(self, block_count: int, block_tokens: int = 16):
+        self.block_tokens = block_tokens
+        self.free = list(range(block_count))
+
+    def ensure_capacity(self, request: Request):
+        required = ceil(request.live_tokens / self.block_tokens)
+        missing = required - len(request.blocks)
+        if missing > len(self.free):
+            raise MemoryError("KV cache exhausted")
+        for _ in range(missing):
+            request.blocks.append(self.free.pop())
+
+    def release(self, request: Request):
+        self.free.extend(request.blocks)
+        request.blocks.clear()
+```
+
+Only the final block of a request can be partially empty. If the block contains $B$ token slots, internal waste is bounded by $B-1$ slots per live sequence, independent of maximum generation length.
+
+## A workload experiment
+
+The following experiment samples 2,000 concurrent requests. Prompt lengths follow a log-normal distribution, maximum generation budgets are deliberately conservative, and actual completions vary. The comparison measures reserved token slots rather than allocator metadata.
+
+```{python}
+#| label: fig-fragmentation
+#| fig-cap: "Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks."
+#| echo: true
+
+rng = np.random.default_rng(11)
+requests = 2_000
+prompt = np.clip(rng.lognormal(mean=5.2, sigma=0.8, size=requests).astype(int), 16, 4096)
+budget = rng.choice([128, 256, 512, 1024], size=requests, p=[0.2, 0.35, 0.3, 0.15])
+actual = np.array([rng.integers(1, limit + 1) for limit in budget])
+live = prompt + actual
+block_sizes = np.array([8, 16, 32, 64, 128])
+
+contiguous_reserved = prompt + budget
+contiguous_efficiency = live.sum() / contiguous_reserved.sum()
+paged_efficiency = np.array([
+    live.sum() / (np.ceil(live / block) * block).sum()
+    for block in block_sizes
+])
+
+fig, ax = plt.subplots(figsize=(7, 3.7))
+ax.plot(block_sizes, 100 * paged_efficiency, "o-", label="paged")
+ax.axhline(100 * contiguous_efficiency, color="0.35", ls="--",
+           label="contiguous reservation")
+ax.set(xlabel="block size (token slots)", ylabel="live-token efficiency (%)", ylim=(0, 102))
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False)
+plt.tight_layout()
+plt.show()
+```
+
+These values are simulator outputs, not measurements from the vLLM paper. The qualitative trade-off is real: smaller blocks reduce internal fragmentation but increase block-table entries and kernel address-translation work.
+
+## Prefix sharing and copy-on-write
+
+Paging makes sharing natural. Parallel samples from one prompt can point their logical prefix blocks to the same physical blocks. Maintain a reference count $c_b$ for every physical block. A fork increments counts; releasing a request decrements them.
+
+Appending to a shared partially filled block requires copy-on-write:
+
+```python
+def append_with_cow(request, refcount, free_blocks, block_tokens):
+    last = request.blocks[-1]
+    offset = request.live_tokens % block_tokens
+    if offset and refcount[last] > 1:
+        replacement = free_blocks.pop()
+        copy_block(last, replacement)  # device-to-device copy
+        refcount[last] -= 1
+        refcount[replacement] = 1
+        request.blocks[-1] = replacement
+    append_token_kv(request.blocks[-1], offset)
+```
+
+Full shared prefix blocks never need copying. Only the block currently being extended can trigger copy-on-write. This supports parallel sampling, beam search, and shared system prompts with the same mechanism.
+
+## Scheduling consequences
+
+Better allocation increases the feasible batch size, but a production server must also decide which requests enter a batch and how to recover under pressure. Swapping cache blocks to host memory preserves work but consumes interconnect bandwidth. Recomputation discards blocks and rebuilds them with a prefill pass, trading compute for storage.
+
+The vLLM paper reports near-zero KV-cache waste and 2 to 4 times higher throughput at comparable latency than the evaluated baselines [@kwon2023pagedattention]. The gain comes from the system built around the allocator, not address translation alone. Larger effective batches improve GPU utilization, while prefix sharing avoids duplicate storage.
+
+## Verification targets
+
+A serious allocator test suite should exercise:
+
+- allocation across non-contiguous physical blocks;
+- release and reuse without stale references;
+- forked prefixes with correct reference counts;
+- copy-on-write only for a shared writable tail;
+- out-of-memory behavior that leaves existing tables unchanged;
+- block-table translation against a contiguous reference implementation.
+
+The last test is especially important. PagedAttention changes where tensors live, not the mathematical output of attention.
+
+## Limitations
+
+This simulator counts token slots. Real systems allocate per layer, shard tensors across devices, align blocks for kernels, and synchronize allocator state with asynchronous execution. Kernel layout can also favor a block size that is not optimal under a pure fragmentation metric.
+
+Still, the model captures the essential systems insight: once persistent state has irregular lifetimes, a tensor is not only a numerical object. It is also a dynamically allocated resource.
+
+## References
+
+::: {#refs}
+:::
