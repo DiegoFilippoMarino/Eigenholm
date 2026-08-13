@@ -28,7 +28,7 @@
 <p>For one coordinate pair, define</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AR(m%5Ctheta)=%0A%5Cbegin%7Bbmatrix%7D%0A%5Ccos(m%5Ctheta)&amp;-%5Csin(m%5Ctheta)%5C%5C%0A%5Csin(m%5Ctheta)&amp;%20%5Ccos(m%5Ctheta)%0A%5Cend%7Bbmatrix%7D.%0A"></p>
 <p>At position <img src="https://latex.codecogs.com/png.latex?m">, RoPE maps <img src="https://latex.codecogs.com/png.latex?q%5Cmapsto%20R(m%5Ctheta)q"> and <img src="https://latex.codecogs.com/png.latex?k%5Cmapsto%20R(m%5Ctheta)k">. Orthogonality and the group law <img src="https://latex.codecogs.com/png.latex?R(a)%5E%5Ctop%20R(b)=R(b-a)"> give</p>
-<p><span id="eq-relative"><img src="https://latex.codecogs.com/png.latex?%0A%5Clangle%20R(m%5Ctheta)q,R(n%5Ctheta)k%5Crangle%0A=q%5E%5Ctop%20R((n-m)%5Ctheta)k.%20%5Ctag%7B1%7D%0A%5Ctag%7B1%7D"></span></p>
+<p><span id="eq-relative"><img src="https://latex.codecogs.com/png.latex?%0A%5Clangle%20R(m%5Ctheta)q,R(n%5Ctheta)k%5Crangle%0A=q%5E%5Ctop%20R((n-m)%5Ctheta)k.%0A%5Ctag%7B1%7D"></span></p>
 <p>The inputs carry absolute angles, but the logit depends only on <img src="https://latex.codecogs.com/png.latex?n-m">. Equation Equation&nbsp;1 is the core of RoPE.</p>
 <p>For even dimension <img src="https://latex.codecogs.com/png.latex?d">, the complete operator is block diagonal:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AR_%7B%5CTheta,m%7D=%5Coperatorname%7Bdiag%7D%0A%5Cleft(R(m%5Ctheta_0),R(m%5Ctheta_1),%5Cldots,R(m%5Ctheta_%7Bd/2-1%7D)%5Cright),%0A"></p>
@@ -541,7 +541,7 @@ Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/E
 <p>Let a sequence be represented by <img src="https://latex.codecogs.com/png.latex?X%5Cin%5Cmathbb%7BR%7D%5E%7Bn%5Ctimes%20d_%7B%5Ctext%7Bmodel%7D%7D%7D">. A single head forms</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AQ=XW%5EQ,%5Cqquad%20K=XW%5EK,%5Cqquad%20V=XW%5EV,%0A"></p>
 <p>where <img src="https://latex.codecogs.com/png.latex?Q,K%5Cin%5Cmathbb%7BR%7D%5E%7Bn%5Ctimes%20d_k%7D"> and <img src="https://latex.codecogs.com/png.latex?V%5Cin%5Cmathbb%7BR%7D%5E%7Bn%5Ctimes%20d_v%7D">. Scaled dot-product attention is <span class="citation" data-cites="vaswani2017attention">(Vaswani et al. 2017)</span></p>
-<p><span id="eq-attention"><img src="https://latex.codecogs.com/png.latex?%0AS=%5Cfrac%7BQK%5E%5Ctop%7D%7B%5Csqrt%7Bd_k%7D%7D,%5Cqquad%0AP=%5Coperatorname%7Bsoftmax%7D_%7B%5Ctext%7Brow%7D%7D(S+M),%5Cqquad%0AO=PV.%20%5Ctag%7B1%7D%0A%5Ctag%7B1%7D"></span></p>
+<p><span id="eq-attention"><img src="https://latex.codecogs.com/png.latex?%0AS=%5Cfrac%7BQK%5E%5Ctop%7D%7B%5Csqrt%7Bd_k%7D%7D,%5Cqquad%0AP=%5Coperatorname%7Bsoftmax%7D_%7B%5Ctext%7Brow%7D%7D(S+M),%5Cqquad%0AO=PV.%0A%5Ctag%7B1%7D"></span></p>
 <p>The score <img src="https://latex.codecogs.com/png.latex?S_%7Bij%7D"> measures how strongly query position <img src="https://latex.codecogs.com/png.latex?i"> selects key position <img src="https://latex.codecogs.com/png.latex?j">. Each row of <img src="https://latex.codecogs.com/png.latex?P"> is a categorical distribution. The output <img src="https://latex.codecogs.com/png.latex?o_i"> is therefore a data-dependent convex combination of value vectors.</p>
 <p>For causal self-attention, the mask is</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AM_%7Bij%7D=%5Cbegin%7Bcases%7D%0A0,&amp;j%5Cle%20i,%5C%5C%0A-%5Cinfty,&amp;j%3Ei.%0A%5Cend%7Bcases%7D%0A"></p>
@@ -1073,11 +1073,11 @@ Figure&nbsp;1: Storage for one materialized attention matrix at FP16, compared w
 <p>When a new block <img src="https://latex.codecogs.com/png.latex?B"> arrives, let</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0Am_B=%5Cmax_%7Bx%5Cin%20B%7Dx,qquad%0A%5Cell_B=%5Csum_%7Bx%5Cin%20B%7De%5E%7Bx-m_B%7D,qquad%0Am'=%5Cmax(m_j,m_B).%0A"></p>
 <p>The combined normalizer is</p>
-<p><span id="eq-online-normalizer"><img src="https://latex.codecogs.com/png.latex?%0A%5Cell'=e%5E%7Bm_j-m'%7D%5Cell_j+e%5E%7Bm_B-m'%7D%5Cell_B.%20%5Ctag%7B1%7D%0A%5Ctag%7B1%7D"></span></p>
+<p><span id="eq-online-normalizer"><img src="https://latex.codecogs.com/png.latex?%0A%5Cell'=e%5E%7Bm_j-m'%7D%5Cell_j+e%5E%7Bm_B-m'%7D%5Cell_B.%0A%5Ctag%7B1%7D"></span></p>
 <p>For attention, maintain an unnormalized value accumulator</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cwidetilde%7Bo%7D_j=%5Csum_%7Bi%5Cle%20j%7De%5E%7Bx_i-m_j%7Dv_i.%0A"></p>
 <p>It updates by the same rescaling:</p>
-<p><span id="eq-online-output"><img src="https://latex.codecogs.com/png.latex?%0A%5Cwidetilde%7Bo%7D'=e%5E%7Bm_j-m'%7D%5Cwidetilde%7Bo%7D_j%0A+e%5E%7Bm_B-m'%7D%5Csum_%7Bx_i%5Cin%20B%7De%5E%7Bx_i-m_B%7Dv_i,%0A%5Cqquad%20o=%5Cfrac%7B%5Cwidetilde%7Bo%7D'%7D%7B%5Cell'%7D.%20%5Ctag%7B2%7D%0A%5Ctag%7B2%7D"></span></p>
+<p><span id="eq-online-output"><img src="https://latex.codecogs.com/png.latex?%0A%5Cwidetilde%7Bo%7D'=e%5E%7Bm_j-m'%7D%5Cwidetilde%7Bo%7D_j%0A+e%5E%7Bm_B-m'%7D%5Csum_%7Bx_i%5Cin%20B%7De%5E%7Bx_i-m_B%7Dv_i,%0A%5Cqquad%20o=%5Cfrac%7B%5Cwidetilde%7Bo%7D'%7D%7B%5Cell'%7D.%0A%5Ctag%7B2%7D"></span></p>
 <p>Equations Equation&nbsp;1 and Equation&nbsp;2 are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
 background-color: null;

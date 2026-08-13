@@ -489,13 +489,13 @@ Z=\sum_y[p(y)-q(y)]_+,
 \tag{1}</span></span></p>
 <p>where <span class="math inline">[z]_+=\max(0,z)</span>. The accepted candidate contributes mass</p>
 <p><span id="eq-accepted-mass"><span class="math display">
-q(x)a(x)=\min(q(x),p(x)). \tag{1}
+q(x)a(x)=\min(q(x),p(x)).
 \tag{2}</span></span></p>
 <p>The probability of rejection is</p>
 <p><span id="eq-rejection"><span class="math display">
 1-\sum_x\min(p(x),q(x))
 =\sum_x[p(x)-q(x)]_+
-=Z. \tag{2}
+=Z.
 \tag{3}</span></span></p>
 <p>Therefore the final mass at token <span class="math inline">x</span> is</p>
 <p><span class="math display">
@@ -510,7 +510,7 @@ q(x)a(x)=\min(q(x),p(x)). \tag{1}
 <h2 class="anchored" data-anchor-id="acceptance-is-distribution-overlap">Acceptance is distribution overlap</h2>
 <p>The expected acceptance probability is</p>
 <p><span id="eq-overlap"><span class="math display">
-\alpha=\sum_xq(x)a(x)=\sum_x\min(p(x),q(x)). \tag{3}
+\alpha=\sum_xq(x)a(x)=\sum_x\min(p(x),q(x)).
 \tag{4}</span></span></p>
 <p>Using <span class="math inline">\sum_x p(x)=\sum_xq(x)=1</span>,</p>
 <p><span class="math display">
@@ -557,13 +557,13 @@ Figure&nbsp;1: Accepted draft mass and residual correction for a six-token examp
 <p>Under the simplifying assumption that acceptances are independent with constant probability <span class="math inline">\alpha</span>, the expected number of emitted tokens is</p>
 <p><span id="eq-expected-tokens"><span class="math display">
 E[N]=1+\alpha+\alpha^2+\cdots+\alpha^\gamma
-=\frac{1-\alpha^{\gamma+1}}{1-\alpha}. \tag{4}
+=\frac{1-\alpha^{\gamma+1}}{1-\alpha}.
 \tag{5}</span></span></p>
 <p>If one draft step costs a fraction <span class="math inline">c</span> of one target verification, an idealized throughput improvement is</p>
 <p><span id="eq-speedup"><span class="math display">
 S(\alpha,\gamma,c)
 =\frac{1-\alpha^{\gamma+1}}
-{(1-\alpha)(1+\gamma c)}. \tag{5}
+{(1-\alpha)(1+\gamma c)}.
 \tag{6}</span></span></p>
 <div id="cell-fig-speculation-length" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gamma <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">17</span>)</span>

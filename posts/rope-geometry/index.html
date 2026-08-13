@@ -483,7 +483,7 @@ R(m\theta)=
 <p>At position <span class="math inline">m</span>, RoPE maps <span class="math inline">q\mapsto R(m\theta)q</span> and <span class="math inline">k\mapsto R(m\theta)k</span>. Orthogonality and the group law <span class="math inline">R(a)^\top R(b)=R(b-a)</span> give</p>
 <p><span id="eq-relative"><span class="math display">
 \langle R(m\theta)q,R(n\theta)k\rangle
-=q^\top R((n-m)\theta)k. \tag{1}
+=q^\top R((n-m)\theta)k.
 \tag{1}</span></span></p>
 <p>The inputs carry absolute angles, but the logit depends only on <span class="math inline">n-m</span>. Equation <a href="#eq-relative" class="quarto-xref">Equation&nbsp;1</a> is the core of RoPE.</p>
 <p>For even dimension <span class="math inline">d</span>, the complete operator is block diagonal:</p>

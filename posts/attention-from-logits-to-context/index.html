@@ -480,7 +480,7 @@ Q=XW^Q,\qquad K=XW^K,\qquad V=XW^V,
 <p><span id="eq-attention"><span class="math display">
 S=\frac{QK^\top}{\sqrt{d_k}},\qquad
 P=\operatorname{softmax}_{\text{row}}(S+M),\qquad
-O=PV. \tag{1}
+O=PV.
 \tag{1}</span></span></p>
 <p>The score <span class="math inline">S_{ij}</span> measures how strongly query position <span class="math inline">i</span> selects key position <span class="math inline">j</span>. Each row of <span class="math inline">P</span> is a categorical distribution. The output <span class="math inline">o_i</span> is therefore a data-dependent convex combination of value vectors.</p>
 <p>For causal self-attention, the mask is</p>

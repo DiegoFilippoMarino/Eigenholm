@@ -527,7 +527,7 @@ m'=\max(m_j,m_B).
 </span></p>
 <p>The combined normalizer is</p>
 <p><span id="eq-online-normalizer"><span class="math display">
-\ell'=e^{m_j-m'}\ell_j+e^{m_B-m'}\ell_B. \tag{1}
+\ell'=e^{m_j-m'}\ell_j+e^{m_B-m'}\ell_B.
 \tag{1}</span></span></p>
 <p>For attention, maintain an unnormalized value accumulator</p>
 <p><span class="math display">
@@ -537,7 +537,7 @@ m'=\max(m_j,m_B).
 <p><span id="eq-online-output"><span class="math display">
 \widetilde{o}'=e^{m_j-m'}\widetilde{o}_j
 +e^{m_B-m'}\sum_{x_i\in B}e^{x_i-m_B}v_i,
-\qquad o=\frac{\widetilde{o}'}{\ell'}. \tag{2}
+\qquad o=\frac{\widetilde{o}'}{\ell'}.
 \tag{2}</span></span></p>
 <p>Equations <a href="#eq-online-normalizer" class="quarto-xref">Equation&nbsp;1</a> and <a href="#eq-online-output" class="quarto-xref">Equation&nbsp;2</a> are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

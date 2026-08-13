@@ -484,7 +484,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="cache-size">Cache size</h2>
 <p>For a decoder with <span class="math inline">L</span> layers, <span class="math inline">h_{kv}</span> key/value heads, head dimension <span class="math inline">d_h</span>, element size <span class="math inline">b</span> bytes, and <span class="math inline">T</span> cached tokens, the cache occupies</p>
 <p><span id="eq-kv-size"><span class="math display">
-B_{KV}=2Lh_{kv}d_hTb. \tag{1}
+B_{KV}=2Lh_{kv}d_hTb.
 \tag{1}</span></span></p>
 <p>The factor two accounts for keys and values. For conventional multi-head attention, <span class="math inline">h_{kv}</span> equals the query-head count. Multi-query and grouped-query attention reduce <span class="math inline">h_{kv}</span>, which directly reduces the persistent cache.</p>
 <div id="cell-fig-kv-capacity" class="cell" data-execution_count="1">
