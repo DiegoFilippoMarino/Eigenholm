@@ -27,7 +27,7 @@ where $Q,K\in\mathbb{R}^{n\times d_k}$ and $V\in\mathbb{R}^{n\times d_v}$. Scale
 $$
 S=\frac{QK^\top}{\sqrt{d_k}},\qquad
 P=\operatorname{softmax}_{\text{row}}(S+M),\qquad
-O=PV. \tag{1}
+O=PV.
 $$ {#eq-attention}
 
 The score $S_{ij}$ measures how strongly query position $i$ selects key position $j$. Each row of $P$ is a categorical distribution. The output $o_i$ is therefore a data-dependent convex combination of value vectors.

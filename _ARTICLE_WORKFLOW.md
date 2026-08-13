@@ -30,7 +30,12 @@ to repeat its location.
    labelled figures/tables/equations, callouts, and bibliography when needed).
    Add assets next to the post and use descriptive alt text. Do not introduce
    page-level styling, inline CSS, or replacement fonts/colors.
-6. Render the new post with Quarto when available and fix rendering errors.
+   For numbered equations, put a Quarto label such as `{#eq-attention}` after
+   the closing `$$` and reference it as `@eq-attention`. Never put LaTeX
+   `\tag{...}` inside an equation: Quarto generates the number, and combining
+   both systems produces duplicate equation tags.
+6. Run `uv run python tools/check_content.py`, then render the complete site
+   with Quarto and fix every validation or rendering error.
    Report the created path, the wiki notes consulted, and anything that needs
    the author's review.
 

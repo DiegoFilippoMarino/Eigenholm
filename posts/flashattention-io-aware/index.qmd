@@ -73,7 +73,7 @@ $$
 The combined normalizer is
 
 $$
-\ell'=e^{m_j-m'}\ell_j+e^{m_B-m'}\ell_B. \tag{1}
+\ell'=e^{m_j-m'}\ell_j+e^{m_B-m'}\ell_B.
 $$ {#eq-online-normalizer}
 
 For attention, maintain an unnormalized value accumulator
@@ -87,7 +87,7 @@ It updates by the same rescaling:
 $$
 \widetilde{o}'=e^{m_j-m'}\widetilde{o}_j
 +e^{m_B-m'}\sum_{x_i\in B}e^{x_i-m_B}v_i,
-\qquad o=\frac{\widetilde{o}'}{\ell'}. \tag{2}
+\qquad o=\frac{\widetilde{o}'}{\ell'}.
 $$ {#eq-online-output}
 
 Equations @eq-online-normalizer and @eq-online-output are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.

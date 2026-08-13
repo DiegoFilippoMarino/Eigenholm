@@ -32,7 +32,7 @@ At position $m$, RoPE maps $q\mapsto R(m\theta)q$ and $k\mapsto R(m\theta)k$. Or
 
 $$
 \langle R(m\theta)q,R(n\theta)k\rangle
-=q^\top R((n-m)\theta)k. \tag{1}
+=q^\top R((n-m)\theta)k.
 $$ {#eq-relative}
 
 The inputs carry absolute angles, but the logit depends only on $n-m$. Equation @eq-relative is the core of RoPE.

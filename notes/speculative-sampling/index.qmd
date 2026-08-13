@@ -37,7 +37,7 @@ $$ {#eq-residual}
 where $[z]_+=\max(0,z)$. The accepted candidate contributes mass
 
 $$
-q(x)a(x)=\min(q(x),p(x)). \tag{1}
+q(x)a(x)=\min(q(x),p(x)).
 $$ {#eq-accepted-mass}
 
 The probability of rejection is
@@ -45,7 +45,7 @@ The probability of rejection is
 $$
 1-\sum_x\min(p(x),q(x))
 =\sum_x[p(x)-q(x)]_+
-=Z. \tag{2}
+=Z.
 $$ {#eq-rejection}
 
 Therefore the final mass at token $x$ is
@@ -64,7 +64,7 @@ The output is exactly distributed as the target for any draft distribution. A po
 The expected acceptance probability is
 
 $$
-\alpha=\sum_xq(x)a(x)=\sum_x\min(p(x),q(x)). \tag{3}
+\alpha=\sum_xq(x)a(x)=\sum_x\min(p(x),q(x)).
 $$ {#eq-overlap}
 
 Using $\sum_x p(x)=\sum_xq(x)=1$,
@@ -110,7 +110,7 @@ Under the simplifying assumption that acceptances are independent with constant 
 
 $$
 E[N]=1+\alpha+\alpha^2+\cdots+\alpha^\gamma
-=\frac{1-\alpha^{\gamma+1}}{1-\alpha}. \tag{4}
+=\frac{1-\alpha^{\gamma+1}}{1-\alpha}.
 $$ {#eq-expected-tokens}
 
 If one draft step costs a fraction $c$ of one target verification, an idealized throughput improvement is
@@ -118,7 +118,7 @@ If one draft step costs a fraction $c$ of one target verification, an idealized 
 $$
 S(\alpha,\gamma,c)
 =\frac{1-\alpha^{\gamma+1}}
-{(1-\alpha)(1+\gamma c)}. \tag{5}
+{(1-\alpha)(1+\gamma c)}.
 $$ {#eq-speedup}
 
 ```{python}

@@ -32,6 +32,9 @@ jobs:
       - name: Install Python dependencies
         run: uv sync --frozen
 
+      - name: Validate published content
+        run: uv run python tools/check_content.py
+
       - name: Publish to GitHub Pages
         uses: quarto-dev/quarto-actions/publish@v2
         with:

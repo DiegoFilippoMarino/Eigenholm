@@ -28,7 +28,7 @@ The model is intentionally compact. It does not benchmark a GPU kernel. It isola
 For a decoder with $L$ layers, $h_{kv}$ key/value heads, head dimension $d_h$, element size $b$ bytes, and $T$ cached tokens, the cache occupies
 
 $$
-B_{KV}=2Lh_{kv}d_hTb. \tag{1}
+B_{KV}=2Lh_{kv}d_hTb.
 $$ {#eq-kv-size}
 
 The factor two accounts for keys and values. For conventional multi-head attention, $h_{kv}$ equals the query-head count. Multi-query and grouped-query attention reduce $h_{kv}$, which directly reduces the persistent cache.
