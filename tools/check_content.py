@@ -62,6 +62,16 @@ def main() -> int:
         if re.search(r"(?i)placeholder|title here|replace (this|with)", text):
             errors.append(f"{relative}: placeholder copy found")
 
+    freeze_root = ROOT / "_freeze"
+    if freeze_root.exists():
+        for frozen_result in sorted(freeze_root.rglob("html.json")):
+            text = frozen_result.read_text(encoding="utf-8")
+            if MANUAL_TAG.search(text):
+                errors.append(
+                    f"{frozen_result.relative_to(ROOT)}: frozen notebook output "
+                    "contains a manual equation tag; refresh or remove the stale result"
+                )
+
     if errors:
         print("Content validation failed:", file=sys.stderr)
         for error in errors:
