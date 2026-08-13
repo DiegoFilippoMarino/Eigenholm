@@ -1,0 +1,308 @@
+---
+title: "Straight Paths, Cheap Samplers"
+description: "A geometric account of why probability paths can matter more than formal solver order in continuous-time generative models."
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
+date: "2026-08-14"
+categories: [Generative Models, Differential Equations, Optimal Transport]
+bibliography: references.bib
+jupyter: python3
+draft: false
+---
+
+A sampler does not merely solve an ODE. It solves the ODE that training chose for it.
+
+This distinction is easy to lose in the taxonomy of diffusion schedules, score parameterizations, flow matching objectives, and numerical integrators. A high-order solver can reduce discretization error along a fixed path. It cannot make a needlessly curved path straight. Flow matching and rectified flow attack the geometry first. EDM and DPM-Solver show how much can still be gained by respecting the structure of the remaining dynamics.
+
+This article studies a case where every quantity is analytic: transport between Gaussian distributions. The example is small, but it isolates the relationship among path geometry, velocity fields, and function-evaluation budgets.
+
+## One endpoint, many probability paths
+
+Let $p_0=\mathcal N(0,I)$ be a noise distribution and $p_1=\mathcal N(\mu,\Sigma)$ be the data distribution. A continuous normalizing flow chooses intermediate densities $p_t$ and a velocity field $v_t$ satisfying the continuity equation
+
+$$
+\partial_t p_t(x)+\nabla\cdot\left(p_t(x)v_t(x)\right)=0.
+$$ {#eq-continuity}
+
+The associated ODE is
+
+$$
+\frac{dx_t}{dt}=v_t(x_t),\qquad x_0\sim p_0.
+$$ {#eq-flow-ode}
+
+Many choices of $p_t$ connect the same endpoints. They do not have the same computational difficulty.
+
+Score-based diffusion starts from a stochastic noising process and obtains a deterministic probability-flow ODE with the same marginals [@song2021sde]. DDPM is a discrete-time member of this family [@ho2020ddpm]. Flow matching instead regresses a velocity field for a chosen path directly, without simulating an SDE [@lipman2023flow]. Rectified flow begins with straight interpolants and learns the causal velocity induced by their crossings [@liu2023rectified].
+
+## Two Gaussian paths
+
+For diagonal $\Sigma=\operatorname{diag}(\sigma_1^2,\ldots,\sigma_d^2)$, the 2-Wasserstein displacement path is
+
+$$
+x_t=t\mu+\left((1-t)I+t\Sigma^{1/2}\right)z,qquad z\sim\mathcal N(0,I).
+$$ {#eq-ot-path}
+
+Each particle follows a straight line at constant speed. Its velocity is $x_1-x_0$.
+
+Now choose a diffusion-like interpolation with signal coefficient
+
+$$
+\alpha(t)=\sin\left(\frac{\pi t}{2}\right).
+$$
+
+The marginals are
+
+$$
+p_t=\mathcal N\left(\alpha(t)\mu,
+\alpha(t)^2\Sigma+\left(1-\alpha(t)^2\right)I\right).
+$$ {#eq-diffusion-path}
+
+A deterministic coupling that realizes @eq-diffusion-path is
+
+$$
+x_t=\alpha(t)\mu+S(t)z,qquad
+S(t)=\left(\alpha(t)^2\Sigma+(1-\alpha(t)^2)I\right)^{1/2}.
+$$
+
+Its velocity field is affine:
+
+$$
+v_t(x)=\dot m(t)+\dot S(t)S(t)^{-1}(x-m(t)),qquad m(t)=\alpha(t)\mu.
+$$ {#eq-gaussian-velocity}
+
+Both paths reach the same Gaussian. Only @eq-ot-path is straight in particle space.
+
+```{python}
+#| label: fig-path-geometry
+#| fig-cap: "Particle trajectories connecting the same Gaussian endpoints. Optimal-transport interpolation is straight; a variance-preserving diffusion-like path bends because each axis changes scale nonlinearly."
+#| echo: true
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(11)
+mu = np.array([2.2, -0.8])
+sigma = np.array([0.35, 1.8])
+z = rng.normal(size=(18, 2))
+t_grid = np.linspace(0, 1, 121)
+
+def alpha(t):
+    return np.sin(np.pi * t / 2)
+
+ot_paths = np.array([
+    t * mu + z * ((1 - t) + t * sigma)
+    for t in t_grid
+])
+
+diff_paths = np.array([
+    alpha(t) * mu + z * np.sqrt(alpha(t) ** 2 * sigma**2 + 1 - alpha(t) ** 2)
+    for t in t_grid
+])
+
+fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6), sharex=True, sharey=True)
+for ax, paths, title in zip(
+    axes,
+    [ot_paths, diff_paths],
+    ["Displacement path", "Diffusion-like path"],
+):
+    for j in range(z.shape[0]):
+        ax.plot(paths[:, j, 0], paths[:, j, 1], alpha=0.65, lw=1)
+    ax.scatter(paths[0, :, 0], paths[0, :, 1], s=13, label="$t=0$")
+    ax.scatter(paths[-1, :, 0], paths[-1, :, 1], s=13, marker="x", label="$t=1$")
+    ax.set(xlabel="$x_1$", ylabel="$x_2$", title=title)
+    ax.spines[["top", "right"]].set_visible(False)
+axes[0].legend(frameon=False, loc="upper left")
+plt.tight_layout()
+plt.show()
+```
+
+## Curvature is a hidden compute bill
+
+For a sampled trajectory $x(t)$, define its path length and endpoint displacement as
+
+$$
+L[x]=\int_0^1\|\dot x(t)\|_2\,dt,
+\qquad D[x]=\|x(1)-x(0)\|_2.
+$$
+
+The ratio $L/D\ge1$ equals one only for a straight path with no backtracking. It is not a complete stiffness measure, but it captures avoidable travel.
+
+Another useful quantity is integrated squared acceleration,
+
+$$
+\mathcal C[x]=\int_0^1\|\ddot x(t)\|_2^2\,dt.
+$$ {#eq-curvature-energy}
+
+Euler's local truncation error is proportional to $\ddot x(t)\Delta t^2$. A path with large @eq-curvature-energy asks a coarse solver to approximate more bending per step.
+
+```{python}
+#| label: fig-curvature-cost
+#| fig-cap: "Excess path length and acceleration energy for 2,000 particles. The straight displacement coupling removes geometric curvature before numerical integration begins."
+#| echo: true
+
+z_many = rng.normal(size=(2000, 2))
+fine_t = np.linspace(0, 1, 2001)
+
+def sampled_paths(kind, points):
+    if kind == "ot":
+        return np.array([t * mu + points * ((1 - t) + t * sigma) for t in fine_t])
+    return np.array([
+        alpha(t) * mu + points * np.sqrt(alpha(t)**2 * sigma**2 + 1 - alpha(t)**2)
+        for t in fine_t
+    ])
+
+metrics = {}
+dt = fine_t[1] - fine_t[0]
+for name in ["ot", "diffusion"]:
+    paths = sampled_paths(name, z_many)
+    velocity = np.gradient(paths, dt, axis=0, edge_order=2)
+    accel = np.gradient(velocity, dt, axis=0, edge_order=2)
+    length = np.trapezoid(np.linalg.norm(velocity, axis=2), fine_t, axis=0)
+    displacement = np.linalg.norm(paths[-1] - paths[0], axis=1)
+    energy = np.trapezoid(np.sum(accel**2, axis=2), fine_t, axis=0)
+    metrics[name] = (length / np.maximum(displacement, 1e-12), energy)
+
+fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.4))
+labels = ["straight", "diffusion-like"]
+axes[0].boxplot([metrics["ot"][0], metrics["diffusion"][0]], tick_labels=labels, showfliers=False)
+axes[0].set(ylabel="path length / endpoint distance", title="Excess travel")
+axes[1].boxplot([metrics["ot"][1], metrics["diffusion"][1]], tick_labels=labels, showfliers=False)
+axes[1].set_yscale("symlog", linthresh=1e-10)
+axes[1].set(ylabel="integrated squared acceleration", title="Curvature energy")
+for ax in axes:
+    ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+The straight path has zero acceleration up to numerical differentiation error. This is not a claim that every optimal-transport marginal velocity remains straight after conditional averaging in a high-dimensional learned model. It is a controlled demonstration of the quantity that flow matching tries to improve.
+
+## Solver order and path design are different levers
+
+Suppose a model has learned the exact affine field in @eq-gaussian-velocity. We can integrate it with explicit Euler or Heun's second-order method. For the displacement path, Euler is exact because the velocity is constant along each trajectory. For the curved path, solver error remains.
+
+```{python}
+#| label: fig-solver-error
+#| fig-cap: "Endpoint error versus neural-function evaluations for exact Gaussian velocity fields. A straight path is solved exactly by Euler, while higher-order integration only reduces error on the curved path."
+#| echo: true
+
+def velocity(x, t, kind):
+    if kind == "ot":
+        scale = (1 - t) + t * sigma
+        return mu + (sigma - 1) * (x - t * mu) / scale
+
+    a = alpha(t)
+    adot = (np.pi / 2) * np.cos(np.pi * t / 2)
+    variance = a**2 * sigma**2 + 1 - a**2
+    scale = np.sqrt(variance)
+    scale_dot = a * adot * (sigma**2 - 1) / scale
+    mean = a * mu
+    mean_dot = adot * mu
+    return mean_dot + (x - mean) * (scale_dot / scale)
+
+def integrate(x0, steps, kind, method):
+    x = x0.copy()
+    dt = 1 / steps
+    for i in range(steps):
+        t = i * dt
+        k1 = velocity(x, t, kind)
+        if method == "euler":
+            x = x + dt * k1
+        else:
+            proposal = x + dt * k1
+            k2 = velocity(proposal, t + dt, kind)
+            x = x + 0.5 * dt * (k1 + k2)
+    return x
+
+initial = rng.normal(size=(4000, 2))
+target = mu + initial * sigma
+steps_grid = np.array([2, 4, 8, 16, 32, 64])
+
+series = {}
+for kind in ["ot", "diffusion"]:
+    for method in ["euler", "heun"]:
+        errors = []
+        nfes = []
+        for steps in steps_grid:
+            estimate = integrate(initial, int(steps), kind, method)
+            errors.append(np.sqrt(np.mean((estimate - target) ** 2)))
+            nfes.append(steps * (1 if method == "euler" else 2))
+        series[(kind, method)] = (np.array(nfes), np.array(errors))
+
+fig, ax = plt.subplots(figsize=(7.2, 3.8))
+styles = {
+    ("ot", "euler"): ("o-", "straight, Euler"),
+    ("ot", "heun"): ("s-", "straight, Heun"),
+    ("diffusion", "euler"): ("o--", "diffusion-like, Euler"),
+    ("diffusion", "heun"): ("s--", "diffusion-like, Heun"),
+}
+for key, (style, label) in styles.items():
+    nfe, error = series[key]
+    ax.loglog(nfe, np.maximum(error, 1e-15), style, label=label)
+ax.set(xlabel="velocity evaluations", ylabel="endpoint RMSE", title="Geometry before integrator order")
+ax.legend(frameon=False, ncol=2)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Heun substantially improves the curved path. It has almost nothing to do on the straight one. Path design and integrator design multiply rather than substitute for each other.
+
+## Reading the modern methods through this lens
+
+### Score SDE and the probability-flow ODE
+
+Score-based models learn $\nabla_x\log p_t(x)$ and can sample either a reverse-time SDE or a deterministic probability-flow ODE [@song2021sde]. This gives a clean separation between learned distributional information and the numerical sampler. It also exposes curvature, stiffness, and schedule choice as first-class concerns.
+
+### Flow matching
+
+Flow matching trains $v_\theta(x,t)$ by regression against a conditional vector field:
+
+$$
+\mathcal L_{\mathrm{CFM}}=
+\mathbb E_{t,x_1,x_t}
+\left[\|v_\theta(x_t,t)-u_t(x_t\mid x_1)\|_2^2\right].
+$$ {#eq-cfm}
+
+The conditional objective has the same gradient as the intractable marginal flow-matching objective under the paper's conditions [@lipman2023flow]. Choosing conditional optimal-transport paths makes @eq-cfm both tractable and geometrically favorable.
+
+### Rectified flow
+
+Rectified flow fits the velocity of linear interpolants $X_t=(1-t)X_0+tX_1$. Interpolants can cross, while unique ODE trajectories cannot. Conditional expectation resolves those crossings into a causal flow. Reflow repeats the procedure on the learned coupling and tends to straighten it further [@liu2023rectified]. The key target is not merely a better score estimate. It is a coupling that tolerates coarse time discretization.
+
+### EDM and DPM-Solver
+
+EDM separates schedule, preconditioning, training weights, and solver choice. Its deterministic sampler uses Heun steps and a noise schedule designed around where truncation error matters [@karras2022edm]. DPM-Solver goes further by exploiting the semilinear form of diffusion ODEs. It solves the linear part analytically and approximates only the neural residual through an exponential-integrator construction [@lu2022dpm].
+
+These methods improve the solver side of the equation. They are especially valuable when retraining with a different path is impossible.
+
+### Consistency models
+
+Consistency models learn a map from any point on a probability-flow trajectory to its endpoint [@song2023consistency]. In the ideal case, the model amortizes the whole ODE solve into one evaluation. Distillation error, trajectory complexity, and boundary parameterization then replace ordinary integration error. A straighter teacher trajectory is still easier to compress.
+
+## A useful error decomposition
+
+For a generated endpoint $\hat x_1$, it helps to separate
+
+$$
+\|\hat x_1-x_1\|
+\lesssim
+\underbrace{\text{field estimation error}}_{\text{training}}
++\underbrace{\text{path or coupling complexity}}_{\text{model design}}
++\underbrace{\text{discretization error}}_{\text{solver}}.
+$$
+
+The terms interact, so this is not a theorem. It is a debugging discipline. Increasing solver order only targets the last term. More network capacity mainly targets the first. Flow matching and rectification can reduce the middle term.
+
+## Limits of the Gaussian experiment
+
+The analytic coupling knows which noise sample maps to which data sample. In unconditional image generation there is no given pairing, and conditional vector fields are averaged into a marginal field. Straight conditional paths can still yield curved marginal trajectories. High-dimensional learned fields can also be stiff for reasons that a Gaussian cannot express.
+
+The experiment nevertheless establishes a narrow result: endpoint distributions do not determine sampling cost. The geometry of the chosen probability path contributes directly to the numerical budget. Before designing a more elaborate solver, it is worth asking whether the model was trained to follow an unnecessarily difficult road.
+
+## References
+
+::: {#refs}
+:::

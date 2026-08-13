@@ -1,0 +1,220 @@
+---
+title: "The Rank of Memory"
+description: "A matrix view of attention and state-space models that makes compressed memory capacity measurable at a sequence boundary."
+author:
+  - name:
+      given: Diego Filippo
+      family: Marino
+date: "2026-08-14"
+categories: [Sequence Models, State Space Models, Linear Algebra]
+bibliography: references.bib
+jupyter: python3
+draft: false
+---
+
+Attention and recurrence are often compared by counting operations. That comparison misses the harder question. What information can cross from an old prefix into a new suffix?
+
+For a linear recurrent model, the answer has an exact algebraic form: no more than the state dimension. The state is not just a cache with a different implementation. It is a rank constraint on communication through time. This observation connects selective state-space models, linear attention, semiseparable matrices, and the persistent advantage of hybrid architectures.
+
+## Unrolling a recurrence into a matrix
+
+Consider a time-varying linear state-space model
+
+$$
+h_i=A_i h_{i-1}+B_i x_i,qquad y_i=C_i^\top h_i,
+$$ {#eq-ssm-recurrence}
+
+where $h_i\in\mathbb R^N$. Unrolling @eq-ssm-recurrence gives
+
+$$
+y_i=\sum_{j\le i} C_i^\top
+\left(\prod_{k=j+1}^{i}A_k\right)B_j x_j.
+$$ {#eq-ssm-unrolled}
+
+The complete sequence operator is therefore a lower-triangular matrix $M$ with entries
+
+$$
+M_{ij}=C_i^\top A_iA_{i-1}\cdots A_{j+1}B_j,qquad j\le i.
+$$ {#eq-ssm-matrix}
+
+This is the matrix side of state-space duality [@dao2024transformers]. Computing $Mx$ directly looks like masked attention. Evaluating @eq-ssm-recurrence is a linear scan. They are two schedules for the same operator.
+
+Mamba makes $A_i$, $B_i$, and $C_i$ depend on the current input, which restores content-dependent selection while retaining a recurrent evaluation [@gu2023mamba]. Mamba-2 takes the matrix view seriously. Its structured state-space duality algorithm mixes recurrent computation across blocks with matrix multiplication inside blocks [@dao2024transformers].
+
+## A cut through time
+
+Split a sequence after token $s$. Let $P=M_{s:n,0:s}$ be the block mapping the entire prefix into future outputs. From @eq-ssm-matrix,
+
+$$
+P_{ij}=C_i^\top
+\underbrace{A_i\cdots A_{s+1}}_{L_i}
+\underbrace{A_s\cdots A_{j+1}B_j}_{R_j}.
+$$
+
+Collecting the left and right factors yields
+
+$$
+P=LR,qquad L\in\mathbb R^{(n-s)\times N},quad
+R\in\mathbb R^{N\times s},
+$$
+
+so
+
+$$
+\operatorname{rank}(P)\le N.
+$$ {#eq-cut-rank}
+
+Equation @eq-cut-rank is the operational meaning of an $N$-dimensional state. Everything the future can recover about the prefix must pass through an $N$-dimensional bottleneck at the cut.
+
+This statement does not say that an SSM remembers only $N$ tokens. A real-valued state can encode complicated summaries of arbitrarily long histories. It says that the *linearized channels of independent influence* across one boundary are bounded by $N$. Exact associative recall of many unrelated items is difficult because those items compete for the same channels.
+
+## Verifying the factorization
+
+The following experiment builds a stable diagonal time-varying SSM, evaluates it both as a recurrence and as a dense matrix, then inspects a prefix-to-suffix block.
+
+```{python}
+#| label: fig-ssm-rank
+#| fig-cap: "The dense operator of a time-varying SSM and the singular spectrum of its prefix-to-suffix block. The numerical rank cannot exceed the four-dimensional state."
+#| echo: true
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(7)
+length, state_dim, cut = 64, 4, 32
+
+# Diagonal, stable, and time-varying transitions.
+A = 0.72 + 0.22 * rng.random((length, state_dim))
+B = rng.normal(size=(length, state_dim))
+C = rng.normal(size=(length, state_dim))
+x = rng.normal(size=length)
+
+M = np.zeros((length, length))
+for j in range(length):
+    carried = B[j].copy()
+    M[j, j] = C[j] @ carried
+    for i in range(j + 1, length):
+        carried = A[i] * carried
+        M[i, j] = C[i] @ carried
+
+h = np.zeros(state_dim)
+y_scan = np.empty(length)
+for i in range(length):
+    h = A[i] * h + B[i] * x[i]
+    y_scan[i] = C[i] @ h
+
+assert np.allclose(y_scan, M @ x, atol=1e-10)
+
+cross = M[cut:, :cut]
+singular = np.linalg.svd(cross, compute_uv=False)
+rank = np.linalg.matrix_rank(cross, tol=1e-10)
+assert rank <= state_dim
+
+fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.4))
+im = axes[0].imshow(M, cmap="coolwarm", aspect="auto")
+axes[0].axhline(cut - 0.5, color="black", lw=0.8)
+axes[0].axvline(cut - 0.5, color="black", lw=0.8)
+axes[0].set(xlabel="input position", ylabel="output position", title="Sequence operator $M$")
+fig.colorbar(im, ax=axes[0], fraction=0.046, label="coupling")
+
+axes[1].semilogy(np.arange(1, len(singular) + 1), singular, "o-")
+axes[1].axvline(state_dim + 0.5, color="black", ls=":", label=f"state size $N={state_dim}$")
+axes[1].set(xlabel="singular-value index", ylabel="singular value", title=f"Cross-cut rank = {rank}")
+axes[1].legend(frameon=False)
+axes[1].spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+The lower-left quadrant contains all influence of the prefix on the suffix. It looks dense, yet it has only four nonzero singular directions. Density and rank are different notions.
+
+## Attention buys cross-cut rank
+
+Causal softmax attention has no fixed state at the boundary. Each future query can address every stored key separately. The corresponding cross-cut block can therefore have rank as large as $\min(s,n-s)$, subject to the head dimension and the actual query-key geometry.
+
+To isolate this difference, compare a recurrent operator of state size $N$ with a causal attention matrix built from random queries and keys. Both maps are dense below the diagonal. Only one has a fixed cross-cut rank ceiling.
+
+```{python}
+#| label: fig-memory-spectra
+#| fig-cap: "Normalized cross-boundary singular spectra. Full attention retains many independent prefix directions, while recurrent memory truncates after its state dimension."
+#| echo: true
+
+def causal_attention(q, k):
+    scores = q @ k.T / np.sqrt(q.shape[1])
+    scores[np.triu_indices_from(scores, k=1)] = -np.inf
+    row_max = np.max(scores, axis=1, keepdims=True)
+    weights = np.exp(scores - row_max)
+    weights /= weights.sum(axis=1, keepdims=True)
+    return weights
+
+q = rng.normal(size=(length, 24))
+k = rng.normal(size=(length, 24))
+W = causal_attention(q, k)
+
+s_ssm = np.linalg.svd(M[cut:, :cut], compute_uv=False)
+s_attn = np.linalg.svd(W[cut:, :cut], compute_uv=False)
+s_ssm /= s_ssm[0]
+s_attn /= s_attn[0]
+
+fig, ax = plt.subplots(figsize=(7.2, 3.8))
+idx = np.arange(1, cut + 1)
+ax.semilogy(idx, s_attn, "o-", ms=3, label="causal softmax attention")
+ax.semilogy(idx, np.maximum(s_ssm, 1e-16), "o-", ms=3, label=f"SSM, state {state_dim}")
+ax.axvline(state_dim + 0.5, color="black", ls=":", lw=1)
+ax.set(xlabel="singular-value index", ylabel="value / largest value", title="Information channels across one cut")
+ax.legend(frameon=False)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+This comparison also clarifies linear attention. Kernel attention can be written with a running state such as
+
+$$
+S_i=\sum_{j\le i}\phi(k_j)v_j^\top,qquad
+z_i=\sum_{j\le i}\phi(k_j),
+$$
+
+followed by $y_i=\phi(q_i)^\top S_i/(\phi(q_i)^\top z_i)$. Its efficiency comes from a finite sufficient statistic. Performer improves the approximation to the softmax kernel, but the recurrent state still fixes the number of channels carried through time [@choromanski2021performer].
+
+## Associative memory and compression
+
+Modern Hopfield networks give a complementary view of attention. A softmax attention update is a continuous associative-memory lookup [@ramsauer2021hopfield]. Keys remain individually addressable, so a query can retrieve one pattern without first compressing all patterns into a fixed-size summary.
+
+An SSM instead performs online lossy compression. Selection decides what to preserve, much like a learned write gate. This is why input-dependent dynamics matter so much in Mamba. The model does not remove the bottleneck. It learns a better compressor.
+
+The same view explains several empirical design choices:
+
+1. **Larger state helps recall.** Increasing $N$ raises the bound in @eq-cut-rank.
+2. **Multiple heads partition memory.** Independent recurrent heads provide separate low-rank channels.
+3. **Occasional attention layers reset the bottleneck.** A hybrid can recover high-rank, content-addressed communication at selected depths.
+4. **Local attention is unusually compatible with recurrence.** Recent tokens stay explicitly addressable while the distant past is summarized.
+
+Jamba follows this hybrid logic, interleaving Mamba and attention rather than treating them as mutually exclusive [@lieber2024jamba]. Hyena reaches long range through implicit convolutions and gating, another compressed operator with subquadratic evaluation [@poli2023hyena]. RWKV makes the recurrent state especially explicit through time-decayed weighted key-value statistics [@peng2023rwkv].
+
+## Hardware does not erase algebra
+
+The dense form may still be the fastest way to compute within a block. GPUs favor matrix multiplication, so Mamba-2 deliberately exposes a quadratic local form while keeping a recurrent global form. This is a systems result built on an algebraic result.
+
+It is useful to separate three questions:
+
+| Question | Governing quantity |
+|:--|:--|
+| How much work scales with sequence length? | algorithmic schedule |
+| How well does the hardware execute that work? | arithmetic intensity and kernel shape |
+| How many independent prefix directions reach the future? | cross-cut rank |
+
+A method can improve the first two without changing the third. Faster scans do not create more memory channels. Conversely, a larger state may improve recall but lose its throughput advantage if the scan is poorly mapped to hardware.
+
+## What this model leaves out
+
+Real sequence models are nonlinear, layered, data-dependent, and residual. A Jacobian at one input replaces the fixed linear operator used here, and ranks can change from layer to layer. Finite precision also makes numerical rank a spectrum rather than a sharp integer.
+
+Still, every recurrent layer must communicate through its state at each cut. The local Jacobian of that communication factors through the state, so the bottleneck survives linearization. Residual depth can compose and reroute information, but it cannot make a single fixed-size boundary state behave exactly like an arbitrarily large key-value store.
+
+The practical question is therefore not whether recurrence can remember. It can. The question is whether the task's useful past admits a compact sufficient statistic. State-space models are strongest when the answer is yes. Attention remains valuable when future queries need many independently addressable facts whose relevance was impossible to predict when they first arrived.
+
+## References
+
+::: {#refs}
+:::
