@@ -41,7 +41,7 @@ Score-based diffusion starts from a stochastic noising process and obtains a det
 For diagonal $\Sigma=\operatorname{diag}(\sigma_1^2,\ldots,\sigma_d^2)$, the 2-Wasserstein displacement path is
 
 $$
-x_t=t\mu+\left((1-t)I+t\Sigma^{1/2}\right)z,qquad z\sim\mathcal N(0,I).
+x_t=t\mu+\left((1-t)I+t\Sigma^{1/2}\right)z,\qquad z\sim\mathcal N(0,I).
 $$ {#eq-ot-path}
 
 Each particle follows a straight line at constant speed. Its velocity is $x_1-x_0$.
@@ -62,14 +62,14 @@ $$ {#eq-diffusion-path}
 A deterministic coupling that realizes @eq-diffusion-path is
 
 $$
-x_t=\alpha(t)\mu+S(t)z,qquad
+x_t=\alpha(t)\mu+S(t)z,\qquad
 S(t)=\left(\alpha(t)^2\Sigma+(1-\alpha(t)^2)I\right)^{1/2}.
 $$
 
 Its velocity field is affine:
 
 $$
-v_t(x)=\dot m(t)+\dot S(t)S(t)^{-1}(x-m(t)),qquad m(t)=\alpha(t)\mu.
+v_t(x)=\dot m(t)+\dot S(t)S(t)^{-1}(x-m(t)),\qquad m(t)=\alpha(t)\mu.
 $$ {#eq-gaussian-velocity}
 
 Both paths reach the same Gaussian. Only @eq-ot-path is straight in particle space.

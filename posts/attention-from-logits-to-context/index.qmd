@@ -99,9 +99,23 @@ $$
 \frac{\partial p_i}{\partial s_j}=p_i(\delta_{ij}-p_j),
 \qquad
 J_{\text{softmax}}=\operatorname{diag}(p)-pp^\top.
-$$
+$$ {#eq-softmax-jacobian}
 
-This matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution. The same invariance explains the standard stable implementation
+This matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution.
+
+Two scalar summaries of @eq-softmax-jacobian explain the previous section quantitatively. Its trace is
+
+$$
+\operatorname{tr}(J_{\text{softmax}})
+=\sum_ip_i(1-p_i)
+=1-\|p\|_2^2,
+$$ {#eq-jacobian-trace}
+
+and its spectral norm is bounded by $\max_ip_i$. Both vanish as the row approaches a one-hot vector, where $\|p\|_2^2\to1$. The collapse is not a numerical accident that better precision could fix; it is the derivative of a function that has become locally constant. A row that has committed to one key cannot report how it would have preferred a different key, so no gradient signal flows back to the logits that produced the commitment.
+
+This gives the $\sqrt{d_k}$ argument teeth. The scaling is not cosmetic normalization: it keeps $\|p\|_2^2$ away from one at initialization, and @eq-jacobian-trace is the quantity it protects. It also explains why entropy is the right diagnostic to plot. Entropy and $1-\|p\|_2^2$ are different measures of the same concentration, and the second is proportional to the gradient the row can still transmit.
+
+The same invariance explains the standard stable implementation
 
 ```python
 def softmax(x, axis=-1):
@@ -129,6 +143,59 @@ $$
 $$
 
 Heads do not provide free capacity. They partition the channel dimension into several learned similarity spaces. Very small $d_k$ constrains each compatibility function, while a single wide head forces one attention distribution to serve every subspace.
+
+## What a head can and cannot express
+
+The constraint imposed by small $d_k$ can be made precise. Since $S=QK^\top/\sqrt{d_k}$ is a product through a $d_k$-dimensional space,
+
+$$
+\operatorname{rank}(S)\le d_k,
+$$ {#eq-score-rank}
+
+no matter how long the sequence is. At $n=4096$ and $d_k=64$, a head chooses its score matrix from a set of measure zero inside $\mathbb R^{n\times n}$. Softmax then acts row-wise, and because each row is invariant to an additive constant, the reachable set is described by row-centered logit matrices of rank at most $d_k$.
+
+That immediately raises a question the formula cannot answer on its own: which attention patterns actually need many dimensions? Some familiar ones need remarkably few.
+
+```{python}
+#| label: fig-logit-rank
+#| fig-cap: "Best achievable error when a target logit matrix is realized by a head of dimension $d_k$, measured as the relative Frobenius norm of the discarded singular values after row centering. Structured relative-position patterns are cheap; arbitrary token-to-token pairings are not."
+#| echo: true
+
+n = 128
+i, j = np.arange(n)[:, None], np.arange(n)[None, :]
+pairing = rng.permutation(n)
+
+targets = {
+    "distance decay": -np.abs(i - j) / 8.0,
+    "periodic, period 16": 3 * np.cos(2 * np.pi * (i - j) / 16),
+    "content match (random)": rng.normal(size=(n, n)),
+    "arbitrary pairing": 6.0 * (j == pairing[:, None]),
+}
+
+head_dims = np.array([1, 2, 4, 8, 16, 32, 64])
+
+fig, ax = plt.subplots(figsize=(7, 3.8))
+for name, target in targets.items():
+    centered = target - target.mean(axis=1, keepdims=True)   # row shifts are free
+    spectrum = np.linalg.svd(centered, compute_uv=False)
+    tail = np.sqrt(np.cumsum(spectrum[::-1] ** 2)[::-1]) / np.linalg.norm(centered)
+    ax.semilogy(head_dims, np.maximum(tail[head_dims], 1e-6), "o-", ms=4, label=name)
+ax.set_xscale("log", base=2)
+ax.set(xlabel=r"head dimension $d_k$",
+       ylabel="relative error of best rank-$d_k$ fit", ylim=(5e-7, 3))
+ax.axhline(1e-6, color="0.6", lw=0.8, ls=":")
+ax.text(1.05, 1.4e-6, "exact (clipped)", fontsize=7, color="0.4")
+ax.spines[["top", "right"]].set_visible(False)
+ax.legend(frameon=False, fontsize=8)
+plt.tight_layout()
+plt.show()
+```
+
+The periodic pattern is exactly rank two, because $\cos\left(\omega(i-j)\right)=\cos\omega i\cos\omega j+\sin\omega i\sin\omega j$. One frequency of relative position costs one coordinate pair, which is precisely the accounting behind rotary embeddings. A smooth distance bias is nearly as cheap: eight dimensions reproduce it to about two percent.
+
+An arbitrary pairing is the opposite. Sending each query to one unrelated key is essentially a permutation matrix, and 64 dimensions still leave 70 percent of it unexplained. Nothing about that pattern is complicated to describe; it is simply incompressible, and @eq-score-rank is a compression budget.
+
+This is the honest version of the claim that attention is a lookup table. It is a lookup table whose addressing function must factor through $d_k$ dimensions. Structured, reusable relations are affordable, arbitrary correspondences are not, and the useful patterns of language mostly live at the cheap end. It is also the reason heads are the right unit of capacity: $h$ heads give a sum of $h$ separately softmaxed rank-$d_k$ operators, which is a strictly richer object than one rank-$hd_k$ operator [@bhojanapalli2020lowrank].
 
 ## Memory is not the same as arithmetic
 

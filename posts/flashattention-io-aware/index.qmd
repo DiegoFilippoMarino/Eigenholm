@@ -24,33 +24,21 @@ $$
 S=QK^\top,\qquad P=\operatorname{softmax}(S),\qquad O=PV.
 $$
 
-A conventional sequence of kernels writes $S$ to HBM, reads it for softmax, writes $P$, then reads $P$ for the second matrix multiplication. Both intermediates contain $n^2$ elements. Kernel fusion can remove some round trips, but $S$ and $P$ still exceed on-chip capacity at useful sequence lengths.
+A conventional sequence of kernels writes $S$ to HBM, reads it for softmax, writes $P$, then reads $P$ for the second matrix multiplication. Counting the elements that cross the HBM boundary for one head:
 
-```{python}
-#| label: fig-attention-memory
-#| fig-cap: "Storage for one materialized attention matrix at FP16, compared with one linear-size QKV working set at head dimension 128."
-#| echo: true
+| Stage | Reads | Writes |
+|:--|:--|:--|
+| $S=QK^\top$ | $Q,K$: $2nd$ | $S$: $n^2$ |
+| $P=\operatorname{softmax}(S)$ | $S$: $n^2$ | $P$: $n^2$ |
+| $O=PV$ | $P,V$: $n^2+nd$ | $O$: $nd$ |
 
-import numpy as np
-import matplotlib.pyplot as plt
+: HBM elements moved by an unfused three-kernel schedule. {#tbl-standard-traffic}
 
-n = 2 ** np.arange(8, 18)
-d = 128
-score_mib = n**2 * 2 / 2**20
-qkv_mib = 3 * n * d * 2 / 2**20
+The total is $4n^2+4nd$ elements, of which the quadratic part dominates as soon as $n\gg d$. Fusing softmax into one of the matrix multiplications removes a round trip and reduces the constant, but it does not change the order: any schedule that materializes $S$ or $P$ pays $\Omega(n^2)$ traffic.
 
-fig, ax = plt.subplots(figsize=(7, 3.8))
-ax.loglog(n, score_mib, "o-", label=r"one $n\times n$ matrix")
-ax.loglog(n, qkv_mib, "o-", label=r"$Q,K,V$ at $d=128$")
-ax.set(xlabel="sequence length", ylabel="storage (MiB)")
-ax.spines[["top", "right"]].set_visible(False)
-ax.grid(which="both", alpha=0.18)
-ax.legend(frameon=False)
-plt.tight_layout()
-plt.show()
-```
+The absolute numbers make the constraint concrete. At $n=16{,}384$ and FP16, one score matrix for a single head of a single batch element occupies 512 MiB. The corresponding $Q$, $K$, and $V$ at $d=128$ occupy about 12 MiB combined. The intermediate is roughly forty times the size of the operands that produced it, and it exists only to be consumed by the next kernel. Meanwhile on-chip SRAM is measured in hundreds of kilobytes per streaming multiprocessor, so no tiling of the *stored* matrix helps; the matrix must not exist.
 
-At $n=16{,}384$, a single FP16 score matrix for one head and one batch element occupies 512 MiB. A model with many heads cannot retain all such matrices without aggressive memory management.
+That reframing is the whole algorithm. Attention is not expensive because of $n^2$ arithmetic alone. It is expensive because the standard schedule promotes a scratch value to a first-class tensor.
 
 ## Softmax can be streamed exactly
 
@@ -65,8 +53,8 @@ $$
 When a new block $B$ arrives, let
 
 $$
-m_B=\max_{x\in B}x,qquad
-\ell_B=\sum_{x\in B}e^{x-m_B},qquad
+m_B=\max_{x\in B}x,\qquad
+\ell_B=\sum_{x\in B}e^{x-m_B},\qquad
 m'=\max(m_j,m_B).
 $$
 
@@ -92,33 +80,58 @@ $$ {#eq-online-output}
 
 Equations @eq-online-normalizer and @eq-online-output are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.
 
-```python
+The exactness claim deserves a test rather than a citation, because it is the property that separates FlashAttention from an approximation. The critical case is a late arrival: a logit larger than everything seen so far shows up in the final tile, forcing every accumulated term to be rescaled after the fact.
+
+```{python}
+#| label: exactness-check
+#| echo: true
+
 import numpy as np
 
+def reference_attention(q, k, v):
+    """One-shot softmax over the full key set."""
+    logits = k @ q * q.shape[-1] ** -0.5
+    p = np.exp(logits - logits.max())
+    return (p / p.sum()) @ v
+
 def tiled_attention(q, k, v, block=64):
-    """Reference implementation for one query vector, not a fast kernel."""
+    """Online-softmax attention for one query vector. Exact, not fast."""
     scale = q.shape[-1] ** -0.5
-    m = -np.inf
-    ell = 0.0
+    m, ell = -np.inf, 0.0
     acc = np.zeros(v.shape[-1], dtype=np.float64)
 
     for start in range(0, len(k), block):
-        kb = k[start:start + block]
-        vb = v[start:start + block]
+        kb, vb = k[start:start + block], v[start:start + block]
         logits = kb @ q * scale
-        block_max = logits.max()
-        new_max = max(m, block_max)
+        new_max = max(m, logits.max())
 
-        old_scale = np.exp(m - new_max)
-        weights = np.exp(logits - new_max)
-        acc = old_scale * acc + weights @ vb
-        ell = old_scale * ell + weights.sum()
+        rescale = np.exp(m - new_max)          # correct the past
+        weights = np.exp(logits - new_max)     # weight the present
+        acc = rescale * acc + weights @ vb
+        ell = rescale * ell + weights.sum()
         m = new_max
 
     return acc / ell
+
+rng = np.random.default_rng(0)
+n, d = 4096, 64
+q, k, v = rng.normal(size=d), rng.normal(size=(n, d)), rng.normal(size=(n, d))
+
+reference = reference_attention(q, k, v)
+for block in (16, 64, 256, 1024, 4096):
+    assert np.allclose(tiled_attention(q, k, v, block), reference, rtol=0, atol=1e-14)
+
+# Worst case for the running maximum: the dominant key is the very last one.
+k_late = k.copy()
+k_late[-1] = q * 12.0
+late = np.max(np.abs(tiled_attention(q, k_late, v, 64)
+                     - reference_attention(q, k_late, v)))
+print(f"late-maximum deviation: {late:.2e}")
 ```
 
-This Python version exposes the recurrence but does not provide the speedup. Performance comes from mapping tiles to GPU thread blocks and using tensor-core matrix multiplications while intermediates remain in SRAM or registers.
+The block size is a scheduling parameter, not a fidelity parameter. Changing it reorders floating-point additions and nothing else, which is why the deviation sits at the rounding floor instead of growing with the number of tiles. Approximate attention methods drop terms; this one keeps every term and only postpones normalizing them.
+
+The Python above exposes the recurrence but provides none of the speedup. Performance comes from mapping tiles to GPU thread blocks and issuing tensor-core matrix multiplications while $(m,\ell,\widetilde o)$ live in registers and the tiles live in SRAM.
 
 ## Tiling the full matrix
 
@@ -130,19 +143,79 @@ Partition $Q$ into row tiles $Q_i$ and $K,V$ into column tiles $K_j,V_j$. For ea
 4. Update each row's $(m,\ell,\widetilde{o})$ state.
 5. Write the final $O_i$ and log-sum-exp statistics.
 
-The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions. The original analysis gives an HBM access complexity of
+The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions, and the tile sizes are what convert on-chip capacity into saved traffic.
+
+Suppose SRAM holds $M$ elements. A working set consists of one query tile, one key tile, one value tile, and one output accumulator:
 
 $$
-\Theta\!\left(\frac{n^2d^2}{M}\right),
-$$
+\underbrace{B_rd}_{Q_i}+\underbrace{B_cd}_{K_j}
++\underbrace{B_cd}_{V_j}+\underbrace{B_rd}_{O_i}
+\;\le\;M
+\quad\Longrightarrow\quad
+B_r,B_c=\Theta\!\left(\frac{M}{d}\right).
+$$ {#eq-tile-budget}
 
-for SRAM capacity $M$, over the relevant range of tile sizes, compared with quadratic intermediate traffic in the standard schedule [@dao2022flashattention].
+Now count traffic. $Q$ is read once and $O$ is written once, contributing $2nd$. Each of the $n/B_r$ query tiles streams the entire key and value tensors, contributing $(n/B_r)\cdot 2nd$. Substituting @eq-tile-budget,
+
+$$
+\text{tiled traffic}
+=2nd+\frac{2n^2d}{B_r}
+=\Theta\!\left(nd+\frac{n^2d^2}{M}\right),
+$$ {#eq-tiled-traffic}
+
+which is the HBM access complexity in the original analysis, over the relevant range of tile sizes [@dao2022flashattention]. Comparing @eq-tiled-traffic against the $4n^2+4nd$ of @tbl-standard-traffic, the asymptotic ratio at large $n$ is $M/(2d^2)$: independent of sequence length, linear in SRAM capacity, and quadratic in head dimension. Larger heads are penalized twice, once for the tiles they force to shrink and once for the bytes each tile carries.
+
+```{python}
+#| label: fig-hbm-traffic
+#| fig-cap: "HBM elements moved per head under the two schedules at head dimension 64. Both curves are quadratic in sequence length; tiling divides the quadratic term by the on-chip working set, so the vertical gap is set by SRAM capacity rather than by sequence length."
+#| echo: true
+
+import matplotlib.pyplot as plt
+
+def standard_traffic(n, d):
+    return 4 * n**2 + 4 * n * d
+
+def tiled_traffic(n, d, sram_elements):
+    tile = max(sram_elements // (4 * d), 1)       # from the SRAM budget above
+    row_tiles = np.ceil(n / np.minimum(tile, n))
+    return 2 * n * d + row_tiles * 2 * n * d
+
+lengths = 2 ** np.arange(9, 18)
+head_dim = 64
+
+fig, ax = plt.subplots(figsize=(7, 3.8))
+ax.loglog(lengths, standard_traffic(lengths, head_dim), "o-",
+          label="materialize $S$ and $P$")
+for sram, style in ((32 * 1024, "s-"), (96 * 1024, "^-")):
+    ax.loglog(lengths, tiled_traffic(lengths, head_dim, sram), style,
+              label=f"tiled, SRAM = {sram // 1024}K elements")
+ax.set(xlabel="sequence length $n$", ylabel="HBM elements moved")
+ax.spines[["top", "right"]].set_visible(False)
+ax.grid(which="both", alpha=0.18)
+ax.legend(frameon=False)
+plt.tight_layout()
+plt.show()
+
+ratio = standard_traffic(2**16, head_dim) / tiled_traffic(2**16, head_dim, 96 * 1024)
+print(f"traffic reduction at n=65,536: {ratio:.1f}x  (predicted M/2d^2 = "
+      f"{96 * 1024 / (2 * head_dim**2):.1f}x)")
+```
+
+The measured ratio matches the closed form, which is the point of the exercise: the speedup is predictable from two hardware numbers and one model number, before any kernel is written. It also shows what tiling does *not* do. Both curves keep slope two on the log-log axes. The algorithm buys a constant factor on a quadratic, and that constant is bounded by the size of the on-chip scratchpad.
 
 ## Backward by recomputation
 
-Ordinary autodiff saves $S$ or $P$ because the backward pass needs probabilities. FlashAttention stores the output and row-wise log-sum-exp, then recomputes score tiles during backward.
+Ordinary autodiff saves $S$ or $P$ because the backward pass needs probabilities. FlashAttention stores only $O$ and the row-wise log-sum-exp
 
-Recomputation adds FLOPs but removes the quadratic saved activation. On modern accelerators, this trade can be faster because matrix multiplication is efficient while repeated HBM traffic is expensive. This is a selective checkpointing strategy guided by the memory hierarchy.
+$$
+L_i=m_i+\log\ell_i,
+$$ {#eq-logsumexp}
+
+then recomputes score tiles during backward. One scalar per row is sufficient because $L_i$ is exactly the normalizer that was divided out: a recomputed score tile becomes the correct probability tile through $P_{ij}=e^{S_{ij}-L_i}$, with no second pass over the row and no dependence on tile order.
+
+The accounting is favorable. The saved activation shrinks from $n^2$ elements to $nd+n$, a factor of roughly $n/d$; at $n=16{,}384$ and $d=64$ that is a 256-fold reduction in stored state per head. The cost is one extra $QK^\top$ during backward, raising attention FLOPs by about 30 percent rather than doubling them, since the backward pass already performs several matrix multiplications of the same shape.
+
+Standard gradient checkpointing makes the same trade at layer granularity and re-executes whole blocks. Here the choice is made per intermediate, keeping the cheap linear-size statistic and discarding the expensive quadratic one. Recomputation is not a concession; it is what makes the linear memory profile reachable without changing the function being differentiated.
 
 ## FlashAttention-2 changes the work partition
 

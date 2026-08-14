@@ -123,7 +123,7 @@ $$ {#eq-speedup}
 
 ```{python}
 #| label: fig-speculation-length
-#| fig-cap: "Idealized speedup from Equation 5 as speculation length changes. The draft cost is 5 percent of a target invocation."
+#| fig-cap: "Idealized speedup from the throughput model above as speculation length changes. The draft cost is 5 percent of a target invocation."
 #| echo: true
 
 gamma = np.arange(1, 17)

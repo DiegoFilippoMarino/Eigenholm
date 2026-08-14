@@ -151,7 +151,25 @@ plt.tight_layout()
 plt.show()
 ```
 
-Changing the base $b$ stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.
+The horizontal line at one rotation is the boundary worth naming. Pair $i$ has wavelength
+
+$$
+\lambda_i=\frac{2\pi}{\theta_i}=2\pi b^{2i/d},
+$$ {#eq-wavelength}
+
+and the pairs split into two populations at $\lambda_i=L$. Pairs with $\lambda_i\ll L$ have wrapped many times during training and can only encode local offsets, since their phase is ambiguous modulo $\lambda_i$. Pairs with $\lambda_i>L$ never completed a revolution and act as monotone absolute coordinates over the whole training window. At $d=64$, $b=10^4$, and $L=2048$, the crossover sits near pair 20 of 32: roughly a third of the spectrum has never been observed through a full period.
+
+## Three ways to extend context, and what each one breaks
+
+Read through @eq-wavelength, the standard extension methods stop looking like a list of tricks.
+
+**Position interpolation** maps $m\mapsto m/s$ for extension factor $s$ [@chen2023extending]. Every wavelength is stretched uniformly, so the ratio $\lambda_i/L'$ is preserved for the new limit $L'=sL$. Nothing exceeds its trained phase range, which is why it works with little fine-tuning. The cost is paid at the fast end: neighboring positions are now separated by $\theta_i/s$ instead of $\theta_i$, so the high-frequency pairs that resolve local order become $s$ times less discriminative. The model has to relearn distinctions it had already mastered.
+
+**Base scaling**, often called NTK-aware scaling, leaves positions alone and raises $b$ to $b'=b\,s^{d/(d-2)}$. The exponent is chosen so that the slowest pair, $i=d/2-1$, is stretched by exactly $s$ while the fastest pair, $i=0$, is untouched, with intermediate pairs interpolating between the two. High-frequency local structure survives; the slow pairs absorb the extension. This is the argument for why simply increasing the base is not a hack but the correct dual of interpolation.
+
+**Band-wise methods** such as YaRN make the split explicit, interpolating only the pairs whose wavelength exceeds the trained context, leaving short-wavelength pairs untouched, and blending across a transition region; they also rescale attention temperature to compensate for the entropy change that a longer key set induces [@peng2024yarn].
+
+The pattern across all three is the same trade. Position enters the logit only through phase, total phase budget is fixed by training, and extending context means deciding which pairs surrender resolution. There is no scaling rule that adds information the training distribution never contained; the choice is only where to spend the loss.
 
 ## Numerical and implementation details
 

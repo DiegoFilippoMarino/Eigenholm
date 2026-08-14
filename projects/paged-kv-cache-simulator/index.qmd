@@ -33,33 +33,19 @@ $$ {#eq-kv-size}
 
 The factor two accounts for keys and values. For conventional multi-head attention, $h_{kv}$ equals the query-head count. Multi-query and grouped-query attention reduce $h_{kv}$, which directly reduces the persistent cache.
 
-```{python}
-#| label: fig-kv-capacity
-#| fig-cap: "KV-cache memory per request for three decoder configurations in FP16. Model labels describe layers, KV heads, and head dimension."
-#| echo: true
+It is more useful to read @eq-kv-size as a per-token rate than as a total. Differentiating with respect to $T$ gives $2Lh_{kv}d_hb$ bytes for every token generated, a figure fixed at model-design time:
 
-import numpy as np
-import matplotlib.pyplot as plt
+| Decoder shape | Bytes per cached token | Tokens per GiB | 8K-token request |
+|:--|--:|--:|--:|
+| 32 layers, 32 KV heads, $d_h=128$ | 512 KiB | 2,048 | 4.0 GiB |
+| 32 layers, 8 KV heads, $d_h=128$ | 128 KiB | 8,192 | 1.0 GiB |
+| 80 layers, 8 KV heads, $d_h=128$ | 320 KiB | 3,277 | 2.5 GiB |
 
-tokens = np.arange(0, 32769, 512)
-configs = {
-    "32L, 32 KV heads, d=128": (32, 32, 128),
-    "32L, 8 KV heads, d=128": (32, 8, 128),
-    "80L, 8 KV heads, d=128": (80, 8, 128),
-}
+: Per-token cache cost at FP16. Grouped-query attention changes the slope, not the shape, of @eq-kv-size. {#tbl-kv-rate}
 
-fig, ax = plt.subplots(figsize=(7, 3.8))
-for label, (layers, kv_heads, head_dim) in configs.items():
-    gib = 2 * layers * kv_heads * head_dim * tokens * 2 / 2**30
-    ax.plot(tokens, gib, label=label)
-ax.set(xlabel="cached tokens", ylabel="KV cache per request (GiB)")
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False, fontsize=8)
-plt.tight_layout()
-plt.show()
-```
+The middle row is the reason grouped-query attention is now standard: a four-fold reduction in $h_{kv}$ turns a 4 GiB request into a 1 GiB request with no change to the allocator. The third row is the reason depth is not free at serving time, since layers multiply the cache just as heads do.
 
-Equation @eq-kv-size is linear in context length and batch size. That is better than storing a quadratic attention matrix, but it becomes the dominant dynamic allocation in a serving engine.
+The consequence for scheduling is that cache capacity, not FLOPs, sets the concurrency limit. On an 80 GiB device holding a 140 GiB-class model across two shards, perhaps 20 GiB remains for cache. At the first row's rate that is five concurrent 8K requests; at the second row's rate it is twenty. Equation @eq-kv-size is linear in context length and batch size, which is far better than a quadratic attention matrix, but it is *persistent* rather than transient, and it is allocated and freed at token granularity by requests whose final length nobody knows in advance. That combination, not the size itself, is what makes it an allocator problem.
 
 ## Allocation model
 
@@ -73,7 +59,10 @@ $$
 
 The attention kernel follows this mapping when reading keys and values. Since physical blocks have equal size, they can be taken from a free list and need not be adjacent.
 
-```python
+```{python}
+#| label: allocator-source
+#| echo: true
+
 from dataclasses import dataclass, field
 from math import ceil
 
@@ -118,6 +107,9 @@ The following experiment samples 2,000 concurrent requests. Prompt lengths follo
 #| fig-cap: "Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks."
 #| echo: true
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 rng = np.random.default_rng(11)
 requests = 2_000
 prompt = np.clip(rng.lognormal(mean=5.2, sigma=0.8, size=requests).astype(int), 16, 4096)
@@ -146,6 +138,130 @@ plt.show()
 
 These values are simulator outputs, not measurements from the vLLM paper. The qualitative trade-off is real: smaller blocks reduce internal fragmentation but increase block-table entries and kernel address-translation work.
 
+## Allocation under load
+
+The static comparison above measures a snapshot. It cannot show the failure mode that matters in a serving engine, because that failure mode is temporal: paged allocation lets the scheduler admit a request whose future memory demand has not been reserved. Every admitted request then grows by one block every $B$ decode steps, and the growth is not cancellable. If the cache fills, some request must be evicted and its work discarded.
+
+The following experiment closes that loop. Requests arrive as a Poisson process, each decode step advances every running request by one token, and admission is greedy under whatever capacity the policy exposes. The paged policy takes one extra parameter: an admission watermark, a fraction of blocks held back so that already-running requests have room to grow.
+
+```{python}
+#| label: fig-admission-watermark
+#| fig-cap: "Discrete-event simulation of 4,000 decode steps against a 60,000-token cache. Paging alone raises occupancy but admits requests it cannot sustain; holding back a small block reserve at admission converts that occupancy into completed work."
+#| echo: true
+
+CAPACITY, BLOCK, STEPS, WARMUP = 60_000, 16, 4000, 500
+
+def simulate(policy, watermark=0.0, arrival_rate=0.6, seed=5):
+    rng = np.random.default_rng(seed)
+    allocator = PagedAllocator(CAPACITY // BLOCK, BLOCK)
+    floor = int(watermark * len(allocator.free))
+    reserved, next_id, completed, preemptions = 0, 0, 0, 0
+    running, queue, target = [], [], {}
+    concurrency, occupancy = [], []
+
+    for _ in range(STEPS):
+        for _ in range(rng.poisson(arrival_rate)):
+            prompt = int(np.clip(rng.lognormal(5.0, 0.8), 16, 2048))
+            budget = int(rng.choice([128, 256, 512, 1024], p=[0.2, 0.35, 0.3, 0.15]))
+            queue.append(Request(next_id, prompt, budget))
+            target[next_id] = int(rng.integers(1, budget + 1))
+            next_id += 1
+
+        while queue:                                    # greedy admission
+            head = queue[0]
+            if policy == "contiguous":
+                need = head.prompt_tokens + head.max_tokens
+                if reserved + need > CAPACITY:
+                    break
+                reserved += need
+            else:
+                if ceil(head.live_tokens / BLOCK) > len(allocator.free) - floor:
+                    break
+                allocator.ensure_capacity(head)
+            running.append(queue.pop(0))
+
+        done, evicted = [], []
+        for r in running:                               # one decode step each
+            r.generated += 1
+            if policy == "paged":
+                try:
+                    allocator.ensure_capacity(r)
+                except MemoryError:
+                    r.generated -= 1
+                    evicted.append(r)
+                    continue
+            if r.generated >= target[r.request_id]:
+                done.append(r)
+
+        for r in done + evicted:
+            running.remove(r)
+            if policy == "paged":
+                allocator.release(r)
+            else:
+                reserved -= r.prompt_tokens + r.max_tokens
+        completed += len(done)
+        for r in evicted:                               # recompute from the prompt
+            preemptions += 1
+            r.generated = 0
+            queue.insert(0, r)
+
+        concurrency.append(len(running))
+        occupancy.append(sum(r.live_tokens for r in running) / CAPACITY)
+
+    return dict(completed=completed, preemptions=preemptions, queued=len(queue),
+                concurrency=np.mean(concurrency[WARMUP:]),
+                occupancy=np.mean(occupancy[WARMUP:]))
+
+baseline = simulate("contiguous")
+watermarks = [0.0, 0.02, 0.05, 0.10, 0.20]
+runs = [simulate("paged", w) for w in watermarks]
+
+completed = np.array([r["completed"] for r in runs])
+occupancy = np.array([r["occupancy"] for r in runs])
+thrash = np.array([r["preemptions"] / max(r["completed"], 1) for r in runs])
+pct = 100 * np.array(watermarks)
+
+fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.5))
+axes[0].plot(pct, completed, "o-", label="paged")
+axes[0].axhline(baseline["completed"], color="0.35", ls="--",
+                label="contiguous reservation")
+axes[0].set(xlabel="blocks held back at admission (%)",
+            ylabel="requests completed", title="Goodput")
+axes[0].legend(frameon=False)
+
+occupancy_line, = axes[1].plot(pct, 100 * occupancy, "o-", label="paged occupancy")
+axes[1].axhline(100 * baseline["occupancy"], color="0.35", ls="--",
+                label="contiguous occupancy")
+axes[1].set(xlabel="blocks held back at admission (%)",
+            ylabel="live-token occupancy (%)", title="Occupancy and thrashing")
+thrash_axis = axes[1].twinx()
+thrash_line, = thrash_axis.semilogy(pct, np.maximum(thrash, 1e-3), "s:", color="0.25",
+                                    label="preemptions per completion")
+thrash_axis.set(ylabel="preemptions per completion", ylim=(5e-4, 5e2))
+axes[1].legend(handles=[occupancy_line, thrash_line], frameon=False, fontsize=7,
+               loc="center right")
+for ax in axes:
+    ax.spines[["top"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+
+print(f"contiguous: {baseline['completed']} completed, "
+      f"{baseline['concurrency']:.0f} concurrent, "
+      f"{100 * baseline['occupancy']:.0f}% occupancy, {baseline['queued']} queued")
+for w, r in zip(watermarks, runs):
+    print(f"paged @ {100 * w:4.0f}% watermark: {r['completed']} completed, "
+          f"{r['concurrency']:.0f} concurrent, {100 * r['occupancy']:.0f}% occupancy, "
+          f"{r['preemptions']} preemptions, {r['queued']} queued")
+```
+
+The result is worth stating carefully, because the naive reading of paging is wrong.
+
+At a zero watermark, paging does exactly what the static experiment promised. Mean concurrency rises from 72 requests to 179, and live-token occupancy rises from 50 percent to 85 percent. Goodput nevertheless *falls below the contiguous baseline*. The allocator admits requests until the cache is nearly full, every survivor keeps demanding one more block, and the system spends its decode steps evicting and restarting work: over eighty thousand preemptions to produce thirteen hundred completions.
+
+Holding back two percent of blocks removes the pathology entirely. Concurrency settles at 130 rather than 179, occupancy reaches 90 percent, preemptions fall to seventeen, and completions rise to 2,308: roughly 1.7 times the contiguous baseline, with the arrival backlog cleared rather than growing without bound. Larger watermarks decay gracefully, trading a few points of occupancy for nothing in return.
+
+Two lessons generalize beyond the simulator. First, occupancy is not goodput. A memory system can be nearly full of tokens that will be thrown away. Second, paging does not remove the admission decision, it relocates it. Contiguous reservation answers "can this request ever fit?" pessimistically and permanently at admission time; paging answers it optimistically and repeatedly at every decode step, which is only safe if the scheduler keeps a margin for the growth it has already committed to. The vLLM watermark, the maximum-batched-token limits in production servers, and continuous-batching admission control all exist for this reason.
+
 ## Prefix sharing and copy-on-write
 
 Paging makes sharing natural. Parallel samples from one prompt can point their logical prefix blocks to the same physical blocks. Maintain a reference count $c_b$ for every physical block. A fork increments counts; releasing a request decrements them.
@@ -169,7 +285,11 @@ Full shared prefix blocks never need copying. Only the block currently being ext
 
 ## Scheduling consequences
 
-Better allocation increases the feasible batch size, but a production server must also decide which requests enter a batch and how to recover under pressure. Swapping cache blocks to host memory preserves work but consumes interconnect bandwidth. Recomputation discards blocks and rebuilds them with a prefill pass, trading compute for storage.
+Better allocation increases the feasible batch size, but the watermark experiment shows that the allocator cannot be evaluated apart from the policy that drives it. A production server must also decide which requests enter a batch and how to recover under pressure.
+
+Recovery has two standard forms, and the choice interacts with block size. Swapping cache blocks to host memory preserves completed work but consumes interconnect bandwidth proportional to the evicted request's live tokens. Recomputation discards the blocks and rebuilds them with one prefill pass, trading compute for storage; it is usually preferred for short prefixes because prefill is parallel across positions while a swap is serial in bandwidth. The simulation above models the recomputation branch, which is why a preempted request restarts from `generated = 0` rather than resuming.
+
+Eviction granularity matters too. Evicting one request frees $\lceil T/B\rceil$ blocks at once, so a scheduler under pressure has a coarse, lumpy lever: it cannot free a little memory, only a whole sequence. This is the practical argument for admission control over eviction. Refusing to start work is cheap, whereas stopping work that is already underway wastes everything spent on it.
 
 The vLLM paper reports near-zero KV-cache waste and 2 to 4 times higher throughput at comparable latency than the evaluated baselines [@kwon2023pagedattention]. The gain comes from the system built around the allocator, not address translation alone. Larger effective batches improve GPU utilization, while prefix sharing avoids duplicate storage.
 

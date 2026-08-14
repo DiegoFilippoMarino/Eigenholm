@@ -21,7 +21,7 @@ For a linear recurrent model, the answer has an exact algebraic form: no more th
 Consider a time-varying linear state-space model
 
 $$
-h_i=A_i h_{i-1}+B_i x_i,qquad y_i=C_i^\top h_i,
+h_i=A_i h_{i-1}+B_i x_i,\qquad y_i=C_i^\top h_i,
 $$ {#eq-ssm-recurrence}
 
 where $h_i\in\mathbb R^N$. Unrolling @eq-ssm-recurrence gives
@@ -34,7 +34,7 @@ $$ {#eq-ssm-unrolled}
 The complete sequence operator is therefore a lower-triangular matrix $M$ with entries
 
 $$
-M_{ij}=C_i^\top A_iA_{i-1}\cdots A_{j+1}B_j,qquad j\le i.
+M_{ij}=C_i^\top A_iA_{i-1}\cdots A_{j+1}B_j,\qquad j\le i.
 $$ {#eq-ssm-matrix}
 
 This is the matrix side of state-space duality [@dao2024transformers]. Computing $Mx$ directly looks like masked attention. Evaluating @eq-ssm-recurrence is a linear scan. They are two schedules for the same operator.
@@ -54,7 +54,7 @@ $$
 Collecting the left and right factors yields
 
 $$
-P=LR,qquad L\in\mathbb R^{(n-s)\times N},quad
+P=LR,\qquad L\in\mathbb R^{(n-s)\times N},\quad
 R\in\mathbb R^{N\times s},
 $$
 
@@ -171,7 +171,7 @@ plt.show()
 This comparison also clarifies linear attention. Kernel attention can be written with a running state such as
 
 $$
-S_i=\sum_{j\le i}\phi(k_j)v_j^\top,qquad
+S_i=\sum_{j\le i}\phi(k_j)v_j^\top,\qquad
 z_i=\sum_{j\le i}\phi(k_j),
 $$
 

@@ -40,7 +40,7 @@ Self-consistency chooses the modal final answer among independently sampled chai
 Equation @eq-independent-passk assumes that each attempt is an independent Bernoulli trial with the same fixed $p$. A simple alternative gives each problem a latent success rate
 
 $$
-P\sim\operatorname{Beta}(\alpha,\beta),qquad
+P\sim\operatorname{Beta}(\alpha,\beta),\qquad
 Y_i\mid P\sim\operatorname{Bernoulli}(P).
 $$ {#eq-beta-binomial}
 

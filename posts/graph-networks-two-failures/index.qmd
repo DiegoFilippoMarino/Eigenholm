@@ -25,16 +25,15 @@ Global attention shortens communication paths. It does not automatically create 
 A message-passing GNN updates node $v$ by
 
 $$
-m_v^{(\ell)}=operatorname{AGG}^{(\ell)}
-\left(\left\{h_u^{(\ell)}:u\in\mathcal N(v)\right\}\right),
-$$
-
-$$
-h_v^{(\ell+1)}=operatorname{UPDATE}^{(\ell)}
+\begin{aligned}
+m_v^{(\ell)}&=\operatorname{AGG}^{(\ell)}
+\left(\left\{\!\left\{h_u^{(\ell)}:u\in\mathcal N(v)\right\}\!\right\}\right),\\[2pt]
+h_v^{(\ell+1)}&=\operatorname{UPDATE}^{(\ell)}
 \left(h_v^{(\ell)},m_v^{(\ell)}\right).
+\end{aligned}
 $$ {#eq-mpnn}
 
-The braces denote a multiset. Permuting the neighbors cannot change the aggregate. This is the correct symmetry for an unlabeled graph, and it imposes an information constraint.
+The doubled braces denote a multiset. Permuting the neighbors cannot change the aggregate, so $\operatorname{AGG}^{(\ell)}$ must be a function on multisets rather than on ordered tuples. This is the correct symmetry for an unlabeled graph, and it imposes an information constraint: whatever @eq-mpnn cannot separate at layer $\ell$ stays merged at every later layer.
 
 Xu et al. showed that neighborhood-aggregation GNNs are at most as discriminative as the one-dimensional Weisfeiler-Lehman test, usually called 1-WL [@xu2019gin]. A model reaches that bound only when its aggregation and readout are injective over multisets. Sum aggregation can be injective under suitable conditions. Mean and max discard multiplicity information.
 
