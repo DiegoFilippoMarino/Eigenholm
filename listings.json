@@ -1,14 +1,8 @@
 [
   {
-    "listing": "/notes/index.html",
+    "listing": "/replications/index.html",
     "items": [
-      "/notes/speculative-sampling/index.html"
-    ]
-  },
-  {
-    "listing": "/projects/index.html",
-    "items": [
-      "/projects/paged-kv-cache-simulator/index.html"
+      "/replications/chinchilla-parametric-fit/index.html"
     ]
   },
   {
@@ -30,9 +24,15 @@
     ]
   },
   {
-    "listing": "/replications/index.html",
+    "listing": "/projects/index.html",
     "items": [
-      "/replications/chinchilla-parametric-fit/index.html"
+      "/projects/paged-kv-cache-simulator/index.html"
+    ]
+  },
+  {
+    "listing": "/notes/index.html",
+    "items": [
+      "/notes/speculative-sampling/index.html"
     ]
   }
 ]
