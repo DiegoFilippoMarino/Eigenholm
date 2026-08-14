@@ -182,15 +182,15 @@ window.Quarto = {
 
 <meta property="og:title" content="A Paged KV-Cache Allocator, Built from First Principles – Eigenholm">
 <meta property="og:description" content="An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index_files/figure-html/fig-kv-capacity-output-1.png">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index_files/figure-html/fig-fragmentation-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="709">
-<meta property="og:image:width" content="1325">
+<meta property="og:image:height" content="690">
+<meta property="og:image:width" content="1326">
 <meta name="twitter:title" content="A Paged KV-Cache Allocator, Built from First Principles – Eigenholm">
 <meta name="twitter:description" content="An executable simulator for contiguous and paged KV-cache allocation, including fragmentation, copy-on-write, and capacity analysis.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index_files/figure-html/fig-kv-capacity-output-1.png">
-<meta name="twitter:image-height" content="709">
-<meta name="twitter:image-width" content="1325">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index_files/figure-html/fig-fragmentation-output-1.png">
+<meta name="twitter:image-height" content="690">
+<meta name="twitter:image-width" content="1326">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -417,6 +417,7 @@ window.Quarto = {
   <li><a href="#cache-size" id="toc-cache-size" class="nav-link" data-scroll-target="#cache-size">Cache size</a></li>
   <li><a href="#allocation-model" id="toc-allocation-model" class="nav-link" data-scroll-target="#allocation-model">Allocation model</a></li>
   <li><a href="#a-workload-experiment" id="toc-a-workload-experiment" class="nav-link" data-scroll-target="#a-workload-experiment">A workload experiment</a></li>
+  <li><a href="#allocation-under-load" id="toc-allocation-under-load" class="nav-link" data-scroll-target="#allocation-under-load">Allocation under load</a></li>
   <li><a href="#prefix-sharing-and-copy-on-write" id="toc-prefix-sharing-and-copy-on-write" class="nav-link" data-scroll-target="#prefix-sharing-and-copy-on-write">Prefix sharing and copy-on-write</a></li>
   <li><a href="#scheduling-consequences" id="toc-scheduling-consequences" class="nav-link" data-scroll-target="#scheduling-consequences">Scheduling consequences</a></li>
   <li><a href="#verification-targets" id="toc-verification-targets" class="nav-link" data-scroll-target="#verification-targets">Verification targets</a></li>
@@ -487,40 +488,54 @@ window.Quarto = {
 B_{KV}=2Lh_{kv}d_hTb.
 \tag{1}</span></span></p>
 <p>The factor two accounts for keys and values. For conventional multi-head attention, <span class="math inline">h_{kv}</span> equals the query-head count. Multi-query and grouped-query attention reduce <span class="math inline">h_{kv}</span>, which directly reduces the persistent cache.</p>
-<div id="cell-fig-kv-capacity" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">32769</span>, <span class="dv">512</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>configs <span class="op">=</span> {</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"32L, 32 KV heads, d=128"</span>: (<span class="dv">32</span>, <span class="dv">32</span>, <span class="dv">128</span>),</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"32L, 8 KV heads, d=128"</span>: (<span class="dv">32</span>, <span class="dv">8</span>, <span class="dv">128</span>),</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"80L, 8 KV heads, d=128"</span>: (<span class="dv">80</span>, <span class="dv">8</span>, <span class="dv">128</span>),</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, (layers, kv_heads, head_dim) <span class="kw">in</span> configs.items():</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    gib <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> layers <span class="op">*</span> kv_heads <span class="op">*</span> head_dim <span class="op">*</span> tokens <span class="op">*</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span><span class="op">**</span><span class="dv">30</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.plot(tokens, gib, label<span class="op">=</span>label)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"cached tokens"</span>, ylabel<span class="op">=</span><span class="st">"KV cache per request (GiB)"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div id="fig-kv-capacity" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-kv-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-kv-capacity-output-1.png" width="663" height="355" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kv-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: KV-cache memory per request for three decoder configurations in FP16. Model labels describe layers, KV heads, and head dimension.
+<p>It is more useful to read <a href="#eq-kv-size" class="quarto-xref">Equation&nbsp;1</a> as a per-token rate than as a total. Differentiating with respect to <span class="math inline">T</span> gives <span class="math inline">2Lh_{kv}d_hb</span> bytes for every token generated, a figure fixed at model-design time:</p>
+<div id="tbl-kv-rate" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-kv-rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Per-token cache cost at FP16. Grouped-query attention changes the slope, not the shape, of <a href="#eq-kv-size" class="quarto-xref">Equation&nbsp;1</a>.
 </figcaption>
+<div aria-describedby="tbl-kv-rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Decoder shape</th>
+<th style="text-align: right;">Bytes per cached token</th>
+<th style="text-align: right;">Tokens per GiB</th>
+<th style="text-align: right;">8K-token request</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">32 layers, 32 KV heads, <span class="math inline">d_h=128</span></td>
+<td style="text-align: right;">512 KiB</td>
+<td style="text-align: right;">2,048</td>
+<td style="text-align: right;">4.0 GiB</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">32 layers, 8 KV heads, <span class="math inline">d_h=128</span></td>
+<td style="text-align: right;">128 KiB</td>
+<td style="text-align: right;">8,192</td>
+<td style="text-align: right;">1.0 GiB</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">80 layers, 8 KV heads, <span class="math inline">d_h=128</span></td>
+<td style="text-align: right;">320 KiB</td>
+<td style="text-align: right;">3,277</td>
+<td style="text-align: right;">2.5 GiB</td>
+</tr>
+</tbody>
+</table>
+</div>
 </figure>
 </div>
-</div>
-</div>
-<p>Equation <a href="#eq-kv-size" class="quarto-xref">Equation&nbsp;1</a> is linear in context length and batch size. That is better than storing a quadratic attention matrix, but it becomes the dominant dynamic allocation in a serving engine.</p>
+<p>The middle row is the reason grouped-query attention is now standard: a four-fold reduction in <span class="math inline">h_{kv}</span> turns a 4 GiB request into a 1 GiB request with no change to the allocator. The third row is the reason depth is not free at serving time, since layers multiply the cache just as heads do.</p>
+<p>The consequence for scheduling is that cache capacity, not FLOPs, sets the concurrency limit. On an 80 GiB device holding a 140 GiB-class model across two shards, perhaps 20 GiB remains for cache. At the first row’s rate that is five concurrent 8K requests; at the second row’s rate it is twenty. Equation <a href="#eq-kv-size" class="quarto-xref">Equation&nbsp;1</a> is linear in context length and batch size, which is far better than a quadratic attention matrix, but it is <em>persistent</em> rather than transient, and it is allocated and freed at token granularity by requests whose final length nobody knows in advance. That combination, not the size itself, is what makes it an allocator problem.</p>
 </section>
 <section id="allocation-model" class="level2">
 <h2 class="anchored" data-anchor-id="allocation-model">Allocation model</h2>
@@ -530,67 +545,72 @@ Figure&nbsp;1: KV-cache memory per request for three decoder configurations in F
 \text{logical block }j\longmapsto\text{physical block }\pi_r(j).
 </span></p>
 <p>The attention kernel follows this mapping when reading keys and values. Since physical blocks have equal size, they can be taken from a free list and need not be adjacent.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass, field</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> ceil</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Request:</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    request_id: <span class="bu">int</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    prompt_tokens: <span class="bu">int</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    max_tokens: <span class="bu">int</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    generated: <span class="bu">int</span> <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    blocks: <span class="bu">list</span>[<span class="bu">int</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> live_tokens(<span class="va">self</span>):</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.prompt_tokens <span class="op">+</span> <span class="va">self</span>.generated</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PagedAllocator:</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, block_count: <span class="bu">int</span>, block_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">16</span>):</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.block_tokens <span class="op">=</span> block_tokens</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.free <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(block_count))</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ensure_capacity(<span class="va">self</span>, request: Request):</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        required <span class="op">=</span> ceil(request.live_tokens <span class="op">/</span> <span class="va">self</span>.block_tokens)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        missing <span class="op">=</span> required <span class="op">-</span> <span class="bu">len</span>(request.blocks)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> missing <span class="op">&gt;</span> <span class="bu">len</span>(<span class="va">self</span>.free):</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">MemoryError</span>(<span class="st">"KV cache exhausted"</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(missing):</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            request.blocks.append(<span class="va">self</span>.free.pop())</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> release(<span class="va">self</span>, request: Request):</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.free.extend(request.blocks)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        request.blocks.clear()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="allocator-source" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass, field</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> ceil</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Request:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    request_id: <span class="bu">int</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    prompt_tokens: <span class="bu">int</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    max_tokens: <span class="bu">int</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    generated: <span class="bu">int</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    blocks: <span class="bu">list</span>[<span class="bu">int</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> live_tokens(<span class="va">self</span>):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.prompt_tokens <span class="op">+</span> <span class="va">self</span>.generated</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PagedAllocator:</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, block_count: <span class="bu">int</span>, block_tokens: <span class="bu">int</span> <span class="op">=</span> <span class="dv">16</span>):</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.block_tokens <span class="op">=</span> block_tokens</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.free <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(block_count))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ensure_capacity(<span class="va">self</span>, request: Request):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        required <span class="op">=</span> ceil(request.live_tokens <span class="op">/</span> <span class="va">self</span>.block_tokens)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        missing <span class="op">=</span> required <span class="op">-</span> <span class="bu">len</span>(request.blocks)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> missing <span class="op">&gt;</span> <span class="bu">len</span>(<span class="va">self</span>.free):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">MemoryError</span>(<span class="st">"KV cache exhausted"</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(missing):</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            request.blocks.append(<span class="va">self</span>.free.pop())</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> release(<span class="va">self</span>, request: Request):</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.free.extend(request.blocks)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        request.blocks.clear()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <p>Only the final block of a request can be partially empty. If the block contains <span class="math inline">B</span> token slots, internal waste is bounded by <span class="math inline">B-1</span> slots per live sequence, independent of maximum generation length.</p>
 </section>
 <section id="a-workload-experiment" class="level2">
 <h2 class="anchored" data-anchor-id="a-workload-experiment">A workload experiment</h2>
 <p>The following experiment samples 2,000 concurrent requests. Prompt lengths follow a log-normal distribution, maximum generation budgets are deliberately conservative, and actual completions vary. The comparison measures reserved token slots rather than allocator metadata.</p>
 <div id="cell-fig-fragmentation" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>requests <span class="op">=</span> <span class="dv">2_000</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> np.clip(rng.lognormal(mean<span class="op">=</span><span class="fl">5.2</span>, sigma<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>requests).astype(<span class="bu">int</span>), <span class="dv">16</span>, <span class="dv">4096</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>budget <span class="op">=</span> rng.choice([<span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>, <span class="dv">1024</span>], size<span class="op">=</span>requests, p<span class="op">=</span>[<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.3</span>, <span class="fl">0.15</span>])</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> np.array([rng.integers(<span class="dv">1</span>, limit <span class="op">+</span> <span class="dv">1</span>) <span class="cf">for</span> limit <span class="kw">in</span> budget])</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>live <span class="op">=</span> prompt <span class="op">+</span> actual</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>block_sizes <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>])</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>contiguous_reserved <span class="op">=</span> prompt <span class="op">+</span> budget</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>contiguous_efficiency <span class="op">=</span> live.<span class="bu">sum</span>() <span class="op">/</span> contiguous_reserved.<span class="bu">sum</span>()</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>paged_efficiency <span class="op">=</span> np.array([</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    live.<span class="bu">sum</span>() <span class="op">/</span> (np.ceil(live <span class="op">/</span> block) <span class="op">*</span> block).<span class="bu">sum</span>()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> block <span class="kw">in</span> block_sizes</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.7</span>))</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>ax.plot(block_sizes, <span class="dv">100</span> <span class="op">*</span> paged_efficiency, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"paged"</span>)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">100</span> <span class="op">*</span> contiguous_efficiency, color<span class="op">=</span><span class="st">"0.35"</span>, ls<span class="op">=</span><span class="st">"--"</span>,</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="st">"contiguous reservation"</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"block size (token slots)"</span>, ylabel<span class="op">=</span><span class="st">"live-token efficiency (%)"</span>, ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">102</span>))</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>requests <span class="op">=</span> <span class="dv">2_000</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> np.clip(rng.lognormal(mean<span class="op">=</span><span class="fl">5.2</span>, sigma<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>requests).astype(<span class="bu">int</span>), <span class="dv">16</span>, <span class="dv">4096</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>budget <span class="op">=</span> rng.choice([<span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>, <span class="dv">1024</span>], size<span class="op">=</span>requests, p<span class="op">=</span>[<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.3</span>, <span class="fl">0.15</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> np.array([rng.integers(<span class="dv">1</span>, limit <span class="op">+</span> <span class="dv">1</span>) <span class="cf">for</span> limit <span class="kw">in</span> budget])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>live <span class="op">=</span> prompt <span class="op">+</span> actual</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>block_sizes <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>contiguous_reserved <span class="op">=</span> prompt <span class="op">+</span> budget</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>contiguous_efficiency <span class="op">=</span> live.<span class="bu">sum</span>() <span class="op">/</span> contiguous_reserved.<span class="bu">sum</span>()</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>paged_efficiency <span class="op">=</span> np.array([</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    live.<span class="bu">sum</span>() <span class="op">/</span> (np.ceil(live <span class="op">/</span> block) <span class="op">*</span> block).<span class="bu">sum</span>()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> block <span class="kw">in</span> block_sizes</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.7</span>))</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.plot(block_sizes, <span class="dv">100</span> <span class="op">*</span> paged_efficiency, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"paged"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">100</span> <span class="op">*</span> contiguous_efficiency, color<span class="op">=</span><span class="st">"0.35"</span>, ls<span class="op">=</span><span class="st">"--"</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="st">"contiguous reservation"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"block size (token slots)"</span>, ylabel<span class="op">=</span><span class="st">"live-token efficiency (%)"</span>, ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">102</span>))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div id="fig-fragmentation" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -598,7 +618,7 @@ Figure&nbsp;1: KV-cache memory per request for three decoder configurations in F
 <img src="index_files/figure-html/fig-fragmentation-output-1.png" width="663" height="345" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fragmentation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks.
+Figure&nbsp;1: Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks.
 </figcaption>
 </figure>
 </div>
@@ -606,25 +626,161 @@ Figure&nbsp;2: Illustrative allocation efficiency under variable request lengths
 </div>
 <p>These values are simulator outputs, not measurements from the vLLM paper. The qualitative trade-off is real: smaller blocks reduce internal fragmentation but increase block-table entries and kernel address-translation work.</p>
 </section>
+<section id="allocation-under-load" class="level2">
+<h2 class="anchored" data-anchor-id="allocation-under-load">Allocation under load</h2>
+<p>The static comparison above measures a snapshot. It cannot show the failure mode that matters in a serving engine, because that failure mode is temporal: paged allocation lets the scheduler admit a request whose future memory demand has not been reserved. Every admitted request then grows by one block every <span class="math inline">B</span> decode steps, and the growth is not cancellable. If the cache fills, some request must be evicted and its work discarded.</p>
+<p>The following experiment closes that loop. Requests arrive as a Poisson process, each decode step advances every running request by one token, and admission is greedy under whatever capacity the policy exposes. The paged policy takes one extra parameter: an admission watermark, a fraction of blocks held back so that already-running requests have room to grow.</p>
+<div id="cell-fig-admission-watermark" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>CAPACITY, BLOCK, STEPS, WARMUP <span class="op">=</span> <span class="dv">60_000</span>, <span class="dv">16</span>, <span class="dv">4000</span>, <span class="dv">500</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate(policy, watermark<span class="op">=</span><span class="fl">0.0</span>, arrival_rate<span class="op">=</span><span class="fl">0.6</span>, seed<span class="op">=</span><span class="dv">5</span>):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    allocator <span class="op">=</span> PagedAllocator(CAPACITY <span class="op">//</span> BLOCK, BLOCK)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    floor <span class="op">=</span> <span class="bu">int</span>(watermark <span class="op">*</span> <span class="bu">len</span>(allocator.free))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    reserved, next_id, completed, preemptions <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    running, queue, target <span class="op">=</span> [], [], {}</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    concurrency, occupancy <span class="op">=</span> [], []</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(STEPS):</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(rng.poisson(arrival_rate)):</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            prompt <span class="op">=</span> <span class="bu">int</span>(np.clip(rng.lognormal(<span class="fl">5.0</span>, <span class="fl">0.8</span>), <span class="dv">16</span>, <span class="dv">2048</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            budget <span class="op">=</span> <span class="bu">int</span>(rng.choice([<span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>, <span class="dv">1024</span>], p<span class="op">=</span>[<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.3</span>, <span class="fl">0.15</span>]))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            queue.append(Request(next_id, prompt, budget))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            target[next_id] <span class="op">=</span> <span class="bu">int</span>(rng.integers(<span class="dv">1</span>, budget <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            next_id <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> queue:                                    <span class="co"># greedy admission</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            head <span class="op">=</span> queue[<span class="dv">0</span>]</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> policy <span class="op">==</span> <span class="st">"contiguous"</span>:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                need <span class="op">=</span> head.prompt_tokens <span class="op">+</span> head.max_tokens</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> reserved <span class="op">+</span> need <span class="op">&gt;</span> CAPACITY:</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">break</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                reserved <span class="op">+=</span> need</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> ceil(head.live_tokens <span class="op">/</span> BLOCK) <span class="op">&gt;</span> <span class="bu">len</span>(allocator.free) <span class="op">-</span> floor:</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">break</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>                allocator.ensure_capacity(head)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>            running.append(queue.pop(<span class="dv">0</span>))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        done, evicted <span class="op">=</span> [], []</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> r <span class="kw">in</span> running:                               <span class="co"># one decode step each</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>            r.generated <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> policy <span class="op">==</span> <span class="st">"paged"</span>:</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>                <span class="cf">try</span>:</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>                    allocator.ensure_capacity(r)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>                <span class="cf">except</span> <span class="pp">MemoryError</span>:</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>                    r.generated <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>                    evicted.append(r)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">continue</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> r.generated <span class="op">&gt;=</span> target[r.request_id]:</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>                done.append(r)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> r <span class="kw">in</span> done <span class="op">+</span> evicted:</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>            running.remove(r)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> policy <span class="op">==</span> <span class="st">"paged"</span>:</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>                allocator.release(r)</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>                reserved <span class="op">-=</span> r.prompt_tokens <span class="op">+</span> r.max_tokens</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        completed <span class="op">+=</span> <span class="bu">len</span>(done)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> r <span class="kw">in</span> evicted:                               <span class="co"># recompute from the prompt</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>            preemptions <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>            r.generated <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>            queue.insert(<span class="dv">0</span>, r)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>        concurrency.append(<span class="bu">len</span>(running))</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>        occupancy.append(<span class="bu">sum</span>(r.live_tokens <span class="cf">for</span> r <span class="kw">in</span> running) <span class="op">/</span> CAPACITY)</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">dict</span>(completed<span class="op">=</span>completed, preemptions<span class="op">=</span>preemptions, queued<span class="op">=</span><span class="bu">len</span>(queue),</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>                concurrency<span class="op">=</span>np.mean(concurrency[WARMUP:]),</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>                occupancy<span class="op">=</span>np.mean(occupancy[WARMUP:]))</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> simulate(<span class="st">"contiguous"</span>)</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>watermarks <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.20</span>]</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>runs <span class="op">=</span> [simulate(<span class="st">"paged"</span>, w) <span class="cf">for</span> w <span class="kw">in</span> watermarks]</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>completed <span class="op">=</span> np.array([r[<span class="st">"completed"</span>] <span class="cf">for</span> r <span class="kw">in</span> runs])</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>occupancy <span class="op">=</span> np.array([r[<span class="st">"occupancy"</span>] <span class="cf">for</span> r <span class="kw">in</span> runs])</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>thrash <span class="op">=</span> np.array([r[<span class="st">"preemptions"</span>] <span class="op">/</span> <span class="bu">max</span>(r[<span class="st">"completed"</span>], <span class="dv">1</span>) <span class="cf">for</span> r <span class="kw">in</span> runs])</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>pct <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> np.array(watermarks)</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">8.8</span>, <span class="fl">3.5</span>))</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(pct, completed, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"paged"</span>)</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axhline(baseline[<span class="st">"completed"</span>], color<span class="op">=</span><span class="st">"0.35"</span>, ls<span class="op">=</span><span class="st">"--"</span>,</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="st">"contiguous reservation"</span>)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"blocks held back at admission (%)"</span>,</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>            ylabel<span class="op">=</span><span class="st">"requests completed"</span>, title<span class="op">=</span><span class="st">"Goodput"</span>)</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>occupancy_line, <span class="op">=</span> axes[<span class="dv">1</span>].plot(pct, <span class="dv">100</span> <span class="op">*</span> occupancy, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"paged occupancy"</span>)</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="dv">100</span> <span class="op">*</span> baseline[<span class="st">"occupancy"</span>], color<span class="op">=</span><span class="st">"0.35"</span>, ls<span class="op">=</span><span class="st">"--"</span>,</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="st">"contiguous occupancy"</span>)</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"blocks held back at admission (%)"</span>,</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>            ylabel<span class="op">=</span><span class="st">"live-token occupancy (%)"</span>, title<span class="op">=</span><span class="st">"Occupancy and thrashing"</span>)</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>thrash_axis <span class="op">=</span> axes[<span class="dv">1</span>].twinx()</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>thrash_line, <span class="op">=</span> thrash_axis.semilogy(pct, np.maximum(thrash, <span class="fl">1e-3</span>), <span class="st">"s:"</span>, color<span class="op">=</span><span class="st">"0.25"</span>,</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>                                    label<span class="op">=</span><span class="st">"preemptions per completion"</span>)</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>thrash_axis.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"preemptions per completion"</span>, ylim<span class="op">=</span>(<span class="fl">5e-4</span>, <span class="fl">5e2</span>))</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(handles<span class="op">=</span>[occupancy_line, thrash_line], frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">7</span>,</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>               loc<span class="op">=</span><span class="st">"center right"</span>)</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes:</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"contiguous: </span><span class="sc">{</span>baseline[<span class="st">'completed'</span>]<span class="sc">}</span><span class="ss"> completed, "</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span>baseline[<span class="st">'concurrency'</span>]<span class="sc">:.0f}</span><span class="ss"> concurrent, "</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> baseline[<span class="st">'occupancy'</span>]<span class="sc">:.0f}</span><span class="ss">% occupancy, </span><span class="sc">{</span>baseline[<span class="st">'queued'</span>]<span class="sc">}</span><span class="ss"> queued"</span>)</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> w, r <span class="kw">in</span> <span class="bu">zip</span>(watermarks, runs):</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"paged @ </span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> w<span class="sc">:4.0f}</span><span class="ss">% watermark: </span><span class="sc">{</span>r[<span class="st">'completed'</span>]<span class="sc">}</span><span class="ss"> completed, "</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span>r[<span class="st">'concurrency'</span>]<span class="sc">:.0f}</span><span class="ss"> concurrent, </span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> r[<span class="st">'occupancy'</span>]<span class="sc">:.0f}</span><span class="ss">% occupancy, "</span></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span>r[<span class="st">'preemptions'</span>]<span class="sc">}</span><span class="ss"> preemptions, </span><span class="sc">{</span>r[<span class="st">'queued'</span>]<span class="sc">}</span><span class="ss"> queued"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-admission-watermark" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-admission-watermark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-admission-watermark-output-1.png" width="836" height="326" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-admission-watermark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Discrete-event simulation of 4,000 decode steps against a 60,000-token cache. Paging alone raises occupancy but admits requests it cannot sustain; holding back a small block reserve at admission converts that occupancy into completed work.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>contiguous: 1356 completed, 72 concurrent, 50% occupancy, 1023 queued
+paged @    0% watermark: 1300 completed, 179 concurrent, 85% occupancy, 83017 preemptions, 930 queued
+paged @    2% watermark: 2308 completed, 130 concurrent, 90% occupancy, 17 preemptions, 16 queued
+paged @    5% watermark: 2304 completed, 129 concurrent, 89% occupancy, 0 preemptions, 27 queued
+paged @   10% watermark: 2253 completed, 126 concurrent, 87% occupancy, 0 preemptions, 75 queued
+paged @   20% watermark: 2056 completed, 114 concurrent, 78% occupancy, 0 preemptions, 285 queued</code></pre>
+</div>
+</div>
+<p>The result is worth stating carefully, because the naive reading of paging is wrong.</p>
+<p>At a zero watermark, paging does exactly what the static experiment promised. Mean concurrency rises from 72 requests to 179, and live-token occupancy rises from 50 percent to 85 percent. Goodput nevertheless <em>falls below the contiguous baseline</em>. The allocator admits requests until the cache is nearly full, every survivor keeps demanding one more block, and the system spends its decode steps evicting and restarting work: over eighty thousand preemptions to produce thirteen hundred completions.</p>
+<p>Holding back two percent of blocks removes the pathology entirely. Concurrency settles at 130 rather than 179, occupancy reaches 90 percent, preemptions fall to seventeen, and completions rise to 2,308: roughly 1.7 times the contiguous baseline, with the arrival backlog cleared rather than growing without bound. Larger watermarks decay gracefully, trading a few points of occupancy for nothing in return.</p>
+<p>Two lessons generalize beyond the simulator. First, occupancy is not goodput. A memory system can be nearly full of tokens that will be thrown away. Second, paging does not remove the admission decision, it relocates it. Contiguous reservation answers “can this request ever fit?” pessimistically and permanently at admission time; paging answers it optimistically and repeatedly at every decode step, which is only safe if the scheduler keeps a margin for the growth it has already committed to. The vLLM watermark, the maximum-batched-token limits in production servers, and continuous-batching admission control all exist for this reason.</p>
+</section>
 <section id="prefix-sharing-and-copy-on-write" class="level2">
 <h2 class="anchored" data-anchor-id="prefix-sharing-and-copy-on-write">Prefix sharing and copy-on-write</h2>
 <p>Paging makes sharing natural. Parallel samples from one prompt can point their logical prefix blocks to the same physical blocks. Maintain a reference count <span class="math inline">c_b</span> for every physical block. A fork increments counts; releasing a request decrements them.</p>
 <p>Appending to a shared partially filled block requires copy-on-write:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> append_with_cow(request, refcount, free_blocks, block_tokens):</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    last <span class="op">=</span> request.blocks[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> request.live_tokens <span class="op">%</span> block_tokens</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> offset <span class="kw">and</span> refcount[last] <span class="op">&gt;</span> <span class="dv">1</span>:</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        replacement <span class="op">=</span> free_blocks.pop()</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        copy_block(last, replacement)  <span class="co"># device-to-device copy</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        refcount[last] <span class="op">-=</span> <span class="dv">1</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        refcount[replacement] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        request.blocks[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> replacement</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    append_token_kv(request.blocks[<span class="op">-</span><span class="dv">1</span>], offset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> append_with_cow(request, refcount, free_blocks, block_tokens):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    last <span class="op">=</span> request.blocks[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> request.live_tokens <span class="op">%</span> block_tokens</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> offset <span class="kw">and</span> refcount[last] <span class="op">&gt;</span> <span class="dv">1</span>:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        replacement <span class="op">=</span> free_blocks.pop()</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        copy_block(last, replacement)  <span class="co"># device-to-device copy</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        refcount[last] <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        refcount[replacement] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        request.blocks[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> replacement</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    append_token_kv(request.blocks[<span class="op">-</span><span class="dv">1</span>], offset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Full shared prefix blocks never need copying. Only the block currently being extended can trigger copy-on-write. This supports parallel sampling, beam search, and shared system prompts with the same mechanism.</p>
 </section>
 <section id="scheduling-consequences" class="level2">
 <h2 class="anchored" data-anchor-id="scheduling-consequences">Scheduling consequences</h2>
-<p>Better allocation increases the feasible batch size, but a production server must also decide which requests enter a batch and how to recover under pressure. Swapping cache blocks to host memory preserves work but consumes interconnect bandwidth. Recomputation discards blocks and rebuilds them with a prefill pass, trading compute for storage.</p>
+<p>Better allocation increases the feasible batch size, but the watermark experiment shows that the allocator cannot be evaluated apart from the policy that drives it. A production server must also decide which requests enter a batch and how to recover under pressure.</p>
+<p>Recovery has two standard forms, and the choice interacts with block size. Swapping cache blocks to host memory preserves completed work but consumes interconnect bandwidth proportional to the evicted request’s live tokens. Recomputation discards the blocks and rebuilds them with one prefill pass, trading compute for storage; it is usually preferred for short prefixes because prefill is parallel across positions while a swap is serial in bandwidth. The simulation above models the recomputation branch, which is why a preempted request restarts from <code>generated = 0</code> rather than resuming.</p>
+<p>Eviction granularity matters too. Evicting one request frees <span class="math inline">\lceil T/B\rceil</span> blocks at once, so a scheduler under pressure has a coarse, lumpy lever: it cannot free a little memory, only a whole sequence. This is the practical argument for admission control over eviction. Refusing to start work is cheap, whereas stopping work that is already underway wastes everything spent on it.</p>
 <p>The vLLM paper reports near-zero KV-cache waste and 2 to 4 times higher throughput at comparable latency than the evaluated baselines <span class="citation" data-cites="kwon2023pagedattention">(<a href="#ref-kwon2023pagedattention" role="doc-biblioref">Kwon et al. 2023</a>)</span>. The gain comes from the system built around the allocator, not address translation alone. Larger effective batches improve GPU utilization, while prefix sharing avoids duplicate storage.</p>
 </section>
 <section id="verification-targets" class="level2">

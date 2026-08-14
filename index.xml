@@ -4913,7 +4913,17 @@ Figure&nbsp;2: Number of rotations observed by each coordinate pair at context l
 </div>
 </div>
 </div>
-<p>Changing the base <img src="https://latex.codecogs.com/png.latex?b"> stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.</p>
+<p>The horizontal line at one rotation is the boundary worth naming. Pair <img src="https://latex.codecogs.com/png.latex?i"> has wavelength</p>
+<p><span id="eq-wavelength"><img src="https://latex.codecogs.com/png.latex?%0A%5Clambda_i=%5Cfrac%7B2%5Cpi%7D%7B%5Ctheta_i%7D=2%5Cpi%20b%5E%7B2i/d%7D,%0A%5Ctag%7B2%7D"></span></p>
+<p>and the pairs split into two populations at <img src="https://latex.codecogs.com/png.latex?%5Clambda_i=L">. Pairs with <img src="https://latex.codecogs.com/png.latex?%5Clambda_i%5Cll%20L"> have wrapped many times during training and can only encode local offsets, since their phase is ambiguous modulo <img src="https://latex.codecogs.com/png.latex?%5Clambda_i">. Pairs with <img src="https://latex.codecogs.com/png.latex?%5Clambda_i%3EL"> never completed a revolution and act as monotone absolute coordinates over the whole training window. At <img src="https://latex.codecogs.com/png.latex?d=64">, <img src="https://latex.codecogs.com/png.latex?b=10%5E4">, and <img src="https://latex.codecogs.com/png.latex?L=2048">, the crossover sits near pair 20 of 32: roughly a third of the spectrum has never been observed through a full period.</p>
+</section>
+<section id="three-ways-to-extend-context-and-what-each-one-breaks" class="level2">
+<h2 class="anchored" data-anchor-id="three-ways-to-extend-context-and-what-each-one-breaks">Three ways to extend context, and what each one breaks</h2>
+<p>Read through Equation&nbsp;2, the standard extension methods stop looking like a list of tricks.</p>
+<p><strong>Position interpolation</strong> maps <img src="https://latex.codecogs.com/png.latex?m%5Cmapsto%20m/s"> for extension factor <img src="https://latex.codecogs.com/png.latex?s"> <span class="citation" data-cites="chen2023extending">(Chen et al. 2023)</span>. Every wavelength is stretched uniformly, so the ratio <img src="https://latex.codecogs.com/png.latex?%5Clambda_i/L'"> is preserved for the new limit <img src="https://latex.codecogs.com/png.latex?L'=sL">. Nothing exceeds its trained phase range, which is why it works with little fine-tuning. The cost is paid at the fast end: neighboring positions are now separated by <img src="https://latex.codecogs.com/png.latex?%5Ctheta_i/s"> instead of <img src="https://latex.codecogs.com/png.latex?%5Ctheta_i">, so the high-frequency pairs that resolve local order become <img src="https://latex.codecogs.com/png.latex?s"> times less discriminative. The model has to relearn distinctions it had already mastered.</p>
+<p><strong>Base scaling</strong>, often called NTK-aware scaling, leaves positions alone and raises <img src="https://latex.codecogs.com/png.latex?b"> to <img src="https://latex.codecogs.com/png.latex?b'=b%5C,s%5E%7Bd/(d-2)%7D">. The exponent is chosen so that the slowest pair, <img src="https://latex.codecogs.com/png.latex?i=d/2-1">, is stretched by exactly <img src="https://latex.codecogs.com/png.latex?s"> while the fastest pair, <img src="https://latex.codecogs.com/png.latex?i=0">, is untouched, with intermediate pairs interpolating between the two. High-frequency local structure survives; the slow pairs absorb the extension. This is the argument for why simply increasing the base is not a hack but the correct dual of interpolation.</p>
+<p><strong>Band-wise methods</strong> such as YaRN make the split explicit, interpolating only the pairs whose wavelength exceeds the trained context, leaving short-wavelength pairs untouched, and blending across a transition region; they also rescale attention temperature to compensate for the entropy change that a longer key set induces <span class="citation" data-cites="peng2024yarn">(Peng et al. 2024)</span>.</p>
+<p>The pattern across all three is the same trade. Position enters the logit only through phase, total phase budget is fixed by training, and extending context means deciding which pairs surrender resolution. There is no scaling rule that adds information the training distribution never contained; the choice is only where to spend the loss.</p>
 </section>
 <section id="numerical-and-implementation-details" class="level2">
 <h2 class="anchored" data-anchor-id="numerical-and-implementation-details">Numerical and implementation details</h2>
@@ -4947,6 +4957,12 @@ font-style: inherit;">1e-6</span>)</span></code></pre></div></div>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-chen2023extending" class="csl-entry">
+Chen, Shouyuan, Sherman Wong, Liangjian Chen, and Yuandong Tian. 2023. <span>“Extending Context Window of Large Language Models via Positional Interpolation.”</span> <a href="https://arxiv.org/abs/2306.15595">https://arxiv.org/abs/2306.15595</a>.
+</div>
+<div id="ref-peng2024yarn" class="csl-entry">
+Peng, Bowen, Jeffrey Quesnelle, Honglu Fan, and Enrico Shippole. 2024. <span>“YaRN: Efficient Context Window Extension of Large Language Models.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2309.00071">https://arxiv.org/abs/2309.00071</a>.
+</div>
 <div id="ref-su2024roformer" class="csl-entry">
 Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024. <span>“RoFormer: Enhanced Transformer with Rotary Position Embedding.”</span> <em>Neurocomputing</em> 568: 127063. <a href="https://doi.org/10.1016/j.neucom.2023.127063">https://doi.org/10.1016/j.neucom.2023.127063</a>.
 </div>
@@ -5229,8 +5245,13 @@ Figure&nbsp;1: Mean attention entropy with and without the square-root scaling. 
 <section id="the-softmax-jacobian" class="level2">
 <h2 class="anchored" data-anchor-id="the-softmax-jacobian">The softmax Jacobian</h2>
 <p>For one row <img src="https://latex.codecogs.com/png.latex?p=%5Coperatorname%7Bsoftmax%7D(s)">,</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cpartial%20p_i%7D%7B%5Cpartial%20s_j%7D=p_i(%5Cdelta_%7Bij%7D-p_j),%0A%5Cqquad%0AJ_%7B%5Ctext%7Bsoftmax%7D%7D=%5Coperatorname%7Bdiag%7D(p)-pp%5E%5Ctop.%0A"></p>
-<p>This matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution. The same invariance explains the standard stable implementation</p>
+<p><span id="eq-softmax-jacobian"><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B%5Cpartial%20p_i%7D%7B%5Cpartial%20s_j%7D=p_i(%5Cdelta_%7Bij%7D-p_j),%0A%5Cqquad%0AJ_%7B%5Ctext%7Bsoftmax%7D%7D=%5Coperatorname%7Bdiag%7D(p)-pp%5E%5Ctop.%0A%5Ctag%7B2%7D"></span></p>
+<p>This matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution.</p>
+<p>Two scalar summaries of Equation&nbsp;2 explain the previous section quantitatively. Its trace is</p>
+<p><span id="eq-jacobian-trace"><img src="https://latex.codecogs.com/png.latex?%0A%5Coperatorname%7Btr%7D(J_%7B%5Ctext%7Bsoftmax%7D%7D)%0A=%5Csum_ip_i(1-p_i)%0A=1-%5C%7Cp%5C%7C_2%5E2,%0A%5Ctag%7B3%7D"></span></p>
+<p>and its spectral norm is bounded by <img src="https://latex.codecogs.com/png.latex?%5Cmax_ip_i">. Both vanish as the row approaches a one-hot vector, where <img src="https://latex.codecogs.com/png.latex?%5C%7Cp%5C%7C_2%5E2%5Cto1">. The collapse is not a numerical accident that better precision could fix; it is the derivative of a function that has become locally constant. A row that has committed to one key cannot report how it would have preferred a different key, so no gradient signal flows back to the logits that produced the commitment.</p>
+<p>This gives the <img src="https://latex.codecogs.com/png.latex?%5Csqrt%7Bd_k%7D"> argument teeth. The scaling is not cosmetic normalization: it keeps <img src="https://latex.codecogs.com/png.latex?%5C%7Cp%5C%7C_2%5E2"> away from one at initialization, and Equation&nbsp;3 is the quantity it protects. It also explains why entropy is the right diagnostic to plot. Entropy and <img src="https://latex.codecogs.com/png.latex?1-%5C%7Cp%5C%7C_2%5E2"> are different measures of the same concentration, and the second is proportional to the gradient the row can still transmit.</p>
+<p>The same invariance explains the standard stable implementation</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -5279,6 +5300,264 @@ font-style: inherit;">True</span>)</span></code></pre></div></div>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cunderbrace%7B4nd_%7B%5Ctext%7Bmodel%7D%7D%5E2%7D_%7BQ,K,V,O%5Ctext%7B%20projections%7D%7D%0A+%5Cunderbrace%7B2n%5E2d_%7B%5Ctext%7Bmodel%7D%7D%7D_%7BQK%5E%5Ctop%5Ctext%7B%20and%20%7DPV%7D.%0A"></p>
 <p>Heads do not provide free capacity. They partition the channel dimension into several learned similarity spaces. Very small <img src="https://latex.codecogs.com/png.latex?d_k"> constrains each compatibility function, while a single wide head forces one attention distribution to serve every subspace.</p>
 </section>
+<section id="what-a-head-can-and-cannot-express" class="level2">
+<h2 class="anchored" data-anchor-id="what-a-head-can-and-cannot-express">What a head can and cannot express</h2>
+<p>The constraint imposed by small <img src="https://latex.codecogs.com/png.latex?d_k"> can be made precise. Since <img src="https://latex.codecogs.com/png.latex?S=QK%5E%5Ctop/%5Csqrt%7Bd_k%7D"> is a product through a <img src="https://latex.codecogs.com/png.latex?d_k">-dimensional space,</p>
+<p><span id="eq-score-rank"><img src="https://latex.codecogs.com/png.latex?%0A%5Coperatorname%7Brank%7D(S)%5Cle%20d_k,%0A%5Ctag%7B4%7D"></span></p>
+<p>no matter how long the sequence is. At <img src="https://latex.codecogs.com/png.latex?n=4096"> and <img src="https://latex.codecogs.com/png.latex?d_k=64">, a head chooses its score matrix from a set of measure zero inside <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%20R%5E%7Bn%5Ctimes%20n%7D">. Softmax then acts row-wise, and because each row is invariant to an additive constant, the reachable set is described by row-centered logit matrices of rank at most <img src="https://latex.codecogs.com/png.latex?d_k">.</p>
+<p>That immediately raises a question the formula cannot answer on its own: which attention patterns actually need many dimensions? Some familiar ones need remarkably few.</p>
+<div id="cell-fig-logit-rank" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">128</span></span>
+<span id="cb3-2">i, j <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.arange(n)[:, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>], np.arange(n)[<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>, :]</span>
+<span id="cb3-3">pairing <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rng.permutation(n)</span>
+<span id="cb3-4"></span>
+<span id="cb3-5">targets <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {</span>
+<span id="cb3-6">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"distance decay"</span>: <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">abs</span>(i <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> j) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8.0</span>,</span>
+<span id="cb3-7">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"periodic, period 16"</span>: <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> np.cos(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> np.pi <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (i <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> j) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>),</span>
+<span id="cb3-8">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"content match (random)"</span>: rng.normal(size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(n, n)),</span>
+<span id="cb3-9">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"arbitrary pairing"</span>: <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6.0</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (j <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> pairing[:, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>]),</span>
+<span id="cb3-10">}</span>
+<span id="cb3-11"></span>
+<span id="cb3-12">head_dims <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.array([<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">32</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">64</span>])</span>
+<span id="cb3-13"></span>
+<span id="cb3-14">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.8</span>))</span>
+<span id="cb3-15"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> name, target <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> targets.items():</span>
+<span id="cb3-16">    centered <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> target <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> target.mean(axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, keepdims<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># row shifts are free</span></span>
+<span id="cb3-17">    spectrum <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linalg.svd(centered, compute_uv<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb3-18">    tail <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.sqrt(np.cumsum(spectrum[::<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)[::<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> np.linalg.norm(centered)</span>
+<span id="cb3-19">    ax.semilogy(head_dims, np.maximum(tail[head_dims], <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-6</span>), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"o-"</span>, ms<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>name)</span>
+<span id="cb3-20">ax.set_xscale(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"log"</span>, base<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb3-21">ax.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">set</span>(xlabel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="vs" style="color: #20794D;
+background-color: null;
+font-style: inherit;">r"head dimension </span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">$</span><span class="vs" style="color: #20794D;
+background-color: null;
+font-style: inherit;">d_k</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">$</span><span class="vs" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>,</span>
+<span id="cb3-22">       ylabel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"relative error of best rank-$d_k$ fit"</span>, ylim<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5e-7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb3-23">ax.axhline(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-6</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"0.6"</span>, lw<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>, ls<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">":"</span>)</span>
+<span id="cb3-24">ax.text(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.05</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4e-6</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"exact (clipped)"</span>, fontsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"0.4"</span>)</span>
+<span id="cb3-25">ax.spines[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"top"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"right"</span>]].set_visible(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb3-26">ax.legend(frameon<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>, fontsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)</span>
+<span id="cb3-27">plt.tight_layout()</span>
+<span id="cb3-28">plt.show()</span></code></pre></div></div>
+<div class="cell-output cell-output-display">
+<div id="fig-logit-rank" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-logit-rank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index_files/figure-html/fig-logit-rank-output-1.png" width="661" height="354" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-logit-rank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Best achievable error when a target logit matrix is realized by a head of dimension <img src="https://latex.codecogs.com/png.latex?d_k">, measured as the relative Frobenius norm of the discarded singular values after row centering. Structured relative-position patterns are cheap; arbitrary token-to-token pairings are not.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The periodic pattern is exactly rank two, because <img src="https://latex.codecogs.com/png.latex?%5Ccos%5Cleft(%5Comega(i-j)%5Cright)=%5Ccos%5Comega%20i%5Ccos%5Comega%20j+%5Csin%5Comega%20i%5Csin%5Comega%20j">. One frequency of relative position costs one coordinate pair, which is precisely the accounting behind rotary embeddings. A smooth distance bias is nearly as cheap: eight dimensions reproduce it to about two percent.</p>
+<p>An arbitrary pairing is the opposite. Sending each query to one unrelated key is essentially a permutation matrix, and 64 dimensions still leave 70 percent of it unexplained. Nothing about that pattern is complicated to describe; it is simply incompressible, and Equation&nbsp;4 is a compression budget.</p>
+<p>This is the honest version of the claim that attention is a lookup table. It is a lookup table whose addressing function must factor through <img src="https://latex.codecogs.com/png.latex?d_k"> dimensions. Structured, reusable relations are affordable, arbitrary correspondences are not, and the useful patterns of language mostly live at the cheap end. It is also the reason heads are the right unit of capacity: <img src="https://latex.codecogs.com/png.latex?h"> heads give a sum of <img src="https://latex.codecogs.com/png.latex?h"> separately softmaxed rank-<img src="https://latex.codecogs.com/png.latex?d_k"> operators, which is a strictly richer object than one rank-<img src="https://latex.codecogs.com/png.latex?hd_k"> operator <span class="citation" data-cites="bhojanapalli2020lowrank">(Bhojanapalli et al. 2020)</span>.</p>
+</section>
 <section id="memory-is-not-the-same-as-arithmetic" class="level2">
 <h2 class="anchored" data-anchor-id="memory-is-not-the-same-as-arithmetic">Memory is not the same as arithmetic</h2>
 <p>The two matrix multiplications require <img src="https://latex.codecogs.com/png.latex?O(n%5E2d)"> arithmetic. A literal implementation also writes <img src="https://latex.codecogs.com/png.latex?S"> and <img src="https://latex.codecogs.com/png.latex?P">, each with <img src="https://latex.codecogs.com/png.latex?n%5E2"> entries. At sequence length 16,384, one FP16 matrix for one batch-head pair occupies 512 MiB. The quadratic intermediate, not only the quadratic FLOP count, is the systems problem.</p>
@@ -5302,6 +5581,9 @@ font-style: inherit;">True</span>)</span></code></pre></div></div>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bhojanapalli2020lowrank" class="csl-entry">
+Bhojanapalli, Srinadh, Chulhee Yun, Ankit Singh Rawat, Sashank J. Reddi, and Sanjiv Kumar. 2020. <span>“Low-Rank Bottleneck in Multi-Head Attention Models.”</span> <em>Proceedings of the 37th International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/2002.07028">https://arxiv.org/abs/2002.07028</a>.
+</div>
 <div id="ref-vaswani2017attention" class="csl-entry">
 Vaswani, Ashish, Noam Shazeer, Niki Parmar, et al. 2017. <span>“Attention Is All You Need.”</span> <em>Advances in Neural Information Processing Systems</em> 30. <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a>.
 </div>
@@ -5343,182 +5625,52 @@ Context.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eige
 <h2 class="anchored" data-anchor-id="the-traffic-in-a-literal-implementation">The traffic in a literal implementation</h2>
 <p>For one head,</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AS=QK%5E%5Ctop,%5Cqquad%20P=%5Coperatorname%7Bsoftmax%7D(S),%5Cqquad%20O=PV.%0A"></p>
-<p>A conventional sequence of kernels writes <img src="https://latex.codecogs.com/png.latex?S"> to HBM, reads it for softmax, writes <img src="https://latex.codecogs.com/png.latex?P">, then reads <img src="https://latex.codecogs.com/png.latex?P"> for the second matrix multiplication. Both intermediates contain <img src="https://latex.codecogs.com/png.latex?n%5E2"> elements. Kernel fusion can remove some round trips, but <img src="https://latex.codecogs.com/png.latex?S"> and <img src="https://latex.codecogs.com/png.latex?P"> still exceed on-chip capacity at useful sequence lengths.</p>
-<div id="cell-fig-attention-memory" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> np</span>
-<span id="cb1-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> plt</span>
-<span id="cb1-3"></span>
-<span id="cb1-4">n <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">**</span> np.arange(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">8</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">18</span>)</span>
-<span id="cb1-5">d <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">128</span></span>
-<span id="cb1-6">score_mib <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> n<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">20</span></span>
-<span id="cb1-7">qkv_mib <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> n <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> d <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">20</span></span>
-<span id="cb1-8"></span>
-<span id="cb1-9">fig, ax <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> plt.subplots(figsize<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">7</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3.8</span>))</span>
-<span id="cb1-10">ax.loglog(n, score_mib, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"o-"</span>, label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">r"one </span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">$</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">n</span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">\t</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">imes n</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">$</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;"> matrix"</span>)</span>
-<span id="cb1-11">ax.loglog(n, qkv_mib, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"o-"</span>, label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">r"</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">$</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">Q,K,V</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">$</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;"> at </span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">$</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">d=128</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">$</span><span class="vs" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span>)</span>
-<span id="cb1-12">ax.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">set</span>(xlabel<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sequence length"</span>, ylabel<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"storage (MiB)"</span>)</span>
-<span id="cb1-13">ax.spines[[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"top"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"right"</span>]].set_visible(<span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span>)</span>
-<span id="cb1-14">ax.grid(which<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"both"</span>, alpha<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.18</span>)</span>
-<span id="cb1-15">ax.legend(frameon<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span>)</span>
-<span id="cb1-16">plt.tight_layout()</span>
-<span id="cb1-17">plt.show()</span></code></pre></div></div>
-<div class="cell-output cell-output-display">
-<div id="fig-attention-memory" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-attention-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-attention-memory-output-1.png" width="661" height="354" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-attention-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Storage for one materialized attention matrix at FP16, compared with one linear-size QKV working set at head dimension 128.
+<p>A conventional sequence of kernels writes <img src="https://latex.codecogs.com/png.latex?S"> to HBM, reads it for softmax, writes <img src="https://latex.codecogs.com/png.latex?P">, then reads <img src="https://latex.codecogs.com/png.latex?P"> for the second matrix multiplication. Counting the elements that cross the HBM boundary for one head:</p>
+<div id="tbl-standard-traffic" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-standard-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: HBM elements moved by an unfused three-kernel schedule.
 </figcaption>
+<div aria-describedby="tbl-standard-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stage</th>
+<th style="text-align: left;">Reads</th>
+<th style="text-align: left;">Writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?S=QK%5E%5Ctop"></td>
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?Q,K">: <img src="https://latex.codecogs.com/png.latex?2nd"></td>
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?S">: <img src="https://latex.codecogs.com/png.latex?n%5E2"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?P=%5Coperatorname%7Bsoftmax%7D(S)"></td>
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?S">: <img src="https://latex.codecogs.com/png.latex?n%5E2"></td>
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?P">: <img src="https://latex.codecogs.com/png.latex?n%5E2"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?O=PV"></td>
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?P,V">: <img src="https://latex.codecogs.com/png.latex?n%5E2+nd"></td>
+<td style="text-align: left;"><img src="https://latex.codecogs.com/png.latex?O">: <img src="https://latex.codecogs.com/png.latex?nd"></td>
+</tr>
+</tbody>
+</table>
+</div>
 </figure>
 </div>
-</div>
-</div>
-<p>At <img src="https://latex.codecogs.com/png.latex?n=16%7B,%7D384">, a single FP16 score matrix for one head and one batch element occupies 512 MiB. A model with many heads cannot retain all such matrices without aggressive memory management.</p>
+<p>The total is <img src="https://latex.codecogs.com/png.latex?4n%5E2+4nd"> elements, of which the quadratic part dominates as soon as <img src="https://latex.codecogs.com/png.latex?n%5Cgg%20d">. Fusing softmax into one of the matrix multiplications removes a round trip and reduces the constant, but it does not change the order: any schedule that materializes <img src="https://latex.codecogs.com/png.latex?S"> or <img src="https://latex.codecogs.com/png.latex?P"> pays <img src="https://latex.codecogs.com/png.latex?%5COmega(n%5E2)"> traffic.</p>
+<p>The absolute numbers make the constraint concrete. At <img src="https://latex.codecogs.com/png.latex?n=16%7B,%7D384"> and FP16, one score matrix for a single head of a single batch element occupies 512 MiB. The corresponding <img src="https://latex.codecogs.com/png.latex?Q">, <img src="https://latex.codecogs.com/png.latex?K">, and <img src="https://latex.codecogs.com/png.latex?V"> at <img src="https://latex.codecogs.com/png.latex?d=128"> occupy about 12 MiB combined. The intermediate is roughly forty times the size of the operands that produced it, and it exists only to be consumed by the next kernel. Meanwhile on-chip SRAM is measured in hundreds of kilobytes per streaming multiprocessor, so no tiling of the <em>stored</em> matrix helps; the matrix must not exist.</p>
+<p>That reframing is the whole algorithm. Attention is not expensive because of <img src="https://latex.codecogs.com/png.latex?n%5E2"> arithmetic alone. It is expensive because the standard schedule promotes a scratch value to a first-class tensor.</p>
 </section>
 <section id="softmax-can-be-streamed-exactly" class="level2">
 <h2 class="anchored" data-anchor-id="softmax-can-be-streamed-exactly">Softmax can be streamed exactly</h2>
 <p>For a row of logits <img src="https://latex.codecogs.com/png.latex?x_1,%5Cldots,x_j">, maintain the running maximum and exponential sum</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0Am_j=%5Cmax_%7Bi%5Cle%20j%7Dx_i,%0A%5Cqquad%0A%5Cell_j=%5Csum_%7Bi%5Cle%20j%7De%5E%7Bx_i-m_j%7D.%0A"></p>
 <p>When a new block <img src="https://latex.codecogs.com/png.latex?B"> arrives, let</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0Am_B=%5Cmax_%7Bx%5Cin%20B%7Dx,qquad%0A%5Cell_B=%5Csum_%7Bx%5Cin%20B%7De%5E%7Bx-m_B%7D,qquad%0Am'=%5Cmax(m_j,m_B).%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0Am_B=%5Cmax_%7Bx%5Cin%20B%7Dx,%5Cqquad%0A%5Cell_B=%5Csum_%7Bx%5Cin%20B%7De%5E%7Bx-m_B%7D,%5Cqquad%0Am'=%5Cmax(m_j,m_B).%0A"></p>
 <p>The combined normalizer is</p>
 <p><span id="eq-online-normalizer"><img src="https://latex.codecogs.com/png.latex?%0A%5Cell'=e%5E%7Bm_j-m'%7D%5Cell_j+e%5E%7Bm_B-m'%7D%5Cell_B.%0A%5Ctag%7B1%7D"></span></p>
 <p>For attention, maintain an unnormalized value accumulator</p>
@@ -5526,13 +5678,57 @@ Figure&nbsp;1: Storage for one materialized attention matrix at FP16, compared w
 <p>It updates by the same rescaling:</p>
 <p><span id="eq-online-output"><img src="https://latex.codecogs.com/png.latex?%0A%5Cwidetilde%7Bo%7D'=e%5E%7Bm_j-m'%7D%5Cwidetilde%7Bo%7D_j%0A+e%5E%7Bm_B-m'%7D%5Csum_%7Bx_i%5Cin%20B%7De%5E%7Bx_i-m_B%7Dv_i,%0A%5Cqquad%20o=%5Cfrac%7B%5Cwidetilde%7Bo%7D'%7D%7B%5Cell'%7D.%0A%5Ctag%7B2%7D"></span></p>
 <p>Equations Equation&nbsp;1 and Equation&nbsp;2 are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
+<p>The exactness claim deserves a test rather than a citation, because it is the property that separates FlashAttention from an approximation. The critical case is a late arrival: a logit larger than everything seen so far shows up in the final tile, forcing every accumulated term to be rescaled after the fact.</p>
+<div id="exactness-check" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> np</span>
-<span id="cb2-2"></span>
-<span id="cb2-3"><span class="kw" style="color: #003B4F;
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> reference_attention(q, k, v):</span>
+<span id="cb1-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""One-shot softmax over the full key set."""</span></span>
+<span id="cb1-5">    logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span> q <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> q.shape[<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span></span>
+<span id="cb1-6">    p <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.exp(logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> logits.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>())</span>
+<span id="cb1-7">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> (p <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> p.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>()) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span> v</span>
+<span id="cb1-8"></span>
+<span id="cb1-9"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">def</span> tiled_attention(q, k, v, block<span class="op" style="color: #5E5E5E;
@@ -5540,10 +5736,10 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">64</span>):</span>
-<span id="cb2-4">    <span class="co" style="color: #5E5E5E;
+<span id="cb1-10">    <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">"""Reference implementation for one query vector, not a fast kernel."""</span></span>
-<span id="cb2-5">    scale <span class="op" style="color: #5E5E5E;
+font-style: inherit;">"""Online-softmax attention for one query vector. Exact, not fast."""</span></span>
+<span id="cb1-11">    scale <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> q.shape[<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -5556,17 +5752,14 @@ background-color: null;
 font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5</span></span>
-<span id="cb2-6">    m <span class="op" style="color: #5E5E5E;
+<span id="cb1-12">    m, ell <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">-</span>np.inf</span>
-<span id="cb2-7">    ell <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+font-style: inherit;">-</span>np.inf, <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.0</span></span>
-<span id="cb2-8">    acc <span class="op" style="color: #5E5E5E;
+<span id="cb1-13">    acc <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> np.zeros(v.shape[<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -5575,8 +5768,8 @@ background-color: null;
 font-style: inherit;">1</span>], dtype<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>np.float64)</span>
-<span id="cb2-9"></span>
-<span id="cb2-10">    <span class="cf" style="color: #003B4F;
+<span id="cb1-14"></span>
+<span id="cb1-15">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> start <span class="kw" style="color: #003B4F;
@@ -5589,73 +5782,172 @@ background-color: null;
 font-style: inherit;">0</span>, <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">len</span>(k), block):</span>
-<span id="cb2-11">        kb <span class="op" style="color: #5E5E5E;
+<span id="cb1-16">        kb, vb <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> k[start:start <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">+</span> block]</span>
-<span id="cb2-12">        vb <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> v[start:start <span class="op" style="color: #5E5E5E;
+font-style: inherit;">+</span> block], v[start:start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> block]</span>
-<span id="cb2-13">        logits <span class="op" style="color: #5E5E5E;
+<span id="cb1-17">        logits <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> kb <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span> q <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span> scale</span>
-<span id="cb2-14">        block_max <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> logits.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">max</span>()</span>
-<span id="cb2-15">        new_max <span class="op" style="color: #5E5E5E;
+<span id="cb1-18">        new_max <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
-font-style: inherit;">max</span>(m, block_max)</span>
-<span id="cb2-16"></span>
-<span id="cb2-17">        old_scale <span class="op" style="color: #5E5E5E;
+font-style: inherit;">max</span>(m, logits.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>())</span>
+<span id="cb1-19"></span>
+<span id="cb1-20">        rescale <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> np.exp(m <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">-</span> new_max)</span>
-<span id="cb2-18">        weights <span class="op" style="color: #5E5E5E;
+font-style: inherit;">-</span> new_max)          <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># correct the past</span></span>
+<span id="cb1-21">        weights <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> np.exp(logits <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">-</span> new_max)</span>
-<span id="cb2-19">        acc <span class="op" style="color: #5E5E5E;
+font-style: inherit;">-</span> new_max)     <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> old_scale <span class="op" style="color: #5E5E5E;
+font-style: inherit;"># weight the present</span></span>
+<span id="cb1-22">        acc <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rescale <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span> acc <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> weights <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span> vb</span>
-<span id="cb2-20">        ell <span class="op" style="color: #5E5E5E;
+<span id="cb1-23">        ell <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> old_scale <span class="op" style="color: #5E5E5E;
+font-style: inherit;">=</span> rescale <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span> ell <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> weights.<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">sum</span>()</span>
-<span id="cb2-21">        m <span class="op" style="color: #5E5E5E;
+<span id="cb1-24">        m <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> new_max</span>
-<span id="cb2-22"></span>
-<span id="cb2-23">    <span class="cf" style="color: #003B4F;
+<span id="cb1-25"></span>
+<span id="cb1-26">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> acc <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">/</span> ell</span></code></pre></div></div>
-<p>This Python version exposes the recurrence but does not provide the speedup. Performance comes from mapping tiles to GPU thread blocks and using tensor-core matrix multiplications while intermediates remain in SRAM or registers.</p>
+font-style: inherit;">/</span> ell</span>
+<span id="cb1-27"></span>
+<span id="cb1-28">rng <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.default_rng(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb1-29">n, d <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4096</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">64</span></span>
+<span id="cb1-30">q, k, v <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rng.normal(size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>d), rng.normal(size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(n, d)), rng.normal(size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(n, d))</span>
+<span id="cb1-31"></span>
+<span id="cb1-32">reference <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> reference_attention(q, k, v)</span>
+<span id="cb1-33"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> block <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">64</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">256</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1024</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4096</span>):</span>
+<span id="cb1-34">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">assert</span> np.allclose(tiled_attention(q, k, v, block), reference, rtol<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, atol<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e-14</span>)</span>
+<span id="cb1-35"></span>
+<span id="cb1-36"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Worst case for the running maximum: the dominant key is the very last one.</span></span>
+<span id="cb1-37">k_late <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> k.copy()</span>
+<span id="cb1-38">k_late[<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> q <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12.0</span></span>
+<span id="cb1-39">late <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">abs</span>(tiled_attention(q, k_late, v, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">64</span>)</span>
+<span id="cb1-40">                     <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> reference_attention(q, k_late, v)))</span>
+<span id="cb1-41"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"late-maximum deviation: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>late<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:.2e}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>late-maximum deviation: 0.00e+00</code></pre>
+</div>
+</div>
+<p>The block size is a scheduling parameter, not a fidelity parameter. Changing it reorders floating-point additions and nothing else, which is why the deviation sits at the rounding floor instead of growing with the number of tiles. Approximate attention methods drop terms; this one keeps every term and only postpones normalizing them.</p>
+<p>The Python above exposes the recurrence but provides none of the speedup. Performance comes from mapping tiles to GPU thread blocks and issuing tensor-core matrix multiplications while <img src="https://latex.codecogs.com/png.latex?(m,%5Cell,%5Cwidetilde%20o)"> live in registers and the tiles live in SRAM.</p>
 </section>
 <section id="tiling-the-full-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="tiling-the-full-matrix">Tiling the full matrix</h2>
@@ -5667,14 +5959,281 @@ font-style: inherit;">/</span> ell</span></code></pre></div></div>
 <li>Update each row’s <img src="https://latex.codecogs.com/png.latex?(m,%5Cell,%5Cwidetilde%7Bo%7D)"> state.</li>
 <li>Write the final <img src="https://latex.codecogs.com/png.latex?O_i"> and log-sum-exp statistics.</li>
 </ol>
-<p>The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions. The original analysis gives an HBM access complexity of</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5CTheta%5C!%5Cleft(%5Cfrac%7Bn%5E2d%5E2%7D%7BM%7D%5Cright),%0A"></p>
-<p>for SRAM capacity <img src="https://latex.codecogs.com/png.latex?M">, over the relevant range of tile sizes, compared with quadratic intermediate traffic in the standard schedule <span class="citation" data-cites="dao2022flashattention">(Dao et al. 2022)</span>.</p>
+<p>The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions, and the tile sizes are what convert on-chip capacity into saved traffic.</p>
+<p>Suppose SRAM holds <img src="https://latex.codecogs.com/png.latex?M"> elements. A working set consists of one query tile, one key tile, one value tile, and one output accumulator:</p>
+<p><span id="eq-tile-budget"><img src="https://latex.codecogs.com/png.latex?%0A%5Cunderbrace%7BB_rd%7D_%7BQ_i%7D+%5Cunderbrace%7BB_cd%7D_%7BK_j%7D%0A+%5Cunderbrace%7BB_cd%7D_%7BV_j%7D+%5Cunderbrace%7BB_rd%7D_%7BO_i%7D%0A%5C;%5Cle%5C;M%0A%5Cquad%5CLongrightarrow%5Cquad%0AB_r,B_c=%5CTheta%5C!%5Cleft(%5Cfrac%7BM%7D%7Bd%7D%5Cright).%0A%5Ctag%7B3%7D"></span></p>
+<p>Now count traffic. <img src="https://latex.codecogs.com/png.latex?Q"> is read once and <img src="https://latex.codecogs.com/png.latex?O"> is written once, contributing <img src="https://latex.codecogs.com/png.latex?2nd">. Each of the <img src="https://latex.codecogs.com/png.latex?n/B_r"> query tiles streams the entire key and value tensors, contributing <img src="https://latex.codecogs.com/png.latex?(n/B_r)%5Ccdot%202nd">. Substituting Equation&nbsp;3,</p>
+<p><span id="eq-tiled-traffic"><img src="https://latex.codecogs.com/png.latex?%0A%5Ctext%7Btiled%20traffic%7D%0A=2nd+%5Cfrac%7B2n%5E2d%7D%7BB_r%7D%0A=%5CTheta%5C!%5Cleft(nd+%5Cfrac%7Bn%5E2d%5E2%7D%7BM%7D%5Cright),%0A%5Ctag%7B4%7D"></span></p>
+<p>which is the HBM access complexity in the original analysis, over the relevant range of tile sizes <span class="citation" data-cites="dao2022flashattention">(Dao et al. 2022)</span>. Comparing Equation&nbsp;4 against the <img src="https://latex.codecogs.com/png.latex?4n%5E2+4nd"> of Table&nbsp;1, the asymptotic ratio at large <img src="https://latex.codecogs.com/png.latex?n"> is <img src="https://latex.codecogs.com/png.latex?M/(2d%5E2)">: independent of sequence length, linear in SRAM capacity, and quadratic in head dimension. Larger heads are penalized twice, once for the tiles they force to shrink and once for the bytes each tile carries.</p>
+<div id="cell-fig-hbm-traffic" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb3-2"></span>
+<span id="cb3-3"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> standard_traffic(n, d):</span>
+<span id="cb3-4">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> n<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> d</span>
+<span id="cb3-5"></span>
+<span id="cb3-6"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> tiled_traffic(n, d, sram_elements):</span>
+<span id="cb3-7">    tile <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(sram_elements <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">//</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> d), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># from the SRAM budget above</span></span>
+<span id="cb3-8">    row_tiles <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.ceil(n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> np.minimum(tile, n))</span>
+<span id="cb3-9">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> d <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> row_tiles <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> d</span>
+<span id="cb3-10"></span>
+<span id="cb3-11">lengths <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> np.arange(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">18</span>)</span>
+<span id="cb3-12">head_dim <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">64</span></span>
+<span id="cb3-13"></span>
+<span id="cb3-14">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.8</span>))</span>
+<span id="cb3-15">ax.loglog(lengths, standard_traffic(lengths, head_dim), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"o-"</span>,</span>
+<span id="cb3-16">          label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"materialize $S$ and $P$"</span>)</span>
+<span id="cb3-17"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> sram, style <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> ((<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">32</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1024</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"s-"</span>), (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">96</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1024</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"^-"</span>)):</span>
+<span id="cb3-18">    ax.loglog(lengths, tiled_traffic(lengths, head_dim, sram), style,</span>
+<span id="cb3-19">              label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"tiled, SRAM = </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>sram <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">//</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1024</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">K elements"</span>)</span>
+<span id="cb3-20">ax.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">set</span>(xlabel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sequence length $n$"</span>, ylabel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"HBM elements moved"</span>)</span>
+<span id="cb3-21">ax.spines[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"top"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"right"</span>]].set_visible(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb3-22">ax.grid(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"both"</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.18</span>)</span>
+<span id="cb3-23">ax.legend(frameon<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb3-24">plt.tight_layout()</span>
+<span id="cb3-25">plt.show()</span>
+<span id="cb3-26"></span>
+<span id="cb3-27">ratio <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> standard_traffic(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, head_dim) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> tiled_traffic(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, head_dim, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">96</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1024</span>)</span>
+<span id="cb3-28"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"traffic reduction at n=65,536: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>ratio<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:.1f}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">x  (predicted M/2d^2 = "</span></span>
+<span id="cb3-29">      <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">96</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1024</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> head_dim<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:.1f}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">x)"</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-display">
+<div id="fig-hbm-traffic" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hbm-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-hbm-traffic-output-1.png" width="661" height="354" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hbm-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: HBM elements moved per head under the two schedules at head dimension 64. Both curves are quadratic in sequence length; tiling divides the quadratic term by the on-chip working set, so the vertical gap is set by SRAM capacity rather than by sequence length.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>traffic reduction at n=65,536: 11.9x  (predicted M/2d^2 = 12.0x)</code></pre>
+</div>
+</div>
+<p>The measured ratio matches the closed form, which is the point of the exercise: the speedup is predictable from two hardware numbers and one model number, before any kernel is written. It also shows what tiling does <em>not</em> do. Both curves keep slope two on the log-log axes. The algorithm buys a constant factor on a quadratic, and that constant is bounded by the size of the on-chip scratchpad.</p>
 </section>
 <section id="backward-by-recomputation" class="level2">
 <h2 class="anchored" data-anchor-id="backward-by-recomputation">Backward by recomputation</h2>
-<p>Ordinary autodiff saves <img src="https://latex.codecogs.com/png.latex?S"> or <img src="https://latex.codecogs.com/png.latex?P"> because the backward pass needs probabilities. FlashAttention stores the output and row-wise log-sum-exp, then recomputes score tiles during backward.</p>
-<p>Recomputation adds FLOPs but removes the quadratic saved activation. On modern accelerators, this trade can be faster because matrix multiplication is efficient while repeated HBM traffic is expensive. This is a selective checkpointing strategy guided by the memory hierarchy.</p>
+<p>Ordinary autodiff saves <img src="https://latex.codecogs.com/png.latex?S"> or <img src="https://latex.codecogs.com/png.latex?P"> because the backward pass needs probabilities. FlashAttention stores only <img src="https://latex.codecogs.com/png.latex?O"> and the row-wise log-sum-exp</p>
+<p><span id="eq-logsumexp"><img src="https://latex.codecogs.com/png.latex?%0AL_i=m_i+%5Clog%5Cell_i,%0A%5Ctag%7B5%7D"></span></p>
+<p>then recomputes score tiles during backward. One scalar per row is sufficient because <img src="https://latex.codecogs.com/png.latex?L_i"> is exactly the normalizer that was divided out: a recomputed score tile becomes the correct probability tile through <img src="https://latex.codecogs.com/png.latex?P_%7Bij%7D=e%5E%7BS_%7Bij%7D-L_i%7D">, with no second pass over the row and no dependence on tile order.</p>
+<p>The accounting is favorable. The saved activation shrinks from <img src="https://latex.codecogs.com/png.latex?n%5E2"> elements to <img src="https://latex.codecogs.com/png.latex?nd+n">, a factor of roughly <img src="https://latex.codecogs.com/png.latex?n/d">; at <img src="https://latex.codecogs.com/png.latex?n=16%7B,%7D384"> and <img src="https://latex.codecogs.com/png.latex?d=64"> that is a 256-fold reduction in stored state per head. The cost is one extra <img src="https://latex.codecogs.com/png.latex?QK%5E%5Ctop"> during backward, raising attention FLOPs by about 30 percent rather than doubling them, since the backward pass already performs several matrix multiplications of the same shape.</p>
+<p>Standard gradient checkpointing makes the same trade at layer granularity and re-executes whole blocks. Here the choice is made per intermediate, keeping the cheap linear-size statistic and discarding the expensive quadratic one. Recomputation is not a concession; it is what makes the linear memory profile reachable without changing the function being differentiated.</p>
 </section>
 <section id="flashattention-2-changes-the-work-partition" class="level2">
 <h2 class="anchored" data-anchor-id="flashattention-2-changes-the-work-partition">FlashAttention-2 changes the work partition</h2>

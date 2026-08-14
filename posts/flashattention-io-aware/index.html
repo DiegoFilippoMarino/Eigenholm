@@ -182,14 +182,14 @@ window.Quarto = {
 
 <meta property="og:title" content="FlashAttention Is an IO Algorithm – Eigenholm">
 <meta property="og:description" content="How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.">
-<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-attention-memory-output-1.png">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-hbm-traffic-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="708">
+<meta property="og:image:height" content="707">
 <meta property="og:image:width" content="1322">
 <meta name="twitter:title" content="FlashAttention Is an IO Algorithm – Eigenholm">
 <meta name="twitter:description" content="How tiled online softmax computes exact attention without materializing the quadratic score matrix in GPU memory.">
-<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-attention-memory-output-1.png">
-<meta name="twitter:image-height" content="708">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index_files/figure-html/fig-hbm-traffic-output-1.png">
+<meta name="twitter:image-height" content="707">
 <meta name="twitter:image-width" content="1322">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -477,39 +477,45 @@ window.Quarto = {
 <p><span class="math display">
 S=QK^\top,\qquad P=\operatorname{softmax}(S),\qquad O=PV.
 </span></p>
-<p>A conventional sequence of kernels writes <span class="math inline">S</span> to HBM, reads it for softmax, writes <span class="math inline">P</span>, then reads <span class="math inline">P</span> for the second matrix multiplication. Both intermediates contain <span class="math inline">n^2</span> elements. Kernel fusion can remove some round trips, but <span class="math inline">S</span> and <span class="math inline">P</span> still exceed on-chip capacity at useful sequence lengths.</p>
-<div id="cell-fig-attention-memory" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> np.arange(<span class="dv">8</span>, <span class="dv">18</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">128</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>score_mib <span class="op">=</span> n<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span><span class="op">**</span><span class="dv">20</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>qkv_mib <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> n <span class="op">*</span> d <span class="op">*</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span><span class="op">**</span><span class="dv">20</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax.loglog(n, score_mib, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"one </span><span class="dv">$</span><span class="vs">n</span><span class="ch">\t</span><span class="vs">imes n</span><span class="dv">$</span><span class="vs"> matrix"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ax.loglog(n, qkv_mib, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"</span><span class="dv">$</span><span class="vs">Q,K,V</span><span class="dv">$</span><span class="vs"> at </span><span class="dv">$</span><span class="vs">d=128</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"sequence length"</span>, ylabel<span class="op">=</span><span class="st">"storage (MiB)"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ax.grid(which<span class="op">=</span><span class="st">"both"</span>, alpha<span class="op">=</span><span class="fl">0.18</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div id="fig-attention-memory" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-attention-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-attention-memory-output-1.png" width="661" height="354" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-attention-memory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Storage for one materialized attention matrix at FP16, compared with one linear-size QKV working set at head dimension 128.
+<p>A conventional sequence of kernels writes <span class="math inline">S</span> to HBM, reads it for softmax, writes <span class="math inline">P</span>, then reads <span class="math inline">P</span> for the second matrix multiplication. Counting the elements that cross the HBM boundary for one head:</p>
+<div id="tbl-standard-traffic" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-standard-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: HBM elements moved by an unfused three-kernel schedule.
 </figcaption>
+<div aria-describedby="tbl-standard-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stage</th>
+<th style="text-align: left;">Reads</th>
+<th style="text-align: left;">Writes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">S=QK^\top</span></td>
+<td style="text-align: left;"><span class="math inline">Q,K</span>: <span class="math inline">2nd</span></td>
+<td style="text-align: left;"><span class="math inline">S</span>: <span class="math inline">n^2</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">P=\operatorname{softmax}(S)</span></td>
+<td style="text-align: left;"><span class="math inline">S</span>: <span class="math inline">n^2</span></td>
+<td style="text-align: left;"><span class="math inline">P</span>: <span class="math inline">n^2</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">O=PV</span></td>
+<td style="text-align: left;"><span class="math inline">P,V</span>: <span class="math inline">n^2+nd</span></td>
+<td style="text-align: left;"><span class="math inline">O</span>: <span class="math inline">nd</span></td>
+</tr>
+</tbody>
+</table>
+</div>
 </figure>
 </div>
-</div>
-</div>
-<p>At <span class="math inline">n=16{,}384</span>, a single FP16 score matrix for one head and one batch element occupies 512 MiB. A model with many heads cannot retain all such matrices without aggressive memory management.</p>
+<p>The total is <span class="math inline">4n^2+4nd</span> elements, of which the quadratic part dominates as soon as <span class="math inline">n\gg d</span>. Fusing softmax into one of the matrix multiplications removes a round trip and reduces the constant, but it does not change the order: any schedule that materializes <span class="math inline">S</span> or <span class="math inline">P</span> pays <span class="math inline">\Omega(n^2)</span> traffic.</p>
+<p>The absolute numbers make the constraint concrete. At <span class="math inline">n=16{,}384</span> and FP16, one score matrix for a single head of a single batch element occupies 512 MiB. The corresponding <span class="math inline">Q</span>, <span class="math inline">K</span>, and <span class="math inline">V</span> at <span class="math inline">d=128</span> occupy about 12 MiB combined. The intermediate is roughly forty times the size of the operands that produced it, and it exists only to be consumed by the next kernel. Meanwhile on-chip SRAM is measured in hundreds of kilobytes per streaming multiprocessor, so no tiling of the <em>stored</em> matrix helps; the matrix must not exist.</p>
+<p>That reframing is the whole algorithm. Attention is not expensive because of <span class="math inline">n^2</span> arithmetic alone. It is expensive because the standard schedule promotes a scratch value to a first-class tensor.</p>
 </section>
 <section id="softmax-can-be-streamed-exactly" class="level2">
 <h2 class="anchored" data-anchor-id="softmax-can-be-streamed-exactly">Softmax can be streamed exactly</h2>
@@ -521,8 +527,8 @@ m_j=\max_{i\le j}x_i,
 </span></p>
 <p>When a new block <span class="math inline">B</span> arrives, let</p>
 <p><span class="math display">
-m_B=\max_{x\in B}x,qquad
-\ell_B=\sum_{x\in B}e^{x-m_B},qquad
+m_B=\max_{x\in B}x,\qquad
+\ell_B=\sum_{x\in B}e^{x-m_B},\qquad
 m'=\max(m_j,m_B).
 </span></p>
 <p>The combined normalizer is</p>
@@ -540,30 +546,55 @@ m'=\max(m_j,m_B).
 \qquad o=\frac{\widetilde{o}'}{\ell'}.
 \tag{2}</span></span></p>
 <p>Equations <a href="#eq-online-normalizer" class="quarto-xref">Equation&nbsp;1</a> and <a href="#eq-online-output" class="quarto-xref">Equation&nbsp;2</a> are exact apart from floating-point rounding. They let a kernel load a query tile, stream over key and value tiles, and retain only row statistics and a partial output on chip.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tiled_attention(q, k, v, block<span class="op">=</span><span class="dv">64</span>):</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Reference implementation for one query vector, not a fast kernel."""</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    scale <span class="op">=</span> q.shape[<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="op">-</span><span class="fl">0.5</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> <span class="op">-</span>np.inf</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ell <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    acc <span class="op">=</span> np.zeros(v.shape[<span class="op">-</span><span class="dv">1</span>], dtype<span class="op">=</span>np.float64)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(k), block):</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        kb <span class="op">=</span> k[start:start <span class="op">+</span> block]</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        vb <span class="op">=</span> v[start:start <span class="op">+</span> block]</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        logits <span class="op">=</span> kb <span class="op">@</span> q <span class="op">*</span> scale</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        block_max <span class="op">=</span> logits.<span class="bu">max</span>()</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        new_max <span class="op">=</span> <span class="bu">max</span>(m, block_max)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        old_scale <span class="op">=</span> np.exp(m <span class="op">-</span> new_max)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.exp(logits <span class="op">-</span> new_max)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        acc <span class="op">=</span> old_scale <span class="op">*</span> acc <span class="op">+</span> weights <span class="op">@</span> vb</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        ell <span class="op">=</span> old_scale <span class="op">*</span> ell <span class="op">+</span> weights.<span class="bu">sum</span>()</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        m <span class="op">=</span> new_max</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> acc <span class="op">/</span> ell</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This Python version exposes the recurrence but does not provide the speedup. Performance comes from mapping tiles to GPU thread blocks and using tensor-core matrix multiplications while intermediates remain in SRAM or registers.</p>
+<p>The exactness claim deserves a test rather than a citation, because it is the property that separates FlashAttention from an approximation. The critical case is a late arrival: a logit larger than everything seen so far shows up in the final tile, forcing every accumulated term to be rescaled after the fact.</p>
+<div id="exactness-check" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> reference_attention(q, k, v):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""One-shot softmax over the full key set."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> k <span class="op">@</span> q <span class="op">*</span> q.shape[<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> np.exp(logits <span class="op">-</span> logits.<span class="bu">max</span>())</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (p <span class="op">/</span> p.<span class="bu">sum</span>()) <span class="op">@</span> v</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tiled_attention(q, k, v, block<span class="op">=</span><span class="dv">64</span>):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Online-softmax attention for one query vector. Exact, not fast."""</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    scale <span class="op">=</span> q.shape[<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    m, ell <span class="op">=</span> <span class="op">-</span>np.inf, <span class="fl">0.0</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    acc <span class="op">=</span> np.zeros(v.shape[<span class="op">-</span><span class="dv">1</span>], dtype<span class="op">=</span>np.float64)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(k), block):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        kb, vb <span class="op">=</span> k[start:start <span class="op">+</span> block], v[start:start <span class="op">+</span> block]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        logits <span class="op">=</span> kb <span class="op">@</span> q <span class="op">*</span> scale</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        new_max <span class="op">=</span> <span class="bu">max</span>(m, logits.<span class="bu">max</span>())</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        rescale <span class="op">=</span> np.exp(m <span class="op">-</span> new_max)          <span class="co"># correct the past</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.exp(logits <span class="op">-</span> new_max)     <span class="co"># weight the present</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        acc <span class="op">=</span> rescale <span class="op">*</span> acc <span class="op">+</span> weights <span class="op">@</span> vb</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        ell <span class="op">=</span> rescale <span class="op">*</span> ell <span class="op">+</span> weights.<span class="bu">sum</span>()</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        m <span class="op">=</span> new_max</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> acc <span class="op">/</span> ell</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>n, d <span class="op">=</span> <span class="dv">4096</span>, <span class="dv">64</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>q, k, v <span class="op">=</span> rng.normal(size<span class="op">=</span>d), rng.normal(size<span class="op">=</span>(n, d)), rng.normal(size<span class="op">=</span>(n, d))</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>reference <span class="op">=</span> reference_attention(q, k, v)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> block <span class="kw">in</span> (<span class="dv">16</span>, <span class="dv">64</span>, <span class="dv">256</span>, <span class="dv">1024</span>, <span class="dv">4096</span>):</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> np.allclose(tiled_attention(q, k, v, block), reference, rtol<span class="op">=</span><span class="dv">0</span>, atol<span class="op">=</span><span class="fl">1e-14</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Worst case for the running maximum: the dominant key is the very last one.</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>k_late <span class="op">=</span> k.copy()</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>k_late[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> q <span class="op">*</span> <span class="fl">12.0</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>late <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(tiled_attention(q, k_late, v, <span class="dv">64</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                     <span class="op">-</span> reference_attention(q, k_late, v)))</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"late-maximum deviation: </span><span class="sc">{</span>late<span class="sc">:.2e}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>late-maximum deviation: 0.00e+00</code></pre>
+</div>
+</div>
+<p>The block size is a scheduling parameter, not a fidelity parameter. Changing it reorders floating-point additions and nothing else, which is why the deviation sits at the rounding floor instead of growing with the number of tiles. Approximate attention methods drop terms; this one keeps every term and only postpones normalizing them.</p>
+<p>The Python above exposes the recurrence but provides none of the speedup. Performance comes from mapping tiles to GPU thread blocks and issuing tensor-core matrix multiplications while <span class="math inline">(m,\ell,\widetilde o)</span> live in registers and the tiles live in SRAM.</p>
 </section>
 <section id="tiling-the-full-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="tiling-the-full-matrix">Tiling the full matrix</h2>
@@ -575,16 +606,79 @@ m'=\max(m_j,m_B).
 <li>Update each row’s <span class="math inline">(m,\ell,\widetilde{o})</span> state.</li>
 <li>Write the final <span class="math inline">O_i</span> and log-sum-exp statistics.</li>
 </ol>
-<p>The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions. The original analysis gives an HBM access complexity of</p>
-<p><span class="math display">
-\Theta\!\left(\frac{n^2d^2}{M}\right),
-</span></p>
-<p>for SRAM capacity <span class="math inline">M</span>, over the relevant range of tile sizes, compared with quadratic intermediate traffic in the standard schedule <span class="citation" data-cites="dao2022flashattention">(<a href="#ref-dao2022flashattention" role="doc-biblioref">Dao et al. 2022</a>)</span>.</p>
+<p>The algorithm still performs dense attention arithmetic. Its gain comes from reducing expensive HBM transactions, and the tile sizes are what convert on-chip capacity into saved traffic.</p>
+<p>Suppose SRAM holds <span class="math inline">M</span> elements. A working set consists of one query tile, one key tile, one value tile, and one output accumulator:</p>
+<p><span id="eq-tile-budget"><span class="math display">
+\underbrace{B_rd}_{Q_i}+\underbrace{B_cd}_{K_j}
++\underbrace{B_cd}_{V_j}+\underbrace{B_rd}_{O_i}
+\;\le\;M
+\quad\Longrightarrow\quad
+B_r,B_c=\Theta\!\left(\frac{M}{d}\right).
+\tag{3}</span></span></p>
+<p>Now count traffic. <span class="math inline">Q</span> is read once and <span class="math inline">O</span> is written once, contributing <span class="math inline">2nd</span>. Each of the <span class="math inline">n/B_r</span> query tiles streams the entire key and value tensors, contributing <span class="math inline">(n/B_r)\cdot 2nd</span>. Substituting <a href="#eq-tile-budget" class="quarto-xref">Equation&nbsp;3</a>,</p>
+<p><span id="eq-tiled-traffic"><span class="math display">
+\text{tiled traffic}
+=2nd+\frac{2n^2d}{B_r}
+=\Theta\!\left(nd+\frac{n^2d^2}{M}\right),
+\tag{4}</span></span></p>
+<p>which is the HBM access complexity in the original analysis, over the relevant range of tile sizes <span class="citation" data-cites="dao2022flashattention">(<a href="#ref-dao2022flashattention" role="doc-biblioref">Dao et al. 2022</a>)</span>. Comparing <a href="#eq-tiled-traffic" class="quarto-xref">Equation&nbsp;4</a> against the <span class="math inline">4n^2+4nd</span> of <a href="#tbl-standard-traffic" class="quarto-xref">Table&nbsp;1</a>, the asymptotic ratio at large <span class="math inline">n</span> is <span class="math inline">M/(2d^2)</span>: independent of sequence length, linear in SRAM capacity, and quadratic in head dimension. Larger heads are penalized twice, once for the tiles they force to shrink and once for the bytes each tile carries.</p>
+<div id="cell-fig-hbm-traffic" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> standard_traffic(n, d):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">4</span> <span class="op">*</span> n<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">4</span> <span class="op">*</span> n <span class="op">*</span> d</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tiled_traffic(n, d, sram_elements):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    tile <span class="op">=</span> <span class="bu">max</span>(sram_elements <span class="op">//</span> (<span class="dv">4</span> <span class="op">*</span> d), <span class="dv">1</span>)       <span class="co"># from the SRAM budget above</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    row_tiles <span class="op">=</span> np.ceil(n <span class="op">/</span> np.minimum(tile, n))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span> <span class="op">*</span> n <span class="op">*</span> d <span class="op">+</span> row_tiles <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> n <span class="op">*</span> d</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>lengths <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> np.arange(<span class="dv">9</span>, <span class="dv">18</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>head_dim <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>ax.loglog(lengths, standard_traffic(lengths, head_dim), <span class="st">"o-"</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>          label<span class="op">=</span><span class="st">"materialize $S$ and $P$"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sram, style <span class="kw">in</span> ((<span class="dv">32</span> <span class="op">*</span> <span class="dv">1024</span>, <span class="st">"s-"</span>), (<span class="dv">96</span> <span class="op">*</span> <span class="dv">1024</span>, <span class="st">"^-"</span>)):</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    ax.loglog(lengths, tiled_traffic(lengths, head_dim, sram), style,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>              label<span class="op">=</span><span class="ss">f"tiled, SRAM = </span><span class="sc">{</span>sram <span class="op">//</span> <span class="dv">1024</span><span class="sc">}</span><span class="ss">K elements"</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"sequence length $n$"</span>, ylabel<span class="op">=</span><span class="st">"HBM elements moved"</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>ax.grid(which<span class="op">=</span><span class="st">"both"</span>, alpha<span class="op">=</span><span class="fl">0.18</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>ratio <span class="op">=</span> standard_traffic(<span class="dv">2</span><span class="op">**</span><span class="dv">16</span>, head_dim) <span class="op">/</span> tiled_traffic(<span class="dv">2</span><span class="op">**</span><span class="dv">16</span>, head_dim, <span class="dv">96</span> <span class="op">*</span> <span class="dv">1024</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"traffic reduction at n=65,536: </span><span class="sc">{</span>ratio<span class="sc">:.1f}</span><span class="ss">x  (predicted M/2d^2 = "</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span><span class="dv">96</span> <span class="op">*</span> <span class="dv">1024</span> <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> head_dim<span class="op">**</span><span class="dv">2</span>)<span class="sc">:.1f}</span><span class="ss">x)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-hbm-traffic" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hbm-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-hbm-traffic-output-1.png" width="661" height="354" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hbm-traffic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: HBM elements moved per head under the two schedules at head dimension 64. Both curves are quadratic in sequence length; tiling divides the quadratic term by the on-chip working set, so the vertical gap is set by SRAM capacity rather than by sequence length.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>traffic reduction at n=65,536: 11.9x  (predicted M/2d^2 = 12.0x)</code></pre>
+</div>
+</div>
+<p>The measured ratio matches the closed form, which is the point of the exercise: the speedup is predictable from two hardware numbers and one model number, before any kernel is written. It also shows what tiling does <em>not</em> do. Both curves keep slope two on the log-log axes. The algorithm buys a constant factor on a quadratic, and that constant is bounded by the size of the on-chip scratchpad.</p>
 </section>
 <section id="backward-by-recomputation" class="level2">
 <h2 class="anchored" data-anchor-id="backward-by-recomputation">Backward by recomputation</h2>
-<p>Ordinary autodiff saves <span class="math inline">S</span> or <span class="math inline">P</span> because the backward pass needs probabilities. FlashAttention stores the output and row-wise log-sum-exp, then recomputes score tiles during backward.</p>
-<p>Recomputation adds FLOPs but removes the quadratic saved activation. On modern accelerators, this trade can be faster because matrix multiplication is efficient while repeated HBM traffic is expensive. This is a selective checkpointing strategy guided by the memory hierarchy.</p>
+<p>Ordinary autodiff saves <span class="math inline">S</span> or <span class="math inline">P</span> because the backward pass needs probabilities. FlashAttention stores only <span class="math inline">O</span> and the row-wise log-sum-exp</p>
+<p><span id="eq-logsumexp"><span class="math display">
+L_i=m_i+\log\ell_i,
+\tag{5}</span></span></p>
+<p>then recomputes score tiles during backward. One scalar per row is sufficient because <span class="math inline">L_i</span> is exactly the normalizer that was divided out: a recomputed score tile becomes the correct probability tile through <span class="math inline">P_{ij}=e^{S_{ij}-L_i}</span>, with no second pass over the row and no dependence on tile order.</p>
+<p>The accounting is favorable. The saved activation shrinks from <span class="math inline">n^2</span> elements to <span class="math inline">nd+n</span>, a factor of roughly <span class="math inline">n/d</span>; at <span class="math inline">n=16{,}384</span> and <span class="math inline">d=64</span> that is a 256-fold reduction in stored state per head. The cost is one extra <span class="math inline">QK^\top</span> during backward, raising attention FLOPs by about 30 percent rather than doubling them, since the backward pass already performs several matrix multiplications of the same shape.</p>
+<p>Standard gradient checkpointing makes the same trade at layer granularity and re-executes whole blocks. Here the choice is made per intermediate, keeping the cheap linear-size statistic and discarding the expensive quadratic one. Recomputation is not a concession; it is what makes the linear memory profile reachable without changing the function being differentiated.</p>
 </section>
 <section id="flashattention-2-changes-the-work-partition" class="level2">
 <h2 class="anchored" data-anchor-id="flashattention-2-changes-the-work-partition">FlashAttention-2 changes the work partition</h2>

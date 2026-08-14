@@ -417,6 +417,7 @@ window.Quarto = {
   <li><a href="#complex-notation-exposes-the-mechanism" id="toc-complex-notation-exposes-the-mechanism" class="nav-link" data-scroll-target="#complex-notation-exposes-the-mechanism">Complex notation exposes the mechanism</a></li>
   <li><a href="#a-vectorized-implementation" id="toc-a-vectorized-implementation" class="nav-link" data-scroll-target="#a-vectorized-implementation">A vectorized implementation</a></li>
   <li><a href="#why-extrapolation-is-difficult" id="toc-why-extrapolation-is-difficult" class="nav-link" data-scroll-target="#why-extrapolation-is-difficult">Why extrapolation is difficult</a></li>
+  <li><a href="#three-ways-to-extend-context-and-what-each-one-breaks" id="toc-three-ways-to-extend-context-and-what-each-one-breaks" class="nav-link" data-scroll-target="#three-ways-to-extend-context-and-what-each-one-breaks">Three ways to extend context, and what each one breaks</a></li>
   <li><a href="#numerical-and-implementation-details" id="toc-numerical-and-implementation-details" class="nav-link" data-scroll-target="#numerical-and-implementation-details">Numerical and implementation details</a></li>
   <li><a href="#what-rope-buys" id="toc-what-rope-buys" class="nav-link" data-scroll-target="#what-rope-buys">What RoPE buys</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -598,7 +599,19 @@ Figure&nbsp;2: Number of rotations observed by each coordinate pair at context l
 </div>
 </div>
 </div>
-<p>Changing the base <span class="math inline">b</span> stretches the slow end of the spectrum. Position interpolation scales every position before rotation. More elaborate context-extension methods separate frequency bands because the pairs above and below the one-cycle boundary play different roles.</p>
+<p>The horizontal line at one rotation is the boundary worth naming. Pair <span class="math inline">i</span> has wavelength</p>
+<p><span id="eq-wavelength"><span class="math display">
+\lambda_i=\frac{2\pi}{\theta_i}=2\pi b^{2i/d},
+\tag{2}</span></span></p>
+<p>and the pairs split into two populations at <span class="math inline">\lambda_i=L</span>. Pairs with <span class="math inline">\lambda_i\ll L</span> have wrapped many times during training and can only encode local offsets, since their phase is ambiguous modulo <span class="math inline">\lambda_i</span>. Pairs with <span class="math inline">\lambda_i&gt;L</span> never completed a revolution and act as monotone absolute coordinates over the whole training window. At <span class="math inline">d=64</span>, <span class="math inline">b=10^4</span>, and <span class="math inline">L=2048</span>, the crossover sits near pair 20 of 32: roughly a third of the spectrum has never been observed through a full period.</p>
+</section>
+<section id="three-ways-to-extend-context-and-what-each-one-breaks" class="level2">
+<h2 class="anchored" data-anchor-id="three-ways-to-extend-context-and-what-each-one-breaks">Three ways to extend context, and what each one breaks</h2>
+<p>Read through <a href="#eq-wavelength" class="quarto-xref">Equation&nbsp;2</a>, the standard extension methods stop looking like a list of tricks.</p>
+<p><strong>Position interpolation</strong> maps <span class="math inline">m\mapsto m/s</span> for extension factor <span class="math inline">s</span> <span class="citation" data-cites="chen2023extending">(<a href="#ref-chen2023extending" role="doc-biblioref">Chen et al. 2023</a>)</span>. Every wavelength is stretched uniformly, so the ratio <span class="math inline">\lambda_i/L'</span> is preserved for the new limit <span class="math inline">L'=sL</span>. Nothing exceeds its trained phase range, which is why it works with little fine-tuning. The cost is paid at the fast end: neighboring positions are now separated by <span class="math inline">\theta_i/s</span> instead of <span class="math inline">\theta_i</span>, so the high-frequency pairs that resolve local order become <span class="math inline">s</span> times less discriminative. The model has to relearn distinctions it had already mastered.</p>
+<p><strong>Base scaling</strong>, often called NTK-aware scaling, leaves positions alone and raises <span class="math inline">b</span> to <span class="math inline">b'=b\,s^{d/(d-2)}</span>. The exponent is chosen so that the slowest pair, <span class="math inline">i=d/2-1</span>, is stretched by exactly <span class="math inline">s</span> while the fastest pair, <span class="math inline">i=0</span>, is untouched, with intermediate pairs interpolating between the two. High-frequency local structure survives; the slow pairs absorb the extension. This is the argument for why simply increasing the base is not a hack but the correct dual of interpolation.</p>
+<p><strong>Band-wise methods</strong> such as YaRN make the split explicit, interpolating only the pairs whose wavelength exceeds the trained context, leaving short-wavelength pairs untouched, and blending across a transition region; they also rescale attention temperature to compensate for the entropy change that a longer key set induces <span class="citation" data-cites="peng2024yarn">(<a href="#ref-peng2024yarn" role="doc-biblioref">Peng et al. 2024</a>)</span>.</p>
+<p>The pattern across all three is the same trade. Position enters the logit only through phase, total phase budget is fixed by training, and extending context means deciding which pairs surrender resolution. There is no scaling rule that adds information the training distribution never contained; the choice is only where to spend the loss.</p>
 </section>
 <section id="numerical-and-implementation-details" class="level2">
 <h2 class="anchored" data-anchor-id="numerical-and-implementation-details">Numerical and implementation details</h2>
@@ -620,6 +633,12 @@ Figure&nbsp;2: Number of rotations observed by each coordinate pair at context l
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-chen2023extending" class="csl-entry" role="listitem">
+Chen, Shouyuan, Sherman Wong, Liangjian Chen, and Yuandong Tian. 2023. <span>“Extending Context Window of Large Language Models via Positional Interpolation.”</span> <a href="https://arxiv.org/abs/2306.15595">https://arxiv.org/abs/2306.15595</a>.
+</div>
+<div id="ref-peng2024yarn" class="csl-entry" role="listitem">
+Peng, Bowen, Jeffrey Quesnelle, Honglu Fan, and Enrico Shippole. 2024. <span>“YaRN: Efficient Context Window Extension of Large Language Models.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2309.00071">https://arxiv.org/abs/2309.00071</a>.
+</div>
 <div id="ref-su2024roformer" class="csl-entry" role="listitem">
 Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024. <span>“RoFormer: Enhanced Transformer with Rotary Position Embedding.”</span> <em>Neurocomputing</em> 568: 127063. <a href="https://doi.org/10.1016/j.neucom.2023.127063">https://doi.org/10.1016/j.neucom.2023.127063</a>.
 </div>
