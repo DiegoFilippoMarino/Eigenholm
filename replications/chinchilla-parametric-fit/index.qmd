@@ -64,10 +64,12 @@ Everything below follows from @eq-chin-exponents and @eq-chin-ratio and the five
 
 ```{python}
 #| label: chin-exponents
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 FITS = {
     "Hoffmann et al. 2022": dict(E=1.69, A=406.4, B=410.7, alpha=0.34, beta=0.28,
@@ -105,9 +107,7 @@ $$ {#eq-chin-scalefree}
 The published $\alpha = 0.34$ and $\beta = 0.28$ are not equal, and not nearly equal: the exponent on the right of @eq-chin-scalefree is $0.06/0.28 = 0.214$. A twenty-fold increase in model size multiplies the optimal token-to-parameter ratio by $20^{0.214} \approx 1.9$. There is no scale-free ratio to quote.
 
 ```{python}
-#| label: fig-chin-ratio
-#| fig-cap: "Optimal tokens per parameter implied by each parametric fit, across three decades of model size. The published Hoffmann constants imply a strongly scale-dependent ratio far above twenty; the re-estimated constants imply a mildly scale-dependent ratio near it."
-#| echo: true
+#| code-fold: false
 
 def tokens_per_param(fit, N):
     coef = (fit["beta"] * fit["B"] / (fit["alpha"] * fit["A"])) ** (1.0 / fit["beta"])
@@ -115,6 +115,13 @@ def tokens_per_param(fit, N):
 
 
 sizes = np.geomspace(1e9, 1e12, 200)
+```
+
+```{python}
+#| label: fig-chin-ratio
+#| fig-cap: "Optimal tokens per parameter implied by each parametric fit, across three decades of model size. The published Hoffmann constants imply a strongly scale-dependent ratio far above twenty; the re-estimated constants imply a mildly scale-dependent ratio near it."
+#| code-summary: "Plotting code"
+
 fig, ax = plt.subplots(figsize=(7.4, 4.1))
 for (name, fit), color in zip(FITS.items(), ["#a4553a", "#2a6e6e"]):
     ax.loglog(sizes, tokens_per_param(fit, sizes), lw=1.9, color=color, label=name)
@@ -123,10 +130,12 @@ ax.axvline(7e10, color="#8d8d96", ls="--", lw=1.0)
 ax.annotate("Chinchilla, 70B", xy=(7e10, 3.5), fontsize=9, color="#65656d", ha="center")
 ax.set(xlabel="parameters $N$", ylabel="optimal tokens per parameter",
        title="Is the ratio scale-free?")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 for name, fit in FITS.items():
     lo, mid, hi = (tokens_per_param(fit, n) for n in (1e9, 7e10, 1e12))
@@ -140,9 +149,7 @@ The published constants put the optimal ratio at 70B parameters near 109 tokens 
 The same disagreement shows up in the headline comparison. Chinchilla was trained at the compute budget used for Gopher, about $5.76 \times 10^{23}$ FLOPs, and the paper's argument is that this budget is better spent on 70B parameters and 1.4T tokens than on Gopher's 280B parameters and 300B tokens.
 
 ```{python}
-#| label: fig-chin-allocation
-#| fig-cap: "Iso-FLOP slices of each parametric fit at Gopher's compute budget, with the minimizing model size marked. The two fits disagree about where the optimum sits by more than a factor of two."
-#| echo: true
+#| code-fold: false
 
 GOPHER_FLOPS = 5.76e23
 
@@ -159,6 +166,17 @@ def optimum(fit, C):
     return N, C / (6.0 * N)
 
 
+for name, fit in FITS.items():
+    N_star, D_star = optimum(fit, GOPHER_FLOPS)
+    print(f"{name:>24}  optimal N = {N_star / 1e9:6.1f}B   D = {D_star / 1e12:5.2f}T"
+          f"   ratio = {D_star / N_star:6.1f}")
+```
+
+```{python}
+#| label: fig-chin-allocation
+#| fig-cap: "Iso-FLOP slices of each parametric fit at Gopher's compute budget, with the minimizing model size marked. The two fits disagree about where the optimum sits by more than a factor of two."
+#| code-summary: "Plotting code"
+
 grid = np.geomspace(5e9, 6e11, 300)
 fig, ax = plt.subplots(figsize=(7.6, 4.2))
 for (name, fit), color in zip(FITS.items(), ["#a4553a", "#2a6e6e"]):
@@ -166,17 +184,13 @@ for (name, fit), color in zip(FITS.items(), ["#a4553a", "#2a6e6e"]):
     ax.semilogx(grid, curve, lw=1.9, color=color, label=name)
     N_star, D_star = optimum(fit, GOPHER_FLOPS)
     ax.plot([N_star], [loss(fit, N_star, D_star)], "o", ms=7, mfc="white", color=color)
-    print(f"{name:>24}  optimal N = {N_star / 1e9:6.1f}B   D = {D_star / 1e12:5.2f}T"
-          f"   ratio = {D_star / N_star:6.1f}")
 
 ax.axvline(7e10, color="#8d8d96", ls="--", lw=1.0)
 ax.annotate("Chinchilla as trained (70B)", xy=(7.4e10, ax.get_ylim()[1] * 0.995),
             fontsize=9, color="#65656d", va="top")
 ax.set(xlabel="parameters $N$ at fixed compute", ylabel="predicted loss",
        title=r"Iso-FLOP slice at Gopher's budget, $C = 5.76 \times 10^{23}$")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 

@@ -61,7 +61,7 @@ The attention kernel follows this mapping when reading keys and values. Since ph
 
 ```{python}
 #| label: allocator-source
-#| echo: true
+#| code-fold: false
 
 from dataclasses import dataclass, field
 from math import ceil
@@ -103,12 +103,12 @@ Only the final block of a request can be partially empty. If the block contains 
 The following experiment samples 2,000 concurrent requests. Prompt lengths follow a log-normal distribution, maximum generation budgets are deliberately conservative, and actual completions vary. The comparison measures reserved token slots rather than allocator metadata.
 
 ```{python}
-#| label: fig-fragmentation
-#| fig-cap: "Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 rng = np.random.default_rng(11)
 requests = 2_000
@@ -124,15 +124,19 @@ paged_efficiency = np.array([
     live.sum() / (np.ceil(live / block) * block).sum()
     for block in block_sizes
 ])
+```
+
+```{python}
+#| label: fig-fragmentation
+#| fig-cap: "Illustrative allocation efficiency under variable request lengths. Paged allocation uses 16-token blocks."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7, 3.7))
 ax.plot(block_sizes, 100 * paged_efficiency, "o-", label="paged")
 ax.axhline(100 * contiguous_efficiency, color="0.35", ls="--",
            label="contiguous reservation")
 ax.set(xlabel="block size (token slots)", ylabel="live-token efficiency (%)", ylim=(0, 102))
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -145,9 +149,7 @@ The static comparison above measures a snapshot. It cannot show the failure mode
 The following experiment closes that loop. Requests arrive as a Poisson process, each decode step advances every running request by one token, and admission is greedy under whatever capacity the policy exposes. The paged policy takes one extra parameter: an admission watermark, a fraction of blocks held back so that already-running requests have room to grow.
 
 ```{python}
-#| label: fig-admission-watermark
-#| fig-cap: "Discrete-event simulation of 4,000 decode steps against a 60,000-token cache. Paging alone raises occupancy but admits requests it cannot sustain; holding back a small block reserve at admission converts that occupancy into completed work."
-#| echo: true
+#| code-fold: false
 
 CAPACITY, BLOCK, STEPS, WARMUP = 60_000, 16, 4000, 500
 
@@ -220,6 +222,12 @@ completed = np.array([r["completed"] for r in runs])
 occupancy = np.array([r["occupancy"] for r in runs])
 thrash = np.array([r["preemptions"] / max(r["completed"], 1) for r in runs])
 pct = 100 * np.array(watermarks)
+```
+
+```{python}
+#| label: fig-admission-watermark
+#| fig-cap: "Discrete-event simulation of 4,000 decode steps against a 60,000-token cache. Paging alone raises occupancy but admits requests it cannot sustain; holding back a small block reserve at admission converts that occupancy into completed work."
+#| code-summary: "Plotting code"
 
 fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.5))
 axes[0].plot(pct, completed, "o-", label="paged")
@@ -227,7 +235,7 @@ axes[0].axhline(baseline["completed"], color="0.35", ls="--",
                 label="contiguous reservation")
 axes[0].set(xlabel="blocks held back at admission (%)",
             ylabel="requests completed", title="Goodput")
-axes[0].legend(frameon=False)
+axes[0].legend()
 
 occupancy_line, = axes[1].plot(pct, 100 * occupancy, "o-", label="paged occupancy")
 axes[1].axhline(100 * baseline["occupancy"], color="0.35", ls="--",
@@ -238,12 +246,14 @@ thrash_axis = axes[1].twinx()
 thrash_line, = thrash_axis.semilogy(pct, np.maximum(thrash, 1e-3), "s:", color="0.25",
                                     label="preemptions per completion")
 thrash_axis.set(ylabel="preemptions per completion", ylim=(5e-4, 5e2))
-axes[1].legend(handles=[occupancy_line, thrash_line], frameon=False, fontsize=7,
+thrash_axis.spines["right"].set_visible(True)   # this panel does use a second y axis
+axes[1].legend(handles=[occupancy_line, thrash_line], fontsize=7,
                loc="center right")
-for ax in axes:
-    ax.spines[["top"]].set_visible(False)
-plt.tight_layout()
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 print(f"contiguous: {baseline['completed']} completed, "
       f"{baseline['concurrency']:.0f} concurrent, "

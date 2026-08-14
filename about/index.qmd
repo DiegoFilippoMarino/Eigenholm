@@ -29,7 +29,9 @@ The site has four sections, divided by what a page is rather than what it is abo
 
 ## Method
 
-I prefer primary sources and explicit assumptions. When a result comes from a paper, the page cites it. When a graph comes from code, the code is included or described closely enough to reproduce it. When a number is illustrative rather than measured on real hardware, it is labelled as such.
+I prefer primary sources and explicit assumptions. When a result comes from a paper, the page cites it. When a number is illustrative rather than measured on real hardware, it is labelled as such.
+
+Every figure and every quoted number on this site is produced by code that runs when the page is built. Only the snippets that carry an argument appear inline, so what you read is the estimator, the algorithm, or the experiment, and not the axis limits. The rest is folded one click away, the toggle at the top of each page opens all of it at once, and the complete source of any page is linked from that page. Nothing is hidden.
 
 The aim is not to compress a topic into a list of facts. It is to expose the mechanism: what is computed, why the equation has that form, where the memory goes, and under which conditions the method stops helping.
 

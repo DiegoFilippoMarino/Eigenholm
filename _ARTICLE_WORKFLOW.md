@@ -26,6 +26,7 @@ to repeat its location.
    build intuition before formalism, then add equations, small examples, or
    code only when they clarify the idea. End with limitations, trade-offs, or
    practical takeaways. Do not leave template placeholders in the post.
+   Apply the code policy below when deciding what a reader sees inline.
 5. Use standard Quarto features already supported by this site (KaTeX math,
    labelled figures/tables/equations, callouts, and bibliography when needed).
    Add assets next to the post and use descriptive alt text. Do not introduce
@@ -56,6 +57,40 @@ Keep the visual system defined here:
 - The editorial look is calm, minimal, readable, and research-oriented. Favor
   clear hierarchy, short sections, restrained callouts, and purposeful figures
   over decorative elements.
+- `eigenholm.mplstyle` at the project root carries the figure house style: color
+  cycle, spine removal, frameless legends, layout, sizes. Adopt it with one line
+  in a page's first executable cell, `plt.style.use("../../eigenholm.mplstyle")`,
+  and never repeat that formatting inline.
+
+## Code in an article
+
+Code earns inline space by carrying the argument, not by being present. The test:
+
+> A snippet is shown iff removing it would make a claim in the prose
+> unverifiable or a mechanism unclear.
+
+Two corollaries do most of the work.
+
+- **An equation beats its numpy restatement.** If the prose already states the
+  relation, a cell that re-encodes it line for line adds nothing; fold the cell
+  and let the equation carry the meaning.
+- **Every number quoted in prose stays traceable.** Folded counts as traceable,
+  hidden does not. This is the floor the rule cannot cross.
+
+Mechanics:
+
+1. **One cell, one job.** A cell either makes a claim or draws it, never both.
+   Split at the point where computation ends and `plt` begins. Keep imports,
+   the style line, and rng seeding in the visible cell so shown code runs top
+   to bottom. Put `label` and `fig-cap` on the cell that emits the figure.
+2. **Folded is the default**, set once in `_quarto.yml`. Cells that carry an
+   argument opt out with `#| code-fold: false`. Give a folded cell a
+   `#| code-summary` naming what it is, usually `"Plotting code"`.
+3. **Never `echo: false`.** Nothing is hidden outright. A reader who wants the
+   axis limits behind a figure gets them in one click, and `code-tools` plus
+   `repo-actions` expose the full source of every page.
+4. End a plotting cell with `plt.show()`, so a trailing expression cannot leak
+   its repr into the output.
 
 ## Sections
 

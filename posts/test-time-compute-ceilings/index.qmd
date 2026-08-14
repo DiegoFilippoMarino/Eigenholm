@@ -63,10 +63,12 @@ As $\rho$ grows, failures cluster by problem. Ten paraphrases of the same mistak
 ```{python}
 #| label: fig-correlated-passk
 #| fig-cap: "Pass@k under equal marginal pass@1 but different within-problem sample correlations. Independence greatly overstates the value of repeated draws when failures share a latent cause."
-#| echo: true
+#| code-summary: "Plotting code, evaluating the product form above"
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 p = 0.20
 k = np.arange(1, 257)
@@ -89,9 +91,7 @@ for rho in [0, 0.02, 0.10, 0.30]:
     ax.plot(k, beta_binomial_passk(k, p, rho), label=f"correlation $\\rho={rho:.2f}$")
 ax.set(xscale="log", xlabel="samples $k$", ylabel="probability of at least one success", title="A correlation ceiling on candidate coverage")
 ax.set_ylim(0, 1.02)
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -110,9 +110,7 @@ Suppose candidates belong to three classes:
 Let a learned verifier assign noisy Gaussian scores. Correct candidates have a positive mean score, ordinary errors have mean zero, and exploit candidates have an even higher mean. The third class may be rare under the generator. Its chance of appearing nevertheless grows as $1-(1-h)^N$.
 
 ```{python}
-#| label: fig-verifier-ceiling
-#| fig-cap: "A synthetic selection experiment. Oracle pass@N rises monotonically, but a misspecified verifier eventually selects rare high-scoring errors as the search budget grows."
-#| echo: true
+#| code-fold: false
 
 rng = np.random.default_rng(19)
 budgets = 2 ** np.arange(0, 11)
@@ -146,6 +144,12 @@ for n in budgets:
     answers[kind == 2] = 1
     counts = np.stack([(answers == a).sum(axis=1) for a in range(14)], axis=1)
     majority.append(np.mean(np.argmax(counts, axis=1) == 0))
+```
+
+```{python}
+#| label: fig-verifier-ceiling
+#| fig-cap: "A synthetic selection experiment. Oracle pass@N rises monotonically, but a misspecified verifier eventually selects rare high-scoring errors as the search budget grows."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.2, 3.8))
 ax.plot(budgets, oracle, "o-", label="oracle pass@N")
@@ -156,9 +160,7 @@ shown = budgets[::2]
 ax.set_xticks(shown, [f"$2^{{{i}}}$" for i in range(0, 11, 2)])
 ax.set(xlabel="candidate budget $N$", ylabel="probability returned answer is correct", title="Coverage can rise while usable accuracy falls")
 ax.set_ylim(0, 1.02)
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 

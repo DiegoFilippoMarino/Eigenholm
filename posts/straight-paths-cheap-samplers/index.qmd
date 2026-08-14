@@ -77,10 +77,12 @@ Both paths reach the same Gaussian. Only @eq-ot-path is straight in particle spa
 ```{python}
 #| label: fig-path-geometry
 #| fig-cap: "Particle trajectories connecting the same Gaussian endpoints. Optimal-transport interpolation is straight; a variance-preserving diffusion-like path bends because each axis changes scale nonlinearly."
-#| echo: true
+#| code-summary: "Plotting code, evaluating the two couplings above"
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 rng = np.random.default_rng(11)
 mu = np.array([2.2, -0.8])
@@ -112,9 +114,7 @@ for ax, paths, title in zip(
     ax.scatter(paths[0, :, 0], paths[0, :, 1], s=13, label="$t=0$")
     ax.scatter(paths[-1, :, 0], paths[-1, :, 1], s=13, marker="x", label="$t=1$")
     ax.set(xlabel="$x_1$", ylabel="$x_2$", title=title)
-    ax.spines[["top", "right"]].set_visible(False)
-axes[0].legend(frameon=False, loc="upper left")
-plt.tight_layout()
+axes[0].legend(loc="upper left")
 plt.show()
 ```
 
@@ -138,9 +138,7 @@ $$ {#eq-curvature-energy}
 Euler's local truncation error is proportional to $\ddot x(t)\Delta t^2$. A path with large @eq-curvature-energy asks a coarse solver to approximate more bending per step.
 
 ```{python}
-#| label: fig-curvature-cost
-#| fig-cap: "Excess path length and acceleration energy for 2,000 particles. The straight displacement coupling removes geometric curvature before numerical integration begins."
-#| echo: true
+#| code-fold: false
 
 z_many = rng.normal(size=(2000, 2))
 fine_t = np.linspace(0, 1, 2001)
@@ -163,6 +161,12 @@ for name in ["ot", "diffusion"]:
     displacement = np.linalg.norm(paths[-1] - paths[0], axis=1)
     energy = np.trapezoid(np.sum(accel**2, axis=2), fine_t, axis=0)
     metrics[name] = (length / np.maximum(displacement, 1e-12), energy)
+```
+
+```{python}
+#| label: fig-curvature-cost
+#| fig-cap: "Excess path length and acceleration energy for 2,000 particles. The straight displacement coupling removes geometric curvature before numerical integration begins."
+#| code-summary: "Plotting code"
 
 fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.4))
 labels = ["straight", "diffusion-like"]
@@ -171,9 +175,6 @@ axes[0].set(ylabel="path length / endpoint distance", title="Excess travel")
 axes[1].boxplot([metrics["ot"][1], metrics["diffusion"][1]], tick_labels=labels, showfliers=False)
 axes[1].set_yscale("symlog", linthresh=1e-10)
 axes[1].set(ylabel="integrated squared acceleration", title="Curvature energy")
-for ax in axes:
-    ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
 plt.show()
 ```
 
@@ -184,9 +185,7 @@ The straight path has zero acceleration up to numerical differentiation error. T
 Suppose a model has learned the exact affine field in @eq-gaussian-velocity. We can integrate it with explicit Euler or Heun's second-order method. For the displacement path, Euler is exact because the velocity is constant along each trajectory. For the curved path, solver error remains.
 
 ```{python}
-#| label: fig-solver-error
-#| fig-cap: "Endpoint error versus neural-function evaluations for exact Gaussian velocity fields. A straight path is solved exactly by Euler, while higher-order integration only reduces error on the curved path."
-#| echo: true
+#| code-fold: false
 
 def velocity(x, t, kind):
     if kind == "ot":
@@ -230,6 +229,12 @@ for kind in ["ot", "diffusion"]:
             errors.append(np.sqrt(np.mean((estimate - target) ** 2)))
             nfes.append(steps * (1 if method == "euler" else 2))
         series[(kind, method)] = (np.array(nfes), np.array(errors))
+```
+
+```{python}
+#| label: fig-solver-error
+#| fig-cap: "Endpoint error versus neural-function evaluations for exact Gaussian velocity fields. A straight path is solved exactly by Euler, while higher-order integration only reduces error on the curved path."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.2, 3.8))
 styles = {
@@ -242,9 +247,7 @@ for key, (style, label) in styles.items():
     nfe, error = series[key]
     ax.loglog(nfe, np.maximum(error, 1e-15), style, label=label)
 ax.set(xlabel="velocity evaluations", ylabel="endpoint RMSE", title="Geometry before integrator order")
-ax.legend(frameon=False, ncol=2)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend(ncol=2)
 plt.show()
 ```
 

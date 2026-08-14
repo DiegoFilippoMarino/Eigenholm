@@ -33,12 +33,12 @@ so the retrieved vector is the target plus a sum of $m-1$ interference terms wei
 Least squares does better than the Hebbian rule, exactly until it cannot. For $m \le d$, random keys are linearly independent with probability one, so $W = VK^{+}$ achieves $Wk_i = v_i$ exactly for every $i$. Past $m = d$ the system is overdetermined and errors appear. The transition is sharp and worth seeing.
 
 ```{python}
-#| label: fig-mem-capacity
-#| fig-cap: "Retrieval error of a linear associative memory as the number of stored pairs crosses the key dimension. Least squares is exact below the threshold and degrades past it; the Hebbian outer-product rule degrades from the start, at the rate the crosstalk calculation predicts."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 DIM, VALUE_DIM = 64, 32
 rng = np.random.default_rng(0)
@@ -58,6 +58,12 @@ curves = {}
 for rule in ("least squares", "hebbian"):
     curves[rule] = [np.mean([store(m, rule, np.random.default_rng(97 * t + m))
                              for t in range(12)]) for m in loads]
+```
+
+```{python}
+#| label: fig-mem-capacity
+#| fig-cap: "Retrieval error of a linear associative memory as the number of stored pairs crosses the key dimension. Least squares is exact below the threshold and degrades past it; the Hebbian outer-product rule degrades from the start, at the rate the crosstalk calculation predicts."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.4, 4.0))
 ax.loglog(loads / DIM, curves["least squares"], "o-", ms=4, color="#2a6e6e", label="least squares")
@@ -67,9 +73,7 @@ ax.loglog(loads / DIM, np.maximum(loads - 1, 1) / DIM, "k--", lw=1.1,
 ax.axvline(1.0, color="black", ls=":", lw=1.1)
 ax.set(xlabel="stored pairs / key dimension", ylabel="relative retrieval error",
        title=f"Capacity of a linear key-value store, d = {DIM}")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -126,9 +130,7 @@ Second, the damage magnitude is controlled by a *whitened* inner product $k_*^\t
 Third, setting $C = I$ recovers the naive projection, which minimizes the change to the weights and ignores what the keys look like. Comparing the two is a direct test of whether the whitening earns its keep.
 
 ```{python}
-#| label: fig-mem-specificity
-#| fig-cap: "Efficacy and collateral damage of a single rank-one edit under anisotropic keys. Both variants install the new association exactly, but the whitened update disturbs held-out associations far less, and the advantage grows with the anisotropy of the key distribution."
-#| echo: true
+#| code-fold: false
 
 def anisotropic_keys(rng, n, dim=DIM, decay=1.0):
     """Keys drawn from a covariance with a power-law spectrum."""
@@ -173,16 +175,24 @@ for decay in decays:
     for name in summary:
         summary[name].append(np.mean([t[name][1] for t in trials]))
     efficacy_check.append(max(max(t[name][0] for name in summary) for t in trials))
+```
+
+```{python}
+#| label: fig-mem-specificity
+#| fig-cap: "Efficacy and collateral damage of a single rank-one edit under anisotropic keys. Both variants install the new association exactly, but the whitened update disturbs held-out associations far less, and the advantage grows with the anisotropy of the key distribution."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.4, 4.0))
 ax.plot(decays, summary["whitened"], "o-", ms=5, color="#2a6e6e", label=r"whitened, $C^{-1}$")
 ax.plot(decays, summary["identity"], "s-", ms=5, color="#a4553a", label=r"unweighted, $C = I$")
 ax.set(xlabel="spectral decay of the key covariance", ylabel="mean damage to stored facts",
        title="One edit, two notions of minimal change")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 print(f"largest post-edit error on the new association: {max(efficacy_check):.2e}")
 ```
@@ -198,9 +208,7 @@ A single edit is cheap. The question that decides whether weight editing is a ma
 Each edit adds a rank-one term, so after $n$ edits the accumulated perturbation has rank at most $n$, and by @eq-mem-damage each one drags every stored fact toward its own new value. There is no cancellation to hope for: the terms are not orthogonal unless the whitened keys happen to be, and successive edits are applied to an already-perturbed matrix, so later residuals $v_* - Wk_*$ are computed against a memory that is already degraded.
 
 ```{python}
-#| label: fig-mem-sequential
-#| fig-cap: "Degradation of stored associations under a sequence of rank-one edits. Left: three memory loads, where a fuller memory degrades faster. Right: the whitened and unweighted updates at a fixed load, where the whitening advantage is large for the first few edits and gone by the end."
-#| echo: true
+#| code-fold: false
 
 def sequential_edits(n_edits, m, rng, use_whitening=True):
     K, root = anisotropic_keys(rng, m, decay=1.0)
@@ -218,7 +226,12 @@ def sequential_edits(n_edits, m, rng, use_whitening=True):
         err = np.linalg.norm(W @ K - V, axis=0) / np.linalg.norm(V, axis=0)
         trace.append(float(np.mean(err)))
     return np.array(trace), baseline
+```
 
+```{python}
+#| label: fig-mem-sequential
+#| fig-cap: "Degradation of stored associations under a sequence of rank-one edits. Left: three memory loads, where a fuller memory degrades faster. Right: the whitened and unweighted updates at a fixed load, where the whitening advantage is large for the first few edits and gone by the end."
+#| code-summary: "Plotting code"
 
 n_edits = 60
 fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.9))
@@ -229,7 +242,7 @@ for m, color in zip([16, 32, 48], ["#2a6e6e", "#4c6ea8", "#a4553a"]):
                  label=f"{m} stored facts")
 axes[0].set(xlabel="edits applied", ylabel="mean relative error on stored facts",
             title=f"Whitened edits, key dimension {DIM}")
-axes[0].legend(frameon=False)
+axes[0].legend()
 
 for use_white, color, style in ((True, "#2a6e6e", "-"), (False, "#a4553a", "--")):
     traces = np.mean([sequential_edits(n_edits, 32, np.random.default_rng(11 * t + 5), use_white)[0]
@@ -237,10 +250,7 @@ for use_white, color, style in ((True, "#2a6e6e", "-"), (False, "#a4553a", "--")
     axes[1].plot(np.arange(1, n_edits + 1), traces, style, lw=1.8, color=color,
                  label="whitened" if use_white else "unweighted")
 axes[1].set(xlabel="edits applied", title="32 stored facts")
-axes[1].legend(frameon=False)
-for ax in axes:
-    ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[1].legend()
 plt.show()
 ```
 

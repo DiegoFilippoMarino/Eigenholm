@@ -84,7 +84,7 @@ The exactness claim deserves a test rather than a citation, because it is the pr
 
 ```{python}
 #| label: exactness-check
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 
@@ -166,11 +166,11 @@ $$ {#eq-tiled-traffic}
 which is the HBM access complexity in the original analysis, over the relevant range of tile sizes [@dao2022flashattention]. Comparing @eq-tiled-traffic against the $4n^2+4nd$ of @tbl-standard-traffic, the asymptotic ratio at large $n$ is $M/(2d^2)$: independent of sequence length, linear in SRAM capacity, and quadratic in head dimension. Larger heads are penalized twice, once for the tiles they force to shrink and once for the bytes each tile carries.
 
 ```{python}
-#| label: fig-hbm-traffic
-#| fig-cap: "HBM elements moved per head under the two schedules at head dimension 64. Both curves are quadratic in sequence length; tiling divides the quadratic term by the on-chip working set, so the vertical gap is set by SRAM capacity rather than by sequence length."
-#| echo: true
+#| code-fold: false
 
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 def standard_traffic(n, d):
     return 4 * n**2 + 4 * n * d
@@ -182,6 +182,12 @@ def tiled_traffic(n, d, sram_elements):
 
 lengths = 2 ** np.arange(9, 18)
 head_dim = 64
+```
+
+```{python}
+#| label: fig-hbm-traffic
+#| fig-cap: "HBM elements moved per head under the two schedules at head dimension 64. Both curves are quadratic in sequence length; tiling divides the quadratic term by the on-chip working set, so the vertical gap is set by SRAM capacity rather than by sequence length."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7, 3.8))
 ax.loglog(lengths, standard_traffic(lengths, head_dim), "o-",
@@ -190,11 +196,13 @@ for sram, style in ((32 * 1024, "s-"), (96 * 1024, "^-")):
     ax.loglog(lengths, tiled_traffic(lengths, head_dim, sram), style,
               label=f"tiled, SRAM = {sram // 1024}K elements")
 ax.set(xlabel="sequence length $n$", ylabel="HBM elements moved")
-ax.spines[["top", "right"]].set_visible(False)
 ax.grid(which="both", alpha=0.18)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 ratio = standard_traffic(2**16, head_dim) / tiled_traffic(2**16, head_dim, 96 * 1024)
 print(f"traffic reduction at n=65,536: {ratio:.1f}x  (predicted M/2d^2 = "

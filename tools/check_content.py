@@ -14,6 +14,20 @@ EQUATION_LABEL = re.compile(r"\{#(eq-[A-Za-z0-9_-]+)\}")
 EQUATION_REFERENCE = re.compile(r"(?<![\w-])@(eq-[A-Za-z0-9_-]+)")
 MANUAL_TAG = re.compile(r"\\tag\s*\{")
 
+# An executable cell and the `#| key: value` options directly beneath its fence.
+PYTHON_CELL = re.compile(r"^```\{python\}\n((?:#\|[^\n]*\n)*)(.*?)^```", re.M | re.S)
+CREATES_FIGURE = re.compile(r"plt\.(subplots|figure)\(")
+VISIBILITY_OPTION = re.compile(r"^#\|\s*(code-fold|code-summary|echo)\s*:", re.M)
+
+# House style lives in eigenholm.mplstyle. Repeating it inline is the noise the
+# code policy exists to remove, so the validator rejects it rather than trusting
+# the next article to remember.
+STYLE_IN_STYLE_FILE = (
+    (re.compile(r"spines\[\["), "axes.spines.top / axes.spines.right"),
+    (re.compile(r"tight_layout\("), "figure.autolayout"),
+    (re.compile(r"frameon\s*=\s*False"), "legend.frameon"),
+)
+
 
 def public_pages() -> list[Path]:
     pages: list[Path] = []
@@ -54,6 +68,24 @@ def main() -> int:
         for reference in EQUATION_REFERENCE.findall(text):
             if reference not in local_labels:
                 errors.append(f"{relative}: unresolved equation reference @{reference}")
+
+        for cell in PYTHON_CELL.finditer(text):
+            options, body = cell.group(1), cell.group(2)
+            line = text.count("\n", 0, cell.start()) + 1
+
+            if CREATES_FIGURE.search(body) and not VISIBILITY_OPTION.search(options):
+                errors.append(
+                    f"{relative}:{line}: this cell draws a figure but declares no "
+                    "code-fold, code-summary, or echo; say whether a reader should "
+                    "see the plotting code"
+                )
+
+            for pattern, replacement in STYLE_IN_STYLE_FILE:
+                if pattern.search(body):
+                    errors.append(
+                        f"{relative}:{line}: figure styling belongs in "
+                        f"eigenholm.mplstyle ({replacement}), not in the cell"
+                    )
 
         if re.search(r"(?m)^draft:\s*true\s*$", text):
             errors.append(f"{relative}: published page is still marked draft")

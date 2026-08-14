@@ -55,10 +55,12 @@ The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate sl
 ```{python}
 #| label: fig-rope-frequencies
 #| fig-cap: "Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64."
-#| echo: true
+#| code-summary: "Plotting code"
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 d = 64
 base = 10_000
@@ -70,12 +72,10 @@ fig, axes = plt.subplots(2, 2, figsize=(8, 5), sharex=True, sharey=True)
 for ax, i, frequency in zip(axes.flat, pair_ids, theta):
     ax.plot(offset, np.cos(offset * frequency), lw=1.1)
     ax.set_title(fr"pair $i={i}$, period $\approx {2*np.pi/frequency:.0f}$")
-    ax.spines[["top", "right"]].set_visible(False)
 for ax in axes[-1]:
     ax.set_xlabel("relative offset")
 for ax in axes[:, 0]:
     ax.set_ylabel("cosine phase")
-plt.tight_layout()
 plt.show()
 ```
 
@@ -134,7 +134,7 @@ cycles. High-frequency pairs have observed many cycles and mostly encode local r
 ```{python}
 #| label: fig-rope-cycles
 #| fig-cap: "Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768."
-#| echo: true
+#| code-summary: "Plotting code"
 
 pair = np.arange(d // 2)
 inv_freq = base ** (-2 * pair / d)
@@ -145,9 +145,7 @@ for length in (2048, 32768):
                 label=f"context {length:,}")
 ax.axhline(1, color="0.5", ls=":", lw=1)
 ax.set(xlabel="coordinate-pair index", ylabel="completed rotations")
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 

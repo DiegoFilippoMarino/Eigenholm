@@ -51,6 +51,13 @@ format:
     toc: true
     code-copy: true
     code-overflow: wrap
+    # Folded is the default so that a cell nobody annotated stays quiet rather
+    # than filling the page. Cells that carry an argument opt out with
+    # `#| code-fold: false`. Nothing is ever hidden outright: code-tools adds a
+    # page-level toggle, and repo-actions above links the source.
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
     link-external-icon: true
     link-external-newwindow: true
 

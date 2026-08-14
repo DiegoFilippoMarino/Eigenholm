@@ -1,17 +1,38 @@
 [
   {
-    "listing": "/projects/index.html",
-    "items": []
-  },
-  {
-    "listing": "/index.html",
+    "listing": "/replications/index.html",
     "items": [
-      "/posts/first-technical-post/index.html",
-      "/posts/new-article/index.html"
+      "/replications/chinchilla-parametric-fit/index.html"
     ]
   },
   {
     "listing": "/notes/index.html",
-    "items": []
+    "items": [
+      "/notes/speculative-sampling/index.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/generalization-gap-privacy-audit/index.html",
+      "/posts/robustness-numbers-are-upper-bounds/index.html",
+      "/posts/quantization-one-quadratic-form/index.html",
+      "/posts/graph-networks-two-failures/index.html",
+      "/posts/test-time-compute-ceilings/index.html",
+      "/posts/preference-likelihood-two-jobs/index.html",
+      "/posts/straight-paths-cheap-samplers/index.html",
+      "/posts/arithmetic-of-editing-a-fact/index.html",
+      "/posts/rank-of-memory/index.html",
+      "/posts/three-ways-a-curve-bends/index.html",
+      "/posts/attention-from-logits-to-context/index.html",
+      "/posts/flashattention-io-aware/index.html",
+      "/posts/rope-geometry/index.html"
+    ]
+  },
+  {
+    "listing": "/projects/index.html",
+    "items": [
+      "/projects/paged-kv-cache-simulator/index.html"
+    ]
   }
 ]

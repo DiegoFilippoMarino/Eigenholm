@@ -115,12 +115,12 @@ The idealized minimizer is therefore exactly $s^\star$, but the useful statement
 There is a fourth regime below all of this, and it is the one the outlier literature is really about. If $s|w_k| < \Delta/2$, the salient weight rounds to zero no matter what, its error is the full $|w_k|$, and no amount of care elsewhere recovers it. That is the arithmetic behind the observation that a single extreme value inflates the shared scale until the small entries are extinguished. The experiment below shows all four regimes in one curve.
 
 ```{python}
-#| label: fig-kink
-#| fig-cap: "Group reconstruction error as one salient input channel is scaled up before rounding, averaged over 400 random draws of the remaining weights. The dotted line marks the scale at which the protected channel becomes the group maximum. Below it protection is nearly free, above it the shared step size grows and every other channel pays."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 BITS = 4
 LEVELS = 2 ** (BITS - 1) - 1
@@ -159,6 +159,12 @@ errors = np.array([
 ])
 errors /= errors[0]
 extinction = (1.0 / LEVELS) / 2.0 * KINK               # scale at which the weight stops rounding to zero
+```
+
+```{python}
+#| label: fig-kink
+#| fig-cap: "Group reconstruction error as one salient input channel is scaled up before rounding, averaged over 400 random draws of the remaining weights. The dotted line marks the scale at which the protected channel becomes the group maximum. Below it protection is nearly free, above it the shared step size grows and every other channel pays."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.4, 4.0))
 ax.loglog(scales, errors, lw=1.7, color="#2a6e6e")
@@ -168,9 +174,7 @@ ax.axvline(KINK, color="black", ls=":", lw=1.2, label=f"break $s^\\star$ = {KINK
 ax.set(xlabel="scale applied to the salient channel",
        ylabel="group error / unscaled error",
        title="Protecting one channel is nearly free until it becomes the group maximum")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -182,7 +186,7 @@ To compare the methods on equal footing, the next block builds a synthetic layer
 
 ```{python}
 #| label: quantizers
-#| echo: true
+#| code-fold: false
 
 def make_layer(rng, n=512, d_in=256, d_out=256, rank=32, n_outlier=6, outlier_gain=30.0):
     """Correlated activations with a heavy-tailed channel profile and a few extreme channels."""
@@ -247,9 +251,7 @@ def rel_error(X, W, Wq):
 With the primitives in place, the comparison is a few lines. The AWQ scale is chosen by the same grid search the paper uses, minimizing the reconstruction error on the calibration activations over a single exponent.
 
 ```{python}
-#| label: fig-methods
-#| fig-cap: "Relative output error of a synthetic transformer projection under weight-only quantization at 3, 4, and 8 bits. Every method is measured on the calibration activations it was fitted to."
-#| echo: true
+#| code-fold: false
 
 rng = np.random.default_rng(11)
 X, W, profile, outliers, basis = make_layer(rng)
@@ -283,6 +285,13 @@ for bits in (3, 4, 8):
         "GPTQ": rel_error(X, W, gptq(W, H, levels=lv)),
     })
 
+```
+
+```{python}
+#| label: fig-methods
+#| fig-cap: "Relative output error of a synthetic transformer projection under weight-only quantization at 3, 4, and 8 bits. Every method is measured on the calibration activations it was fitted to."
+#| code-summary: "Plotting code"
+
 methods = ["RTN", "LLM.int8-style", "AWQ-style", "GPTQ"]
 colors = ["#8d8d96", "#4c6ea8", "#2a6e6e", "#a4553a"]
 width = 0.2
@@ -295,9 +304,7 @@ for k, (name, color) in enumerate(zip(methods, colors)):
 ax.set_yscale("log")
 ax.set_xticks(positions, [f"{row['bits']}-bit" for row in rows])
 ax.set(ylabel="relative output error", title=f"Weight-only quantization, AWQ exponent = {alpha_awq:.2f}")
-ax.legend(frameon=False, ncols=2)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend(ncols=2)
 plt.show()
 ```
 
@@ -316,9 +323,7 @@ Read through @tbl-taxonomy, that is not a surprising empirical finding. It is a 
 The synthetic setting lets us test the mechanism directly, without perplexity or a domain corpus, by moving the activation distribution between fit and evaluation. The shift below rotates the latent subspace and redraws the channel profile together, which is what changing corpus domain does to a real layer: different topics excite different directions of the residual stream, while the systematic outlier channels stay outliers.
 
 ```{python}
-#| label: fig-shift
-#| fig-cap: "Relative output error when the quantizer is fitted on one activation distribution and evaluated on another. The horizontal axis interpolates from a fully redrawn latent subspace and channel profile on the left to the calibration distribution itself on the right."
-#| echo: true
+#| code-fold: false
 
 def shifted_activations(rng, mix, n=512):
     """Blend calibration structure with an independent draw; mix = 1 recovers calibration."""
@@ -350,6 +355,12 @@ for mix in mixes:
         trials["GPTQ"].append(rel_error(Xe, W, Q_gptq))
     for name in methods:
         curves[name].append(np.mean(trials[name]))
+```
+
+```{python}
+#| label: fig-shift
+#| fig-cap: "Relative output error when the quantizer is fitted on one activation distribution and evaluated on another. The horizontal axis interpolates from a fully redrawn latent subspace and channel profile on the left to the calibration distribution itself on the right."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.4, 4.0))
 for name, color in zip(methods, colors):
@@ -358,10 +369,12 @@ ax.set_yscale("log")
 ax.set(xlabel="agreement between calibration and evaluation activations",
        ylabel="relative output error",
        title="4-bit weight-only quantization under activation distribution shift")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 for name in methods:
     print(f"{name:16s} matched {curves[name][-1]:.4f}   fully shifted {curves[name][0]:.4f}")
@@ -382,9 +395,7 @@ The natural fix for outlier channels is per-channel activation quantization, one
 @eq-equivalent-transform is the workaround: since $\operatorname{diag}(s)^{-1}$ and $\operatorname{diag}(s)$ multiply on opposite sides of the contraction, they cancel exactly, and the offending per-channel factor is applied offline to the weights instead of online to the activations. The migration exponent $\alpha$ then interpolates between two failures, and the sweep below shows both walls of the basin.
 
 ```{python}
-#| label: fig-alpha
-#| fig-cap: "SmoothQuant migration strength for 8-bit weights and 8-bit activations. Small alpha leaves the outliers in the activations, large alpha moves them into the weights, and the basin between is where both operands are quantizable."
-#| echo: true
+#| code-fold: false
 
 def per_token_round(X, levels=127):
     peak = np.max(np.abs(X), axis=1, keepdims=True)
@@ -403,15 +414,19 @@ for alpha in alphas:
 
 w8a8 = np.array(w8a8)
 best_alpha = alphas[int(np.argmin(w8a8))]
+```
+
+```{python}
+#| label: fig-alpha
+#| fig-cap: "SmoothQuant migration strength for 8-bit weights and 8-bit activations. Small alpha leaves the outliers in the activations, large alpha moves them into the weights, and the basin between is where both operands are quantizable."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.2, 3.8))
 ax.semilogy(alphas, w8a8, lw=1.7, color="#2a6e6e")
 ax.axvline(best_alpha, color="black", ls=":", lw=1.1, label=f"minimum at $\\alpha$ = {best_alpha:.2f}")
 ax.set(xlabel="migration strength $\\alpha$", ylabel="relative output error",
        title="Moving quantization difficulty from activations to weights")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 

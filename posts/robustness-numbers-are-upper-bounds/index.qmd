@@ -41,10 +41,12 @@ The data is a three-class spiral embedded in twenty dimensions, eighteen of whic
 
 ```{python}
 #| label: adv-setup
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 DIM, CLASSES, EPS = 20, 3, 0.5
 
@@ -117,7 +119,7 @@ Projected gradient descent is the reference first-order attack: start from a ran
 
 ```{python}
 #| label: adv-attacks
-#| echo: true
+#| code-fold: false
 
 def pgd(par, X, y, eps=EPS, steps=50, rng=None, defense=None, mode="true", eot=1):
     """Projected gradient descent against a possibly-defended classifier.
@@ -173,7 +175,7 @@ The three defenses are chosen to instantiate the three sub-types of obfuscated g
 
 ```{python}
 #| label: adv-defenses
-#| echo: true
+#| code-fold: false
 
 QUANT = 0.5
 NOISE = 0.5
@@ -219,9 +221,7 @@ print(f"adversarially trained clean accuracy: "
 Now the evaluation grid. Each defense is measured against each attack, and every number is an instance of @eq-adv-measured with a different $\mathcal{A}$.
 
 ```{python}
-#| label: fig-adv-grid
-#| fig-cap: "Accuracy under attack for four models. Each row is a defense, each column an attack. The quantizing defense looks strong under the attacks a naive evaluation would run and collapses under the attack matched to its mechanism."
-#| echo: true
+#| code-fold: false
 
 attack_rng = np.random.default_rng(11)
 surrogate = train(init_params(np.random.default_rng(5)), X_train, y_train)
@@ -280,6 +280,12 @@ rows["adversarial training"] = {
 names = list(rows)
 cols = ["clean", "FGSM", "PGD", "transfer", "random search", "matched"]
 grid = np.array([[rows[n][c] for c in cols] for n in names])
+```
+
+```{python}
+#| label: fig-adv-grid
+#| fig-cap: "Accuracy under attack for four models. Each row is a defense, each column an attack. The quantizing defense looks strong under the attacks a naive evaluation would run and collapses under the attack matched to its mechanism."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(8.6, 3.4))
 im = ax.imshow(grid, cmap="RdYlGn", vmin=0.0, vmax=1.0, aspect="auto")
@@ -290,7 +296,6 @@ for i in range(grid.shape[0]):
         ax.text(j, i, f"{grid[i, j]:.2f}", ha="center", va="center", fontsize=9)
 ax.set_title("Accuracy under attack, $\\ell_\\infty$ budget 0.5")
 fig.colorbar(im, ax=ax, fraction=0.03, label="accuracy")
-plt.tight_layout()
 plt.show()
 ```
 
@@ -300,7 +305,7 @@ The randomized row does not behave as the taxonomy would lead one to expect, and
 
 ```{python}
 #| label: adv-eot
-#| echo: true
+#| code-fold: false
 
 print(f"{'steps':>6}{'EOT=1':>10}{'EOT=20':>10}")
 for steps in (5, 10, 50):
@@ -323,9 +328,7 @@ The adversarial training row is the one that behaves the way a genuine defense s
 The obfuscated-gradients paper offers five behavioural signs that a defense is masking rather than defending. They are usually quoted as a checklist. They are more useful as a script, since each one is a comparison between two numbers that any evaluation already produces.
 
 ```{python}
-#| label: fig-adv-flags
-#| fig-cap: "The five gradient-masking diagnostics evaluated for each defense. The quantizing defense trips three of the five. The other three models, including the one whose randomness turned out not to mask anything, trip none."
-#| echo: true
+#| code-fold: false
 
 def unbounded(predict, par, X, y, big=6.0, rng=None, defense=None, mode="true"):
     adv = pgd(par, X, y, eps=big, steps=100, rng=rng, defense=defense, mode=mode)
@@ -359,6 +362,12 @@ for i, (name, (pred, par, defense, mode)) in enumerate(configs.items()):
                             defense=defense, mode=mode) > 0.05
     flags[i, 3] = r["random search"] < r["PGD"] - 0.02
     flags[i, 4] = bool(np.any(np.diff(curve) > 0.02))
+```
+
+```{python}
+#| label: fig-adv-flags
+#| fig-cap: "The five gradient-masking diagnostics evaluated for each defense. The quantizing defense trips three of the five. The other three models, including the one whose randomness turned out not to mask anything, trip none."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(8.2, 3.0))
 ax.imshow(flags, cmap="Reds", vmin=0, vmax=1.4, aspect="auto")
@@ -368,7 +377,6 @@ for i in range(flags.shape[0]):
     for j in range(flags.shape[1]):
         ax.text(j, i, "fired" if flags[i, j] else "clear", ha="center", va="center", fontsize=9)
 ax.set_title("Gradient-masking diagnostics")
-plt.tight_layout()
 plt.show()
 ```
 
@@ -397,9 +405,7 @@ $$ {#eq-adv-radius}
 with $\Phi^{-1}$ the standard normal quantile function [@cohen2019certified]. The bound assumes nothing about $f$, which is what lets it apply to networks that satisfy no Lipschitz or smoothness condition. Since $\underline{p_A}$ must be estimated by sampling, the honest version uses a Clopper-Pearson lower confidence bound, and the certificate then holds with the stated confidence.
 
 ```{python}
-#| label: fig-adv-certified
-#| fig-cap: "Certified accuracy against L2 radius for the smoothed classifier at three noise levels, using exact Clopper-Pearson bounds at 99% confidence. Larger noise certifies further but classifies less well, and no attack was run to produce any point on this plot."
-#| echo: true
+#| code-fold: false
 
 from math import erf, lgamma
 
@@ -466,9 +472,9 @@ def smoothed_counts(par, X, sigma, draws, rng):
 
 radii = np.linspace(0.0, 1.6, 40)
 subset = slice(0, 400)
-fig, ax = plt.subplots(figsize=(7.6, 4.1))
+certified_curves = {}
 
-for sigma, color in zip([0.25, 0.5, 1.0], ["#a4553a", "#4c6ea8", "#2a6e6e"]):
+for sigma in (0.25, 0.5, 1.0):
     smooth_base = train(init_params(np.random.default_rng(9)), X_train, y_train,
                         perturb=lambda p, Xb, yb, r: Xb + sigma * r.normal(size=Xb.shape),
                         rng=np.random.default_rng(10))
@@ -484,16 +490,24 @@ for sigma, color in zip([0.25, 0.5, 1.0], ["#a4553a", "#4c6ea8", "#2a6e6e"]):
         pa = cache[k]
         certified[i] = sigma * normal_quantile(pa) if pa > 0.5 else -1.0
     correct = top == y_test[subset]
-    curve = [float(np.mean(correct & (certified >= r))) for r in radii]
+    certified_curves[sigma] = [float(np.mean(correct & (certified >= r))) for r in radii]
+```
+
+```{python}
+#| label: fig-adv-certified
+#| fig-cap: "Certified accuracy against L2 radius for the smoothed classifier at three noise levels, using exact Clopper-Pearson bounds at 99% confidence. Larger noise certifies further but classifies less well, and no attack was run to produce any point on this plot."
+#| code-summary: "Plotting code"
+
+fig, ax = plt.subplots(figsize=(7.6, 4.1))
+for (sigma, curve), color in zip(certified_curves.items(),
+                                 ["#a4553a", "#4c6ea8", "#2a6e6e"]):
     ax.plot(radii, curve, lw=1.8, color=color, label=fr"$\sigma = {sigma}$")
 
 ax.axvline(EPS * np.sqrt(DIM), color="black", ls=":", lw=1.2,
            label=r"$\ell_2$ size of the $\ell_\infty$ ball used above")
 ax.set(xlabel=r"$\ell_2$ radius", ylabel="certified accuracy",
        title="Certified accuracy of the smoothed classifier")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 

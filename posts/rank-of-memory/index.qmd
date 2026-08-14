@@ -73,12 +73,12 @@ This statement does not say that an SSM remembers only $N$ tokens. A real-valued
 The following experiment builds a stable diagonal time-varying SSM, evaluates it both as a recurrence and as a dense matrix, then inspects a prefix-to-suffix block.
 
 ```{python}
-#| label: fig-ssm-rank
-#| fig-cap: "The dense operator of a time-varying SSM and the singular spectrum of its prefix-to-suffix block. The numerical rank cannot exceed the four-dimensional state."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 rng = np.random.default_rng(7)
 length, state_dim, cut = 64, 4, 32
@@ -109,6 +109,12 @@ cross = M[cut:, :cut]
 singular = np.linalg.svd(cross, compute_uv=False)
 rank = np.linalg.matrix_rank(cross, tol=1e-10)
 assert rank <= state_dim
+```
+
+```{python}
+#| label: fig-ssm-rank
+#| fig-cap: "The dense operator of a time-varying SSM and the singular spectrum of its prefix-to-suffix block. The numerical rank cannot exceed the four-dimensional state."
+#| code-summary: "Plotting code"
 
 fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.4))
 im = axes[0].imshow(M, cmap="coolwarm", aspect="auto")
@@ -120,9 +126,7 @@ fig.colorbar(im, ax=axes[0], fraction=0.046, label="coupling")
 axes[1].semilogy(np.arange(1, len(singular) + 1), singular, "o-")
 axes[1].axvline(state_dim + 0.5, color="black", ls=":", label=f"state size $N={state_dim}$")
 axes[1].set(xlabel="singular-value index", ylabel="singular value", title=f"Cross-cut rank = {rank}")
-axes[1].legend(frameon=False)
-axes[1].spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[1].legend()
 plt.show()
 ```
 
@@ -135,9 +139,7 @@ Causal softmax attention has no fixed state at the boundary. Each future query c
 To isolate this difference, compare a recurrent operator of state size $N$ with a causal attention matrix built from random queries and keys. Both maps are dense below the diagonal. Only one has a fixed cross-cut rank ceiling.
 
 ```{python}
-#| label: fig-memory-spectra
-#| fig-cap: "Normalized cross-boundary singular spectra. Full attention retains many independent prefix directions, while recurrent memory truncates after its state dimension."
-#| echo: true
+#| code-fold: false
 
 def causal_attention(q, k):
     scores = q @ k.T / np.sqrt(q.shape[1])
@@ -155,6 +157,12 @@ s_ssm = np.linalg.svd(M[cut:, :cut], compute_uv=False)
 s_attn = np.linalg.svd(W[cut:, :cut], compute_uv=False)
 s_ssm /= s_ssm[0]
 s_attn /= s_attn[0]
+```
+
+```{python}
+#| label: fig-memory-spectra
+#| fig-cap: "Normalized cross-boundary singular spectra. Full attention retains many independent prefix directions, while recurrent memory truncates after its state dimension."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.2, 3.8))
 idx = np.arange(1, cut + 1)
@@ -162,9 +170,7 @@ ax.semilogy(idx, s_attn, "o-", ms=3, label="causal softmax attention")
 ax.semilogy(idx, np.maximum(s_ssm, 1e-16), "o-", ms=3, label=f"SSM, state {state_dim}")
 ax.axvline(state_dim + 0.5, color="black", ls=":", lw=1)
 ax.set(xlabel="singular-value index", ylabel="value / largest value", title="Information channels across one cut")
-ax.legend(frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 

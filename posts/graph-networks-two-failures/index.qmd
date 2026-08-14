@@ -42,12 +42,12 @@ Xu et al. showed that neighborhood-aggregation GNNs are at most as discriminativ
 The 1-WL test repeatedly hashes each node's current color together with the multiset of neighbor colors. Begin with identical colors on a 6-cycle and on two disconnected triangles. Every node has degree two, and every node sees two neighbors of its own color at every round. The color histograms remain identical forever.
 
 ```{python}
-#| label: fig-wl-blind-spot
-#| fig-cap: "A 6-cycle and two disjoint triangles remain identical to 1-WL from uniform node features, although their normalized Laplacian spectra and connectivity differ."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 def adjacency(n, edges):
     A = np.zeros((n, n), dtype=float)
@@ -84,6 +84,12 @@ def normalized_laplacian_spectrum(A):
 
 spec_cycle = normalized_laplacian_spectrum(A_cycle)
 spec_tri = normalized_laplacian_spectrum(A_tri)
+```
+
+```{python}
+#| label: fig-wl-blind-spot
+#| fig-cap: "A 6-cycle and two disjoint triangles remain identical to 1-WL from uniform node features, although their normalized Laplacian spectra and connectivity differ."
+#| code-summary: "Plotting code"
 
 def draw_graph(ax, A, positions, title):
     for i in range(len(A)):
@@ -107,9 +113,7 @@ x = np.arange(6)
 axes[2].plot(x, spec_cycle, "o-", label="6-cycle")
 axes[2].plot(x, spec_tri, "s--", label="two triangles")
 axes[2].set(xlabel="eigenvalue index", ylabel="normalized Laplacian eigenvalue", title="A structural signal 1-WL misses")
-axes[2].legend(frameon=False)
-axes[2].spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[2].legend()
 plt.show()
 ```
 
@@ -138,9 +142,7 @@ On graphs with narrow cuts, a large amount of dependency must pass through very 
 Consider two dense communities connected by one bridge. The source and target are structurally distinguishable. Communication is still poor.
 
 ```{python}
-#| label: fig-oversquashing
-#| fig-cap: "Linearized source-to-target influence across a two-community bottleneck. Multi-scale rewiring and a global mixing channel reduce graph distance, but they solve communication rather than structural identity."
-#| echo: true
+#| code-fold: false
 
 def barbell(clique_size=10):
     n = 2 * clique_size
@@ -175,6 +177,12 @@ def influence_curve(P):
         power = P @ power
         values.append(abs(power[target, source]))
     return np.array(values)
+```
+
+```{python}
+#| label: fig-oversquashing
+#| fig-cap: "Linearized source-to-target influence across a two-community bottleneck. Multi-scale rewiring and a global mixing channel reduce graph distance, but they solve communication rather than structural identity."
+#| code-summary: "Plotting code"
 
 fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.5))
 
@@ -190,9 +198,7 @@ axes[1].semilogy(depths, np.maximum(influence_curve(P_local), 1e-12), "o-", labe
 axes[1].semilogy(depths, np.maximum(influence_curve(P_rewired), 1e-12), "s-", label="multi-scale rewiring")
 axes[1].semilogy(depths, influence_curve(P_global), "^-", label="global mixing")
 axes[1].set(xlabel="layers", ylabel="$|\\partial h_{target}/\\partial x_{source}|$", title="Transport through the bottleneck")
-axes[1].legend(frameon=False)
-axes[1].spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[1].legend()
 plt.show()
 ```
 

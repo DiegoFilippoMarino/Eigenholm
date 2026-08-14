@@ -52,12 +52,12 @@ $$ {#eq-minnorm}
 where $\Phi^+$ is the Moore-Penrose pseudoinverse. Near $p\approx n$, the design matrix becomes poorly conditioned and fits noise with large coefficients. Far into the overparameterized regime, many interpolating solutions exist and the minimum-norm bias can reduce test error again. This is the linear core of double descent [@belkin2019double].
 
 ```{python}
-#| label: fig-membership-double-descent
-#| fig-cap: "Linear interpolation, double descent, and a loss-threshold membership attack. Test error improves again beyond the interpolation peak while exact fitting keeps membership readily detectable."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 rng = np.random.default_rng(23)
 n_train, n_test, max_features = 120, 2500, 400
@@ -106,23 +106,26 @@ train_mse = np.array(train_mse)
 test_mse = np.array(test_mse)
 attack_auc = np.array(attack_auc)
 weight_norm = np.array(weight_norm)
+```
 
-fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.6))
+```{python}
+#| label: fig-membership-double-descent
+#| fig-cap: "Linear interpolation, double descent, and a loss-threshold membership attack. Test error improves again beyond the interpolation peak while exact fitting keeps membership readily detectable."
+#| code-summary: "Plotting code"
+
+fig, axes = plt.subplots(1, 2)
 axes[0].semilogy(p_values, train_mse, label="train MSE")
 axes[0].semilogy(p_values, test_mse, label="test MSE")
 axes[0].axvline(n_train, color="black", ls=":", label="$p=n$")
 axes[0].set(xlabel="visible features $p$", ylabel="mean squared error", title="Interpolation and test risk")
-axes[0].legend(frameon=False)
+axes[0].legend()
 
 axes[1].plot(p_values, attack_auc, label="loss-attack AUC")
 axes[1].axhline(0.5, color="black", ls=":", label="chance")
 axes[1].axvline(n_train, color="black", ls=":")
 axes[1].set(xlabel="visible features $p$", ylabel="membership AUC", title="Membership signal")
 axes[1].set_ylim(0.45, 1.01)
-axes[1].legend(frameon=False)
-for ax in axes:
-    ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[1].legend()
 plt.show()
 ```
 
@@ -151,9 +154,7 @@ $$ {#eq-ngram}
 The geometric mean of these probabilities measures how confidently the model continues the complete canary.
 
 ```{python}
-#| label: fig-canary-discoverability
-#| fig-cap: "Exact canary continuation in a smoothed count model. Repetition strengthens the stored sequence, while longer prefixes make the memorized continuation easier to address."
-#| echo: true
+#| code-fold: false
 
 from collections import Counter
 
@@ -185,14 +186,18 @@ for j, repeats in enumerate(repetitions):
     corpus = np.vstack([background, np.tile(canary, (repeats, 1))])
     for i, context in enumerate(contexts):
         scores[i, j] = continuation_score(corpus, canary, context)
+```
+
+```{python}
+#| label: fig-canary-discoverability
+#| fig-cap: "Exact canary continuation in a smoothed count model. Repetition strengthens the stored sequence, while longer prefixes make the memorized continuation easier to address."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7.2, 3.8))
 for i, context in enumerate(contexts):
     ax.semilogx(repetitions, scores[i], "o-", base=2, label=f"context {context}")
 ax.set(xlabel="canary repetitions", ylabel="geometric mean next-token probability", title="Duplication and address specificity")
-ax.legend(frameon=False, ncol=2)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+ax.legend(ncol=2)
 plt.show()
 ```
 

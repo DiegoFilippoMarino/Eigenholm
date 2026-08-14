@@ -33,12 +33,12 @@ The interesting quantity is the smallest nonzero singular value of $\Phi$. Below
 That is the whole mechanism, and it is visible in one plot.
 
 ```{python}
-#| label: fig-bend-double-descent
-#| fig-cap: "Minimum-norm regression on random ReLU features with 80 training points. Test risk peaks exactly where the feature count matches the sample count, and the peak coincides with the collapse of the smallest singular value and the blow-up of the solution norm."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 n_train, n_test, d_input = 80, 2000, 12
 noise_sd = 0.35
@@ -74,6 +74,12 @@ for k, width in enumerate(widths):
         risks[k] += r / trials
         norms[k] += nb / trials
         sigmas[k] += s / trials
+```
+
+```{python}
+#| label: fig-bend-double-descent
+#| fig-cap: "Minimum-norm regression on random ReLU features with 80 training points. Test risk peaks exactly where the feature count matches the sample count, and the peak coincides with the collapse of the smallest singular value and the blow-up of the solution norm."
+#| code-summary: "Plotting code"
 
 fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.9))
 axes[0].loglog(widths / n_train, risks, "o-", ms=4, color="#2a6e6e")
@@ -86,10 +92,7 @@ axes[1].loglog(widths / n_train, sigmas, "s-", ms=4, color="#4c6ea8",
                label="smallest singular value")
 axes[1].axvline(1.0, color="black", ls=":", lw=1.1)
 axes[1].set(xlabel="features / training points", title="What happens at the threshold")
-axes[1].legend(frameon=False)
-for ax in axes:
-    ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[1].legend()
 plt.show()
 ```
 
@@ -130,7 +133,7 @@ So the conjunction is not what makes the curve sharp. The scaling exponent is. A
 ```{python}
 #| label: fig-bend-emergence
 #| fig-cap: "Exact-match accuracy from a smooth power-law loss. Left: task length shifts the curve along the scale axis without changing its shape, with the predicted crossings marked. Right: the same construction at three scaling exponents, where the exponent alone controls the width of the transition."
-#| echo: true
+#| code-summary: "Plotting code, evaluating the exact-match formula above"
 
 scales = np.geomspace(1e2, 1e14, 800)
 c_const = 0.5
@@ -151,7 +154,7 @@ for k, color in zip([1, 20, 400], ["#2a6e6e", "#4c6ea8", "#a4553a"]):
 axes[0].axhline(0.5, color="black", ls=":", lw=0.9)
 axes[0].set(xlabel="scale $N$", ylabel="exact-match accuracy",
             title=fr"Answer length shifts, $\alpha={alpha}$")
-axes[0].legend(frameon=False, fontsize=9)
+axes[0].legend(fontsize=9)
 
 for a, color in zip([0.15, 0.35, 0.9], ["#a4553a", "#4c6ea8", "#2a6e6e"]):
     curve = exact_match(scales, 20, a)
@@ -160,11 +163,12 @@ for a, color in zip([0.15, 0.35, 0.9], ["#a4553a", "#4c6ea8", "#2a6e6e"]):
 axes[1].axhline(0.5, color="black", ls=":", lw=0.9)
 axes[1].set(xlabel="scale, in units of the crossing point", ylabel="exact-match accuracy",
             title="The exponent sets the width")
-axes[1].legend(frameon=False, fontsize=9)
-for ax in axes:
-    ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[1].legend(fontsize=9)
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 for k in (1, 20, 400):
     lo = (k * c_const / np.log(10.0)) ** (1 / alpha)
@@ -187,7 +191,7 @@ The setup is modular addition, the standard grokking testbed. The model below is
 
 ```{python}
 #| label: grok-setup
-#| echo: true
+#| code-fold: false
 
 MODULUS, EMBED, HIDDEN = 31, 32, 128
 
@@ -272,9 +276,7 @@ Weight decay is not an incidental hyperparameter here. Removing it removes the p
 To see the mechanism rather than the symptom, we need the two measures that the mechanistic study derived from its reverse-engineered circuit [@nanda2023progress]. The circuit for modular addition works in the Fourier basis, embedding each input as sines and cosines at a small set of key frequencies and composing rotations through angle-addition identities. That suggests reading the embedding matrix in the frequency domain and asking two questions during training. First, if we keep *only* the key frequencies and delete everything else, how well does the model generalize? Second, if we delete *only* the key frequencies and keep everything else, how well does the model still fit its training data?
 
 ```{python}
-#| label: fig-bend-grokking
-#| fig-cap: "Grokking in a two-layer network on modular addition. Training accuracy saturates within a few hundred steps, validation accuracy stays at chance for tens of thousands. The restricted model, which keeps only the five dominant embedding frequencies, generalizes long before the full model does, and the excluded model, which deletes exactly those frequencies, loses its grip on the training set as they become load-bearing."
-#| echo: true
+#| code-fold: false
 
 snaps, (ta, tb, ty), (va, vb, vy) = train()
 
@@ -305,28 +307,35 @@ for step, par in snaps:
 
 hist = np.array(rows)
 step, tr_acc, te_acc, res_acc, exc_loss, norm = hist.T
+```
+
+```{python}
+#| label: fig-bend-grokking
+#| fig-cap: "Grokking in a two-layer network on modular addition. Training accuracy saturates within a few hundred steps, validation accuracy stays at chance for tens of thousands. The restricted model, which keeps only the five dominant embedding frequencies, generalizes long before the full model does, and the excluded model, which deletes exactly those frequencies, loses its grip on the training set as they become load-bearing."
+#| code-summary: "Plotting code"
 
 fig, axes = plt.subplots(1, 3, figsize=(12.2, 3.7))
 axes[0].semilogx(step, tr_acc, lw=1.8, color="#a4553a", label="train")
 axes[0].semilogx(step, te_acc, lw=1.8, color="#2a6e6e", label="validation")
 axes[0].set(xlabel="optimization step", ylabel="accuracy", title="The visible curve")
-axes[0].legend(frameon=False)
+axes[0].legend()
 
 axes[1].semilogx(step, te_acc, lw=1.8, color="#2a6e6e", label="validation accuracy")
 axes[1].semilogx(step, res_acc, lw=1.8, ls="--", color="#4c6ea8",
                  label=f"restricted to {len(key_freqs)} frequencies")
 axes[1].set(xlabel="optimization step", title="The circuit is early")
-axes[1].legend(frameon=False, fontsize=9)
+axes[1].legend(fontsize=9)
 
 axes[2].semilogx(step, exc_loss, lw=1.8, color="#4c6ea8", label="excluded train loss")
 axes[2].semilogx(step, norm / norm.max(), lw=1.8, color="#8d8d96",
                  label="weight norm, normalized")
 axes[2].set(xlabel="optimization step", title="The memorized solution is removed")
-axes[2].legend(frameon=False, fontsize=9)
-for ax in axes:
-    ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+axes[2].legend(fontsize=9)
 plt.show()
+```
+
+```{python}
+#| code-fold: false
 
 fit = step[np.argmax(tr_acc > 0.99)]
 grok = step[np.argmax(te_acc > 0.9)]

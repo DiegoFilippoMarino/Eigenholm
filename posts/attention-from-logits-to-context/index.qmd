@@ -56,12 +56,12 @@ $$
 The unscaled logit has standard deviation $\sqrt{d_k}$. As the head dimension grows, the largest logit tends to dominate the softmax, reducing its entropy and concentrating the Jacobian near zero. Scaling restores an order-one logit variance.
 
 ```{python}
-#| label: fig-scaling
-#| fig-cap: "Mean attention entropy with and without the square-root scaling. Each point averages 400 random attention rows over 64 keys."
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 rng = np.random.default_rng(7)
 dims = np.array([8, 16, 32, 64, 128, 256, 512])
@@ -77,15 +77,19 @@ for d in dims:
         p = np.exp(z)
         p /= p.sum(axis=1, keepdims=True)
         values.append(np.mean(-np.sum(p * np.log(p + 1e-30), axis=1)))
+```
+
+```{python}
+#| label: fig-scaling
+#| fig-cap: "Mean attention entropy with and without the square-root scaling. Each point averages 400 random attention rows over 64 keys."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7, 3.6))
 ax.plot(dims, entropy_raw, "o-", label="unscaled")
 ax.plot(dims, entropy_scaled, "o-", label=r"scaled by $\sqrt{d_k}$")
 ax.axhline(np.log(64), color="0.55", lw=1, ls=":", label="uniform entropy")
 ax.set(xscale="log", xlabel=r"head dimension $d_k$", ylabel="entropy (nats)")
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -157,9 +161,7 @@ no matter how long the sequence is. At $n=4096$ and $d_k=64$, a head chooses its
 That immediately raises a question the formula cannot answer on its own: which attention patterns actually need many dimensions? Some familiar ones need remarkably few.
 
 ```{python}
-#| label: fig-logit-rank
-#| fig-cap: "Best achievable error when a target logit matrix is realized by a head of dimension $d_k$, measured as the relative Frobenius norm of the discarded singular values after row centering. Structured relative-position patterns are cheap; arbitrary token-to-token pairings are not."
-#| echo: true
+#| code-fold: false
 
 n = 128
 i, j = np.arange(n)[:, None], np.arange(n)[None, :]
@@ -174,20 +176,30 @@ targets = {
 
 head_dims = np.array([1, 2, 4, 8, 16, 32, 64])
 
-fig, ax = plt.subplots(figsize=(7, 3.8))
+# Best rank-r approximation error in Frobenius norm is the norm of the discarded
+# singular values, so the whole curve comes from one spectrum per target.
+residual = {}
 for name, target in targets.items():
     centered = target - target.mean(axis=1, keepdims=True)   # row shifts are free
     spectrum = np.linalg.svd(centered, compute_uv=False)
     tail = np.sqrt(np.cumsum(spectrum[::-1] ** 2)[::-1]) / np.linalg.norm(centered)
-    ax.semilogy(head_dims, np.maximum(tail[head_dims], 1e-6), "o-", ms=4, label=name)
+    residual[name] = tail[head_dims]
+```
+
+```{python}
+#| label: fig-logit-rank
+#| fig-cap: "Best achievable error when a target logit matrix is realized by a head of dimension $d_k$, measured as the relative Frobenius norm of the discarded singular values after row centering. Structured relative-position patterns are cheap; arbitrary token-to-token pairings are not."
+#| code-summary: "Plotting code"
+
+fig, ax = plt.subplots(figsize=(7, 3.8))
+for name, tail in residual.items():
+    ax.semilogy(head_dims, np.maximum(tail, 1e-6), "o-", ms=4, label=name)
 ax.set_xscale("log", base=2)
 ax.set(xlabel=r"head dimension $d_k$",
        ylabel="relative error of best rank-$d_k$ fit", ylim=(5e-7, 3))
 ax.axhline(1e-6, color="0.6", lw=0.8, ls=":")
 ax.text(1.05, 1.4e-6, "exact (clipped)", fontsize=7, color="0.4")
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False, fontsize=8)
-plt.tight_layout()
+ax.legend(fontsize=8)
 plt.show()
 ```
 

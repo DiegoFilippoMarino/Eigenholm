@@ -78,10 +78,12 @@ Speculative performance is controlled by total-variation distance, not by whethe
 ```{python}
 #| label: fig-speculative-mass
 #| fig-cap: "Accepted draft mass and residual correction for a six-token example. The two components sum exactly to the target distribution."
-#| echo: true
+#| code-summary: "Plotting code"
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.style.use("../../eigenholm.mplstyle")
 
 p = np.array([0.36, 0.25, 0.17, 0.10, 0.08, 0.04])
 q = np.array([0.20, 0.35, 0.10, 0.18, 0.05, 0.12])
@@ -94,9 +96,7 @@ ax.bar(x, accepted, label="accepted draft mass")
 ax.bar(x, residual_mass, bottom=accepted, label="residual correction")
 ax.plot(x, p, "ko", label="target probability")
 ax.set(xlabel="token id", ylabel="probability mass", xticks=x)
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -124,7 +124,7 @@ $$ {#eq-speedup}
 ```{python}
 #| label: fig-speculation-length
 #| fig-cap: "Idealized speedup from the throughput model above as speculation length changes. The draft cost is 5 percent of a target invocation."
-#| echo: true
+#| code-summary: "Plotting code, evaluating the speedup formula above"
 
 gamma = np.arange(1, 17)
 c = 0.05
@@ -135,9 +135,7 @@ for alpha in (0.4, 0.6, 0.8, 0.9):
     ax.plot(gamma, speedup, "o-", ms=3, label=fr"$\alpha={alpha}$")
 ax.axhline(1, color="0.55", lw=1, ls=":")
 ax.set(xlabel=r"draft length $\gamma$", ylabel="idealized speedup")
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
@@ -147,7 +145,7 @@ Longer speculation is not automatically better. When $\alpha$ is modest, the pro
 
 ```{python}
 #| label: speculative-sampler
-#| echo: true
+#| code-fold: false
 
 import numpy as np
 
@@ -168,9 +166,7 @@ Numerical implementations need additional care. Probabilities may be derived fro
 ## Empirical sanity check
 
 ```{python}
-#| label: fig-sampling-check
-#| fig-cap: "Monte Carlo check with 300,000 speculative samples. Error bars show three standard errors under the target multinomial model."
-#| echo: true
+#| code-fold: false
 
 rng = np.random.default_rng(23)
 draws = 300_000
@@ -181,15 +177,19 @@ for _ in range(draws):
 
 estimate = counts / draws
 stderr = np.sqrt(p * (1 - p) / draws)
+```
+
+```{python}
+#| label: fig-sampling-check
+#| fig-cap: "Monte Carlo check with 300,000 speculative samples. Error bars show three standard errors under the target multinomial model."
+#| code-summary: "Plotting code"
 
 fig, ax = plt.subplots(figsize=(7, 3.7))
 ax.errorbar(x, estimate, yerr=3 * stderr, fmt="o", capsize=3,
             label="speculative estimate")
 ax.plot(x, p, "x", ms=8, label="target")
 ax.set(xlabel="token id", ylabel="probability", xticks=x)
-ax.spines[["top", "right"]].set_visible(False)
-ax.legend(frameon=False)
-plt.tight_layout()
+ax.legend()
 plt.show()
 ```
 
