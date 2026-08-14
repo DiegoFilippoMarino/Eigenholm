@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Diego Filippo Marino">
+<meta name="dcterms.date" content="2026-08-14">
+<meta name="description" content="LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set.">
+
+<title>Four Quantizers, One Quadratic Form – Eigenholm</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Four Quantizers, One Quadratic Form – Eigenholm">
+<meta property="og:description" content="LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/index_files/figure-html/fig-kink-output-1.png">
+<meta property="og:site_name" content="Eigenholm">
+<meta property="og:image:height" content="746">
+<meta property="og:image:width" content="1399">
+<meta name="twitter:title" content="Four Quantizers, One Quadratic Form – Eigenholm">
+<meta name="twitter:description" content="LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/index_files/figure-html/fig-kink-output-1.png">
+<meta name="twitter:image-height" content="746">
+<meta name="twitter:image-width" content="1399">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Eigenholm</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Writing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/index.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes/index.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about/index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/DiegoFilippoMarino/Eigenholm"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-objective-every-method-shares" id="toc-the-objective-every-method-shares" class="nav-link active" data-scroll-target="#the-objective-every-method-shares">The objective every method shares</a></li>
+  <li><a href="#the-four-feasible-sets" id="toc-the-four-feasible-sets" class="nav-link" data-scroll-target="#the-four-feasible-sets">The four feasible sets</a></li>
+  <li><a href="#why-scaling-a-salient-channel-has-a-kink" id="toc-why-scaling-a-salient-channel-has-a-kink" class="nav-link" data-scroll-target="#why-scaling-a-salient-channel-has-a-kink">Why scaling a salient channel has a kink</a></li>
+  <li><a href="#a-common-benchmark-for-the-four-constraints" id="toc-a-common-benchmark-for-the-four-constraints" class="nav-link" data-scroll-target="#a-common-benchmark-for-the-four-constraints">A common benchmark for the four constraints</a></li>
+  <li><a href="#the-calibration-experiment" id="toc-the-calibration-experiment" class="nav-link" data-scroll-target="#the-calibration-experiment">The calibration experiment</a></li>
+  <li><a href="#where-the-activation-side-changes-the-problem" id="toc-where-the-activation-side-changes-the-problem" class="nav-link" data-scroll-target="#where-the-activation-side-changes-the-problem">Where the activation side changes the problem</a></li>
+  <li><a href="#what-the-common-form-does-not-capture" id="toc-what-the-common-form-does-not-capture" class="nav-link" data-scroll-target="#what-the-common-form-does-not-capture">What the common form does not capture</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/quantization-one-quadratic-form/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Four Quantizers, One Quadratic Form</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Quantization</div>
+    <div class="quarto-category">Numerical Linear Algebra</div>
+    <div class="quarto-category">Inference</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Diego Filippo Marino </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 14, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The literature on post-training quantization of large language models reads like a catalogue of unrelated tricks. LLM.int8() splits a few hidden dimensions into a separate 16-bit matrix multiply <span class="citation" data-cites="dettmers2022llmint8">(<a href="#ref-dettmers2022llmint8" role="doc-biblioref">Dettmers et al. 2022</a>)</span>. GPTQ walks along the input dimension, rounding one column at a time and correcting the rest with inverse-Hessian information <span class="citation" data-cites="frantar2023gptq">(<a href="#ref-frantar2023gptq" role="doc-biblioref">Frantar et al. 2023</a>)</span>. AWQ multiplies salient input channels by a scalar before rounding and divides it back afterwards <span class="citation" data-cites="lin2024awq">(<a href="#ref-lin2024awq" role="doc-biblioref">Lin et al. 2024</a>)</span>. SmoothQuant divides the activations by a per-channel factor and folds that factor into the weights <span class="citation" data-cites="xiao2023smoothquant">(<a href="#ref-xiao2023smoothquant" role="doc-biblioref">Xiao et al. 2023</a>)</span>.</p>
+<p>Four papers, four mechanisms, four sets of experiments. Underneath, they all minimize the same quadratic form. What separates them is the feasible set they minimize it over, and that choice, not the cleverness of the mechanism, determines both the achievable error and the amount of calibration data each method needs.</p>
+<p>This article writes the four methods in a common notation, derives why activation-aware scaling has a kink rather than an optimum in the interior, and runs a controlled experiment where the calibration distribution and the evaluation distribution differ. The last part is where the unified view earns its keep: it predicts the calibration-hunger gap that AWQ reports empirically, from a parameter count alone.</p>
+<section id="the-objective-every-method-shares" class="level2">
+<h2 class="anchored" data-anchor-id="the-objective-every-method-shares">The objective every method shares</h2>
+<p>Take one linear layer, activations <span class="math inline">X \in \mathbb{R}^{n \times d_{\text{in}}}</span> collected from a calibration set, weights <span class="math inline">W \in \mathbb{R}^{d_{\text{in}} \times d_{\text{out}}}</span>, output <span class="math inline">Y = XW</span>. A quantizer returns some <span class="math inline">\widehat W</span> representable in the target format. The layerwise reconstruction error is</p>
+<p><span id="eq-proxy-loss"><span class="math display">
+\mathcal{L}(\widehat W) = \bigl\lVert X(\widehat W - W) \bigr\rVert_F^2
+= \operatorname{tr}\bigl(E^\top H E\bigr),
+\qquad E = \widehat W - W,
+\qquad H = X^\top X.
+\tag{1}</span></span></p>
+<p>Two facts about <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> do most of the work.</p>
+<p>First, it separates across output columns. Writing <span class="math inline">E = [e_1, \dots, e_{d_{\text{out}}}]</span> gives <span class="math inline">\mathcal{L} = \sum_c e_c^\top H e_c</span>, so each output neuron is an independent problem in <span class="math inline">\mathbb{R}^{d_{\text{in}}}</span> with the same metric <span class="math inline">H</span>. Every method exploits this, which is why they all quantize one layer at a time and never need a backward pass through the network.</p>
+<p>Second, <span class="math inline">H</span> is not the identity. It is the uncentered second-moment matrix of the activations, and in a transformer it is spectacularly anisotropic in two separate ways. Its diagonal is heavy-tailed, because a handful of hidden dimensions carry activations two orders of magnitude larger than the rest, and those dimensions are the same across layers and across nearly every token <span class="citation" data-cites="dettmers2022llmint8">(<a href="#ref-dettmers2022llmint8" role="doc-biblioref">Dettmers et al. 2022</a>)</span>. Its off-diagonal is large, because hidden states are far from having independent coordinates. Rounding treats all coordinates alike. The loss does not.</p>
+<p>That mismatch is the whole subject. The four methods are four answers to the question of how to reconcile an isotropic rounding grid with an anisotropic error metric, and it will turn out that they respond to the two kinds of anisotropy separately.</p>
+</section>
+<section id="the-four-feasible-sets" class="level2">
+<h2 class="anchored" data-anchor-id="the-four-feasible-sets">The four feasible sets</h2>
+<p>Round-to-nearest, the baseline, ignores <span class="math inline">H</span> completely. Given a group of weights sharing one scale, it sets <span class="math inline">\Delta = \max_j |w_j| / (2^{b-1} - 1)</span> and rounds. It is the minimizer of <span class="math inline">\lVert E \rVert_F^2</span>, which is <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> with <span class="math inline">H</span> replaced by <span class="math inline">I</span>.</p>
+<p><strong>GPTQ keeps <span class="math inline">W</span> free and fixes the metric.</strong> It solves <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> greedily under the constraint that coordinates are quantized in a fixed order and, once quantized, stay on the grid. This is Optimal Brain Surgeon arithmetic <span class="citation" data-cites="hassibi1993obs">(<a href="#ref-hassibi1993obs" role="doc-biblioref">Hassibi and Stork 1993</a>)</span> carried over from pruning to rounding <span class="citation" data-cites="frantar2022obc">(<a href="#ref-frantar2022obc" role="doc-biblioref">Frantar and Alistarh 2022</a>)</span>. Suppose coordinate <span class="math inline">q</span> has just been forced to take the value <span class="math inline">Q(w_q)</span>, an error <span class="math inline">\epsilon_q = Q(w_q) - w_q</span>. Minimizing <span class="math inline">e^\top H e</span> subject to <span class="math inline">e_q = \epsilon_q</span> is a linearly constrained quadratic program with solution</p>
+<p><span id="eq-obs-update"><span class="math display">
+e = \frac{\epsilon_q}{[H^{-1}]_{qq}}\, H^{-1} u_q,
+\qquad
+\mathcal{L}^\star = \frac{\epsilon_q^2}{[H^{-1}]_{qq}},
+\tag{2}</span></span></p>
+<p>where <span class="math inline">u_q</span> is the <span class="math inline">q</span>-th standard basis vector. The still-free coordinates absorb a correction proportional to a column of <span class="math inline">H^{-1}</span>. GPTQ’s three contributions are engineering on top of <a href="#eq-obs-update" class="quarto-xref">Equation&nbsp;2</a>: quantize all output rows in the same column order so <span class="math inline">H^{-1}</span> is shared, batch the updates, and precompute the required part of <span class="math inline">H^{-1}</span> through a Cholesky factor for numerical stability at 175B parameters.</p>
+<p><a href="#eq-obs-update" class="quarto-xref">Equation&nbsp;2</a> also states the exact condition under which error feedback is worth anything. If <span class="math inline">H</span> is diagonal then <span class="math inline">H^{-1}u_q = u_q / H_{qq}</span>, so <span class="math inline">e = \epsilon_q u_q</span> and no other coordinate moves at all: GPTQ reduces exactly to round-to-nearest. Its entire advantage is purchased from the off-diagonal of <span class="math inline">H</span>, that is, from correlation between input channels. This matters for the experiments below, because a synthetic layer with independent activation channels would make GPTQ look useless for reasons that have nothing to do with quantization.</p>
+<p><strong>AWQ and SmoothQuant keep the rounding and change the coordinates.</strong> Both insert a diagonal <span class="math inline">S = \operatorname{diag}(s)</span>, <span class="math inline">s \in \mathbb{R}^{d_{\text{in}}}_{&gt;0}</span>, and use the exact identity</p>
+<p><span id="eq-equivalent-transform"><span class="math display">
+Y = XW = \bigl(X S^{-1}\bigr)\bigl(S W\bigr),
+\tag{3}</span></span></p>
+<p>then quantize the reparameterized factors. The transform is free at inference time because <span class="math inline">S^{-1}</span> folds into the preceding LayerNorm or linear layer. AWQ quantizes only <span class="math inline">SW</span> and picks <span class="math inline">s = s_X^{\alpha}</span> with <span class="math inline">s_X</span> the mean per-channel activation magnitude, searching one scalar <span class="math inline">\alpha \in [0,1]</span> <span class="citation" data-cites="lin2024awq">(<a href="#ref-lin2024awq" role="doc-biblioref">Lin et al. 2024</a>)</span>. SmoothQuant quantizes both factors, targeting INT8 activations as well as weights, and uses</p>
+<p><span id="eq-smooth-scale"><span class="math display">
+s_j = \frac{\max_i |X_{ij}|^{\alpha}}{\max_c |W_{jc}|^{1-\alpha}},
+\tag{4}</span></span></p>
+<p>a geometric interpolation that hands a fraction <span class="math inline">\alpha</span> of the difficulty from the activations to the weights <span class="citation" data-cites="xiao2023smoothquant">(<a href="#ref-xiao2023smoothquant" role="doc-biblioref">Xiao et al. 2023</a>)</span>.</p>
+<p><strong>LLM.int8() changes the feasible set by partitioning it.</strong> Choose an index set <span class="math inline">O \subset \{1,\dots,d_{\text{in}}\}</span> of outlier channels and require <span class="math inline">\widehat W_{j,:} = W_{j,:}</span> exactly for <span class="math inline">j \in O</span>, quantizing only the complement. The error becomes <span class="math inline">E_{O,:} = 0</span>, so</p>
+<p><span class="math display">
+\mathcal{L} = \operatorname{tr}\bigl(E_{\bar O,:}^\top H_{\bar O \bar O} E_{\bar O,:}\bigr),
+</span></p>
+<p>and the largest diagonal entries of <span class="math inline">H</span> are removed from the sum by construction. With <span class="math inline">|O| \le 7</span> out of thousands of channels, this costs about 0.1% extra memory and recovers 16-bit accuracy up to 175B parameters.</p>
+<p>Written this way the taxonomy is a table of constraints, not of tricks.</p>
+<div id="tbl-taxonomy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-taxonomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: The four post-training quantizers as constrained minimizers of the same layerwise objective. The last column is the count that matters for the calibration experiment below.
+</figcaption>
+<div aria-describedby="tbl-taxonomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">What is optimized</th>
+<th style="text-align: left;">What is fixed</th>
+<th style="text-align: right;">Free parameters fit to calibration</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RTN</td>
+<td style="text-align: left;">nothing</td>
+<td style="text-align: left;">grid, <span class="math inline">H \equiv I</span></td>
+<td style="text-align: right;"><span class="math inline">0</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SmoothQuant</td>
+<td style="text-align: left;">diagonal <span class="math inline">S</span> from <a href="#eq-smooth-scale" class="quarto-xref">Equation&nbsp;4</a></td>
+<td style="text-align: left;">closed form given <span class="math inline">\alpha</span></td>
+<td style="text-align: right;"><span class="math inline">1</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AWQ</td>
+<td style="text-align: left;">scalar <span class="math inline">\alpha</span>, grid search on <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a></td>
+<td style="text-align: left;"><span class="math inline">s = s_X^\alpha</span></td>
+<td style="text-align: right;"><span class="math inline">1</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">GPTQ</td>
+<td style="text-align: left;">all unquantized weights, via <a href="#eq-obs-update" class="quarto-xref">Equation&nbsp;2</a></td>
+<td style="text-align: left;">column order</td>
+<td style="text-align: right;"><span class="math inline">\mathcal{O}(d_{\text{in}} d_{\text{out}})</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LLM.int8()</td>
+<td style="text-align: left;">outlier set <span class="math inline">O</span></td>
+<td style="text-align: left;">threshold <span class="math inline">\alpha = 6</span></td>
+<td style="text-align: right;"><span class="math inline">\approx |O|</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="why-scaling-a-salient-channel-has-a-kink" class="level2">
+<h2 class="anchored" data-anchor-id="why-scaling-a-salient-channel-has-a-kink">Why scaling a salient channel has a kink</h2>
+<p>The AWQ argument is usually stated as an empirical observation: scaling up salient channels reduces their relative error by roughly <span class="math inline">1/s</span>, because the round error stays near <span class="math inline">\Delta/2</span> while the group maximum rarely moves. That “rarely” hides the entire structure of the problem, and making it precise gives a sharper statement than the papers do.</p>
+<p>Consider one group of <span class="math inline">g</span> weights sharing a symmetric absmax scale, with <span class="math inline">b</span>-bit signed integers, <span class="math inline">M = \max_{j} |w_j|</span> and <span class="math inline">\Delta = M / (2^{b-1}-1)</span>. Scale a single channel <span class="math inline">k</span> by <span class="math inline">s \ge 1</span> and leave the rest alone. The group maximum becomes <span class="math inline">M(s) = \max\bigl(s|w_k|, \max_{j \ne k}|w_j|\bigr)</span>. After de-scaling, the effective error on channel <span class="math inline">k</span> is <span class="math inline">\Delta(s)/(2s)</span> and on every other channel it is <span class="math inline">\Delta(s)/2</span>. With importances <span class="math inline">h_j = H_{jj}</span>, the expected contribution of the group to <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> under a uniform round-error model is</p>
+<p><span id="eq-awq-kink"><span class="math display">
+J(s) \;=\; \frac{\Delta(s)^2}{12}\left(\frac{h_k}{s^2} + \sum_{j \ne k} h_j\right),
+\qquad
+\Delta(s) = \frac{\max\bigl(s|w_k|,\, M_{-k}\bigr)}{2^{b-1}-1},
+\tag{5}</span></span></p>
+<p>with <span class="math inline">M_{-k} = \max_{j\ne k}|w_j|</span>. The function is piecewise smooth with a break at</p>
+<p><span id="eq-kink-location"><span class="math display">
+s^\star = \frac{M_{-k}}{|w_k|},
+\tag{6}</span></span></p>
+<p>the scale at which the protected channel becomes the group maximum. On either side of <a href="#eq-kink-location" class="quarto-xref">Equation&nbsp;6</a> the behaviour is qualitatively different:</p>
+<ul>
+<li>For <span class="math inline">s \le s^\star</span> the step size <span class="math inline">\Delta</span> is constant, so <span class="math inline">J(s) = c\,(h_k s^{-2} + F)</span> with <span class="math inline">F = \sum_{j\ne k} h_j</span>. The function is strictly decreasing, quadratically at first and then asymptotically flat once the salient term drops below the floor <span class="math inline">F</span> contributed by the rest of the group.</li>
+<li>For <span class="math inline">s &gt; s^\star</span> we have <span class="math inline">\Delta \propto s</span>, so <span class="math inline">J(s) = c'(h_k + F s^2)</span>. The salient term is now pinned and the floor grows quadratically. Every other channel in the group pays for the protection of channel <span class="math inline">k</span>.</li>
+</ul>
+<p>The idealized minimizer is therefore exactly <span class="math inline">s^\star</span>, but the useful statement is asymmetric rather than exact: below the break, scaling is close to free and eventually stops helping; above it, scaling is quadratically expensive. That asymmetry is why AWQ searches its scale on a grid over one exponent rather than solving a first-order condition, and why the authors report that a gradient-based version converged unstably. It also explains the shape SmoothQuant reports for its migration sweep, a flat basin near the middle of the range with steep sides: when many channels move together, many breaks like <a href="#eq-kink-location" class="quarto-xref">Equation&nbsp;6</a> smear into a basin whose width is set by how spread out the weight magnitudes are.</p>
+<p>There is a fourth regime below all of this, and it is the one the outlier literature is really about. If <span class="math inline">s|w_k| &lt; \Delta/2</span>, the salient weight rounds to zero no matter what, its error is the full <span class="math inline">|w_k|</span>, and no amount of care elsewhere recovers it. That is the arithmetic behind the observation that a single extreme value inflates the shared scale until the small entries are extinguished. The experiment below shows all four regimes in one curve.</p>
+<div id="cell-fig-kink" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>BITS <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>LEVELS <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (BITS <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>GROUP <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>KINK <span class="op">=</span> <span class="fl">40.0</span>            <span class="co"># ratio of the incumbent group maximum to the salient weight</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>SALIENT_IMPORTANCE <span class="op">=</span> <span class="fl">900.0</span>   <span class="co"># H_kk / H_jj for a channel whose activations are 30 times larger</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> absmax_round(vec, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Symmetric absmax quantize-dequantize of one group."""</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(vec))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> peak <span class="op">==</span> <span class="fl">0.0</span>:</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> vec.copy()</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> peak <span class="op">/</span> levels</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(vec <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_error(scale, rng):</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> rng.uniform(<span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0.85</span>, size<span class="op">=</span>GROUP)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">0</span>], weights[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>                 <span class="co"># pin the incumbent group maximum</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">2</span>] <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> KINK) <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">+</span> <span class="fl">0.02</span> <span class="op">*</span> rng.standard_normal())</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    importance <span class="op">=</span> np.ones(GROUP)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    importance[<span class="dv">2</span>] <span class="op">=</span> SALIENT_IMPORTANCE</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    lifted <span class="op">=</span> weights.copy()</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    lifted[<span class="dv">2</span>] <span class="op">*=</span> scale</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    restored <span class="op">=</span> absmax_round(lifted)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    restored[<span class="dv">2</span>] <span class="op">/=</span> scale</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.<span class="bu">sum</span>(importance <span class="op">*</span> (restored <span class="op">-</span> weights) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>scales <span class="op">=</span> np.geomspace(<span class="fl">1.0</span>, <span class="fl">400.0</span>, <span class="dv">80</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>errors <span class="op">=</span> np.array([</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    np.mean([group_error(s, np.random.default_rng(<span class="dv">7000</span> <span class="op">+</span> i)) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">400</span>)])</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> scales</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>errors <span class="op">/=</span> errors[<span class="dv">0</span>]</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>extinction <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> LEVELS) <span class="op">/</span> <span class="fl">2.0</span> <span class="op">*</span> KINK               <span class="co"># scale at which the weight stops rounding to zero</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>ax.loglog(scales, errors, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>ax.axvline(extinction, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"-."</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="ss">f"rounds to zero below </span><span class="sc">{</span>extinction<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>ax.axvline(KINK, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="ss">f"break $s^</span><span class="ch">\\</span><span class="ss">star$ = </span><span class="sc">{</span>KINK<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"scale applied to the salient channel"</span>,</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"group error / unscaled error"</span>,</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Protecting one channel is nearly free until it becomes the group maximum"</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-kink" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kink-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-kink-output-1.png" width="700" height="373" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kink-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Group reconstruction error as one salient input channel is scaled up before rounding, averaged over 400 random draws of the remaining weights. The dotted line marks the scale at which the protected channel becomes the group maximum. Below it protection is nearly free, above it the shared step size grows and every other channel pays.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>All four regimes appear. The curve is flat at the far left, where the protected weight still rounds to zero and the scale accomplishes nothing. It then falls quadratically until the salient channel stops dominating the group. It runs along a shallow basin up to the predicted break. Past the break it climbs with slope two on the log-log axes, which is the <span class="math inline">F s^2</span> term of <a href="#eq-awq-kink" class="quarto-xref">Equation&nbsp;5</a> and nothing else. Nothing in this is specific to language models. It is a property of sharing one step size across a group of weights with unequal importance.</p>
+</section>
+<section id="a-common-benchmark-for-the-four-constraints" class="level2">
+<h2 class="anchored" data-anchor-id="a-common-benchmark-for-the-four-constraints">A common benchmark for the four constraints</h2>
+<p>To compare the methods on equal footing, the next block builds a synthetic layer with both kinds of anisotropy. Activations are generated from a low-rank factor model, which supplies the off-diagonal structure that error feedback exploits, then multiplied by a log-normal per-channel scale profile with a small set of extreme outlier channels, which supplies the heavy diagonal. Weights are ordinary Gaussians, since every paper agrees that weight distributions are flat and easy. Each quantizer is implemented against the same rounding primitive.</p>
+<div id="quantizers" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_layer(rng, n<span class="op">=</span><span class="dv">512</span>, d_in<span class="op">=</span><span class="dv">256</span>, d_out<span class="op">=</span><span class="dv">256</span>, rank<span class="op">=</span><span class="dv">32</span>, n_outlier<span class="op">=</span><span class="dv">6</span>, outlier_gain<span class="op">=</span><span class="fl">30.0</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Correlated activations with a heavy-tailed channel profile and a few extreme channels."""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> latent <span class="op">@</span> basis <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    outliers <span class="op">=</span> rng.choice(d_in, size<span class="op">=</span>n_outlier, replace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    profile[outliers] <span class="op">*=</span> outlier_gain</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> X <span class="op">*</span> profile</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> rng.normal(size<span class="op">=</span>(d_in, d_out)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, W, profile, outliers, basis</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_round(W, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Round-to-nearest with per-output-row groups along the input dimension."""</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(W)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, W.shape[<span class="dv">0</span>], group):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        block <span class="op">=</span> W[start:start <span class="op">+</span> group]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(block), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        out[start:start <span class="op">+</span> group] <span class="op">=</span> np.clip(np.<span class="bu">round</span>(block <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gptq(W, H, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS, damp<span class="op">=</span><span class="fl">0.002</span>):</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Weight-only quantization with inverse-Hessian error feedback (GPTQ)."""</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    d_in <span class="op">=</span> W.shape[<span class="dv">0</span>]</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    Hd <span class="op">=</span> H <span class="op">+</span> damp <span class="op">*</span> np.mean(np.diag(H)) <span class="op">*</span> np.eye(d_in)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.linalg.cholesky(np.linalg.inv(Hd)).T          <span class="co"># H^{-1} = U^T U, U upper</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    Wc <span class="op">=</span> W.copy()</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> np.empty_like(W)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, d_in, group):</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        stop <span class="op">=</span> <span class="bu">min</span>(start <span class="op">+</span> group, d_in)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(Wc[start:stop]), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(start, stop):</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            q <span class="op">=</span> np.clip(np.<span class="bu">round</span>(Wc[i] <span class="op">/</span> step[<span class="dv">0</span>]), <span class="op">-</span>levels, levels) <span class="op">*</span> step[<span class="dv">0</span>]</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            Q[i] <span class="op">=</span> q</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>            err <span class="op">=</span> (Wc[i] <span class="op">-</span> q) <span class="op">/</span> U[i, i]</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>            Wc[i:] <span class="op">-=</span> np.outer(U[i, i:], err)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        Wc[start:stop] <span class="op">=</span> Q[start:stop]</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_round(W, s, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Quantize diag(s) W and divide the scale back out (AWQ / SmoothQuant weight side)."""</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group, levels) <span class="op">/</span> s[:, <span class="va">None</span>]</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mixed_precision(W, keep, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keep a set of input channels in full precision (LLM.int8 decomposition)."""</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> group_round(W, group, levels)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    Q[keep] <span class="op">=</span> W[keep]</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rel_error(X, W, Wq):</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.linalg.norm(X <span class="op">@</span> (Wq <span class="op">-</span> W)) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>With the primitives in place, the comparison is a few lines. The AWQ scale is chosen by the same grid search the paper uses, minimizing the reconstruction error on the calibration activations over a single exponent.</p>
+<div id="cell-fig-methods" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>X, W, profile, outliers, basis <span class="op">=</span> make_layer(rng)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> X.T <span class="op">@</span> X</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>act_mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> awq_scale(X, W, alphas<span class="op">=</span>np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">21</span>), group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> mag <span class="op">/</span> np.exp(np.mean(np.log(mag)))          <span class="co"># normalize the geometric mean to 1</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    best, best_alpha, best_s <span class="op">=</span> np.inf, <span class="fl">0.0</span>, np.ones(W.shape[<span class="dv">0</span>])</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> mag <span class="op">**</span> alpha</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> rel_error(X, W, scaled_round(W, s, group, levels))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> err <span class="op">&lt;</span> best:</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            best, best_alpha, best_s <span class="op">=</span> err, alpha, s</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> best_s, best_alpha</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>s_awq, alpha_awq <span class="op">=</span> awq_scale(X, W)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>keep <span class="op">=</span> np.argsort(act_mag)[<span class="op">-</span><span class="dv">6</span>:]</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bits <span class="kw">in</span> (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">8</span>):</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    lv <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (bits <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    rows.append({</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bits"</span>: bits,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"RTN"</span>: rel_error(X, W, group_round(W, levels<span class="op">=</span>lv)),</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"LLM.int8-style"</span>: rel_error(X, W, mixed_precision(W, keep, levels<span class="op">=</span>lv)),</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AWQ-style"</span>: rel_error(X, W, scaled_round(W, s_awq, levels<span class="op">=</span>lv)),</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"GPTQ"</span>: rel_error(X, W, gptq(W, H, levels<span class="op">=</span>lv)),</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> [<span class="st">"RTN"</span>, <span class="st">"LLM.int8-style"</span>, <span class="st">"AWQ-style"</span>, <span class="st">"GPTQ"</span>]</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">"#8d8d96"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"#a4553a"</span>]</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.arange(<span class="bu">len</span>(rows))</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">3.9</span>))</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, (name, color) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(methods, colors)):</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> [row[name] <span class="cf">for</span> row <span class="kw">in</span> rows]</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    ax.bar(positions <span class="op">+</span> (k <span class="op">-</span> <span class="fl">1.5</span>) <span class="op">*</span> width, vals, width, label<span class="op">=</span>name, color<span class="op">=</span>color)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(positions, [<span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'bits'</span>]<span class="sc">}</span><span class="ss">-bit"</span> <span class="cf">for</span> row <span class="kw">in</span> rows])</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"relative output error"</span>, title<span class="op">=</span><span class="ss">f"Weight-only quantization, AWQ exponent = </span><span class="sc">{</span>alpha_awq<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>, ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-methods-output-1.png" width="719" height="364" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Relative output error of a synthetic transformer projection under weight-only quantization at 3, 4, and 8 bits. Every method is measured on the calibration activations it was fitted to.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Round-to-nearest is tolerable at 8 bits and falls apart below it, exactly as every paper reports. The other three land within a factor of about five of each other and roughly an order of magnitude below round-to-nearest at 4 bits. Outlier decomposition is the strongest here, which flatters it: six extreme channels out of 256 is 2.3% of the layer, whereas real models concentrate the same effect into roughly 0.1% of dimensions, so the synthetic version pays less for the full-precision carve-out than the real one does. Error feedback and activation-aware scaling both beat plain rounding by a wide margin on the data they were fitted to.</p>
+<p>One implementation detail deserves a warning, because it is easy to misread as a property of the method. GPTQ dampens <span class="math inline">H</span> by adding a fraction of its mean diagonal. When that diagonal is heavy-tailed, the mean is set by the outlier channels, so the customary 1% dampening can exceed the entire diagonal entry of an ordinary channel and erase the metric precisely where the method needs it. The runs above use 0.2%, and the sensitivity is not subtle: at 1% in this setup, error feedback loses most of its advantage over plain rounding. Dampening is a numerical guard, but the fraction interacts directly with the anisotropy that the method exists to exploit.</p>
+<p>The phrase “on the data they were fitted to” is doing a lot of work.</p>
+</section>
+<section id="the-calibration-experiment" class="level2">
+<h2 class="anchored" data-anchor-id="the-calibration-experiment">The calibration experiment</h2>
+<p>AWQ’s central criticism of GPTQ is that its reconstruction overfits the calibration set: AWQ reports needing roughly ten times fewer calibration samples, and degrading by 0.5 perplexity under a calibration-to-evaluation domain shift where GPTQ degrades by 2.3 to 4.9.</p>
+<p>Read through <a href="#tbl-taxonomy" class="quarto-xref">Table&nbsp;1</a>, that is not a surprising empirical finding. It is a parameter count. GPTQ fits a number of free values proportional to the size of the weight matrix, all of them tuned to one estimate <span class="math inline">H</span> of the activation second moment. AWQ and SmoothQuant fit a single scalar. Any statistical intuition about degrees of freedom says the first should track a shifted distribution worse than the second, and should need more samples to estimate its target in the first place.</p>
+<p>The synthetic setting lets us test the mechanism directly, without perplexity or a domain corpus, by moving the activation distribution between fit and evaluation. The shift below rotates the latent subspace and redraws the channel profile together, which is what changing corpus domain does to a real layer: different topics excite different directions of the residual stream, while the systematic outlier channels stay outliers.</p>
+<div id="cell-fig-shift" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> shifted_activations(rng, mix, n<span class="op">=</span><span class="dv">512</span>):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Blend calibration structure with an independent draw; mix = 1 recovers calibration."""</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    rank, d_in <span class="op">=</span> basis.shape</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    fresh_basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    blend <span class="op">=</span> mix <span class="op">*</span> basis <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> mix) <span class="op">*</span> fresh_basis</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> latent <span class="op">@</span> blend <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    fresh_profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    fresh_profile[outliers] <span class="op">*=</span> <span class="fl">30.0</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Xs <span class="op">*</span> (profile <span class="op">**</span> mix <span class="op">*</span> fresh_profile <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> mix))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>mixes <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">9</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>Q_rtn <span class="op">=</span> group_round(W)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>Q_mix <span class="op">=</span> mixed_precision(W, keep)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>Q_awq <span class="op">=</span> scaled_round(W, s_awq)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>Q_gptq <span class="op">=</span> gptq(W, H)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mix <span class="kw">in</span> mixes:</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>):</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        Xe <span class="op">=</span> shifted_activations(np.random.default_rng(<span class="dv">1000</span> <span class="op">+</span> seed), mix)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"RTN"</span>].append(rel_error(Xe, W, Q_rtn))</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"LLM.int8-style"</span>].append(rel_error(Xe, W, Q_mix))</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"AWQ-style"</span>].append(rel_error(Xe, W, Q_awq))</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"GPTQ"</span>].append(rel_error(Xe, W, Q_gptq))</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> methods:</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        curves[name].append(np.mean(trials[name]))</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, color <span class="kw">in</span> <span class="bu">zip</span>(methods, colors):</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    ax.plot(mixes, curves[name], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"agreement between calibration and evaluation activations"</span>,</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"4-bit weight-only quantization under activation distribution shift"</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> methods:</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:16s}</span><span class="ss"> matched </span><span class="sc">{</span>curves[name][<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">   fully shifted </span><span class="sc">{</span>curves[name][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-shift" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-shift-output-1.png" width="700" height="374" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Relative output error when the quantizer is fitted on one activation distribution and evaluated on another. The horizontal axis interpolates from a fully redrawn latent subspace and channel profile on the left to the calibration distribution itself on the right.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RTN              matched 0.1004   fully shifted 0.1075
+LLM.int8-style   matched 0.0114   fully shifted 0.0213
+AWQ-style        matched 0.0264   fully shifted 0.0602
+GPTQ             matched 0.0131   fully shifted 0.2974</code></pre>
+</div>
+</div>
+<p>On matched activations, error feedback is about twice as accurate as activation-aware scaling. Under a full shift it is not merely overtaken. It becomes the worst method in the comparison, roughly three times worse than doing nothing beyond round-to-nearest, a swing of more than twenty times its own matched error. Activation-aware scaling degrades by about a factor of two, and outlier decomposition degrades least of all, because the fact it encodes, which handful of channels is enormous, is the most stable fact in the layer.</p>
+<p>The asymmetry has a clean explanation in <a href="#eq-obs-update" class="quarto-xref">Equation&nbsp;2</a>. Error feedback does not merely fail to help when <span class="math inline">H</span> changes, it actively injects a correction computed for the wrong geometry. The quantized weights carry a compensation term aligned with the calibration subspace, and when the evaluation activations excite a different subspace, that term is pure added error. A method that fits nothing cannot be wrong in this way, which is the entire content of the flat round-to-nearest line.</p>
+<p>None of this is evidence against GPTQ. It is evidence that the methods occupy different points on a bias-variance curve whose axis is the last column of <a href="#tbl-taxonomy" class="quarto-xref">Table&nbsp;1</a>. Under a fixed, well-sampled deployment distribution, more calibration-fitted parameters is the right trade, and that is the regime the GPTQ results were measured in. Under domain shift or a small calibration budget it is the wrong trade, which is the regime AWQ measured. The framing also suggests where the repair would live: shrinking the error-feedback update toward zero, or estimating <span class="math inline">H</span> from a deliberately broad corpus, rather than giving up second-order compensation. Whether the gap can be closed rather than merely traded is, as far as the cited work goes, still open.</p>
+</section>
+<section id="where-the-activation-side-changes-the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="where-the-activation-side-changes-the-problem">Where the activation side changes the problem</h2>
+<p>Everything above is weight-only. Quantizing <span class="math inline">X</span> as well, the W8A8 regime SmoothQuant targets, adds a constraint that has nothing to do with <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> and everything to do with kernels.</p>
+<p>The natural fix for outlier channels is per-channel activation quantization, one scale per column of <span class="math inline">X</span>. Table 1 of the SmoothQuant paper shows it works, lifting a 175B model from 32.3% to 71.4%. It is also unusable, because in <span class="math inline">Y = XW</span> the channel index is the contraction dimension of the matrix multiply. Scales can be applied along the outer dimensions, per token of <span class="math inline">X</span> or per output column of <span class="math inline">W</span>, and fused into the epilogue. A scale that varies along the summed index cannot be pulled out of the sum.</p>
+<p><a href="#eq-equivalent-transform" class="quarto-xref">Equation&nbsp;3</a> is the workaround: since <span class="math inline">\operatorname{diag}(s)^{-1}</span> and <span class="math inline">\operatorname{diag}(s)</span> multiply on opposite sides of the contraction, they cancel exactly, and the offending per-channel factor is applied offline to the weights instead of online to the activations. The migration exponent <span class="math inline">\alpha</span> then interpolates between two failures, and the sweep below shows both walls of the basin.</p>
+<div id="cell-fig-alpha" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> per_token_round(X, levels<span class="op">=</span><span class="dv">127</span>):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(X <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">41</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> []</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>) <span class="op">**</span> alpha) <span class="op">/</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(W), axis<span class="op">=</span><span class="dv">1</span>) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> alpha))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> np.clip(s, <span class="fl">1e-6</span>, <span class="va">None</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> per_token_round(X <span class="op">/</span> s)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    Ws <span class="op">=</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group<span class="op">=</span>W.shape[<span class="dv">0</span>], levels<span class="op">=</span><span class="dv">127</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    w8a8.append(<span class="bu">float</span>(np.linalg.norm(Xs <span class="op">@</span> Ws <span class="op">-</span> X <span class="op">@</span> W) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W)))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> np.array(w8a8)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>best_alpha <span class="op">=</span> alphas[<span class="bu">int</span>(np.argmin(w8a8))]</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>ax.semilogy(alphas, w8a8, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>ax.axvline(best_alpha, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>, label<span class="op">=</span><span class="ss">f"minimum at $</span><span class="ch">\\</span><span class="ss">alpha$ = </span><span class="sc">{</span>best_alpha<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"migration strength $</span><span class="ch">\\</span><span class="st">alpha$"</span>, ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Moving quantization difficulty from activations to weights"</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-alpha" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alpha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-alpha-output-1.png" width="681" height="355" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alpha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: SmoothQuant migration strength for 8-bit weights and 8-bit activations. Small alpha leaves the outliers in the activations, large alpha moves them into the weights, and the basin between is where both operands are quantizable.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The minimum lands in the region the paper reports, and the curve is asymmetric in the way the kink analysis predicts: overshooting into the weights is punished harder than undershooting, because weights are dense in their range while activation outliers are sparse.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why weight-only quantization speeds anything up
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nothing in <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> says anything about latency, and 4-bit weights do not make a GPU multiply faster, since no mainstream hardware does a mixed 16-bit by 4-bit product. The speedup is a memory-traffic result. Single-sequence decoding has arithmetic intensity near one: each weight is read once and used for one multiply-accumulate. The kernel is bandwidth-bound, so dequantizing on the fly trades idle arithmetic units for a fourfold reduction in bytes moved, and the reported 3 to 4.5 times end-to-end gains follow. Batched serving moves toward compute-bound, which is where quantizing activations as well starts to matter, and is the reason SmoothQuant and the weight-only methods are complementary rather than competing.</p>
+</div>
+</div>
+</section>
+<section id="what-the-common-form-does-not-capture" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-common-form-does-not-capture">What the common form does not capture</h2>
+<p>Three limitations are worth stating plainly.</p>
+<p>The layerwise objective is a proxy. Minimizing <span class="math inline">\lVert X(\widehat W - W)\rVert_F^2</span> layer by layer is not the same as minimizing end-to-end loss, and every method inherits the gap. GPTQ mitigates it by feeding already-quantized activations forward into the next block, which makes each layer’s <span class="math inline">H</span> reflect the errors upstream, but the objective is still local.</p>
+<p>The uniform round-error model used in <a href="#eq-awq-kink" class="quarto-xref">Equation&nbsp;5</a> is an approximation. At 3 bits and below, errors are neither small nor independent of the weights, and clipping interacts with the group maximum in ways the second-moment analysis misses. The empirical curves above hold anyway, which suggests the approximation is adequate for locating kinks rather than predicting absolute error.</p>
+<p>The format itself is a design variable this framing takes as given. QLoRA’s NF4 changes the grid rather than the coordinates: it places the <span class="math inline">2^k</span> levels at equal-probability quantiles of a standard normal, which is optimal for zero-mean normally distributed weights and beats integer and float grids bit for bit <span class="citation" data-cites="dettmers2023qlora">(<a href="#ref-dettmers2023qlora" role="doc-biblioref">Dettmers et al. 2023</a>)</span>. That is a fifth answer to the same question, and it composes with all four constraints above rather than competing with them. The training-time analogue is fine-grained FP8 scaling, where the tile-level scales in DeepSeek-V3 play exactly the role of <span class="math inline">S</span> in <a href="#eq-equivalent-transform" class="quarto-xref">Equation&nbsp;3</a>, applied to sub-tensors rather than channels <span class="citation" data-cites="deepseekai2024v3">(<a href="#ref-deepseekai2024v3" role="doc-biblioref">DeepSeek-AI 2024</a>)</span>.</p>
+<p>What survives is a modest but useful claim. Post-training quantization is one least-squares problem in a metric set by the activations. The methods differ in whether they move the weights, the coordinates, or the precision boundary, and in how many numbers they fit to the calibration set. The last of those is the axis nobody reports, and it is the one that predicts what happens when the deployment distribution stops matching the calibration corpus.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-deepseekai2024v3" class="csl-entry" role="listitem">
+DeepSeek-AI. 2024. <span>“<span>DeepSeek-V3</span> Technical Report.”</span> <em>arXiv Preprint arXiv:2412.19437</em>. <a href="https://arxiv.org/abs/2412.19437">https://arxiv.org/abs/2412.19437</a>.
+</div>
+<div id="ref-dettmers2022llmint8" class="csl-entry" role="listitem">
+Dettmers, Tim, Mike Lewis, Younes Belkada, and Luke Zettlemoyer. 2022. <span>“<span class="nocase">LLM.int8()</span>: 8-Bit Matrix Multiplication for Transformers at Scale.”</span> <em>Advances in Neural Information Processing Systems 35</em>. <a href="https://arxiv.org/abs/2208.07339">https://arxiv.org/abs/2208.07339</a>.
+</div>
+<div id="ref-dettmers2023qlora" class="csl-entry" role="listitem">
+Dettmers, Tim, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. 2023. <span>“<span>QLoRA</span>: Efficient Finetuning of Quantized <span>LLMs</span>.”</span> <em>Advances in Neural Information Processing Systems 36</em>. <a href="https://arxiv.org/abs/2305.14314">https://arxiv.org/abs/2305.14314</a>.
+</div>
+<div id="ref-frantar2022obc" class="csl-entry" role="listitem">
+Frantar, Elias, and Dan Alistarh. 2022. <span>“Optimal Brain Compression: A Framework for Accurate Post-Training Quantization and Pruning.”</span> <em>Advances in Neural Information Processing Systems 35</em>. <a href="https://arxiv.org/abs/2208.11580">https://arxiv.org/abs/2208.11580</a>.
+</div>
+<div id="ref-frantar2023gptq" class="csl-entry" role="listitem">
+Frantar, Elias, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh. 2023. <span>“<span>GPTQ</span>: Accurate Post-Training Quantization for Generative Pre-Trained Transformers.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2210.17323">https://arxiv.org/abs/2210.17323</a>.
+</div>
+<div id="ref-hassibi1993obs" class="csl-entry" role="listitem">
+Hassibi, Babak, and David G. Stork. 1993. <span>“Second Order Derivatives for Network Pruning: Optimal Brain Surgeon.”</span> <em>Advances in Neural Information Processing Systems 5</em>, 164–71.
+</div>
+<div id="ref-lin2024awq" class="csl-entry" role="listitem">
+Lin, Ji, Jiaming Tang, Haotian Tang, et al. 2024. <span>“<span>AWQ</span>: Activation-Aware Weight Quantization for on-Device <span>LLM</span> Compression and Acceleration.”</span> <em>Proceedings of Machine Learning and Systems 6 (MLSys)</em>. <a href="https://arxiv.org/abs/2306.00978">https://arxiv.org/abs/2306.00978</a>.
+</div>
+<div id="ref-xiao2023smoothquant" class="csl-entry" role="listitem">
+Xiao, Guangxuan, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han. 2023. <span>“<span>SmoothQuant</span>: Accurate and Efficient Post-Training Quantization for Large Language Models.”</span> <em>Proceedings of the 40th International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/2211.10438">https://arxiv.org/abs/2211.10438</a>.
+</div>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
+  author = {Marino, Diego Filippo},
+  title = {Four {Quantizers,} {One} {Quadratic} {Form}},
+  date = {2026-08-14},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Marino, Diego Filippo. 2026. <span>“Four Quantizers, One Quadratic
+Form.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/">https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/diegofilippomarino\.github\.io\/Eigenholm\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "DiegoFilippoMarino/Eigenholm";
+    script.dataset.repoId = "R_kgDOTEzjQw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOTEzjQ84C_3sV";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/quantization-one-quadratic-form/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

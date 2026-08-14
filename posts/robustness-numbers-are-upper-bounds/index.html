@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Diego Filippo Marino">
+<meta name="dcterms.date" content="2026-08-14">
+<meta name="description" content="Reported robustness is a minimum over the attacks you thought to run, which makes weak search look like strength, in adversarial examples and in safety training alike.">
+
+<title>Every Robustness Number Is an Upper Bound – Eigenholm</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Every Robustness Number Is an Upper Bound – Eigenholm">
+<meta property="og:description" content="Reported robustness is a minimum over the attacks you thought to run, which makes weak search look like strength, in adversarial examples and in safety training alike.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/index_files/figure-html/fig-adv-grid-output-1.png">
+<meta property="og:site_name" content="Eigenholm">
+<meta property="og:image:height" content="635">
+<meta property="og:image:width" content="1647">
+<meta name="twitter:title" content="Every Robustness Number Is an Upper Bound – Eigenholm">
+<meta name="twitter:description" content="Reported robustness is a minimum over the attacks you thought to run, which makes weak search look like strength, in adversarial examples and in safety training alike.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/index_files/figure-html/fig-adv-grid-output-1.png">
+<meta name="twitter:image-height" content="635">
+<meta name="twitter:image-width" content="1647">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Eigenholm</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Writing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/index.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes/index.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about/index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/DiegoFilippoMarino/Eigenholm"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a-model-and-a-real-attack" id="toc-a-model-and-a-real-attack" class="nav-link active" data-scroll-target="#a-model-and-a-real-attack">A model and a real attack</a></li>
+  <li><a href="#three-defenses-one-of-which-is-real" id="toc-three-defenses-one-of-which-is-real" class="nav-link" data-scroll-target="#three-defenses-one-of-which-is-real">Three defenses, one of which is real</a></li>
+  <li><a href="#the-diagnostics-run-as-code" id="toc-the-diagnostics-run-as-code" class="nav-link" data-scroll-target="#the-diagnostics-run-as-code">The diagnostics, run as code</a></li>
+  <li><a href="#the-one-number-that-is-a-lower-bound" id="toc-the-one-number-that-is-a-lower-bound" class="nav-link" data-scroll-target="#the-one-number-that-is-a-lower-bound">The one number that is a lower bound</a></li>
+  <li><a href="#the-same-quantifier-in-safety-training" id="toc-the-same-quantifier-in-safety-training" class="nav-link" data-scroll-target="#the-same-quantifier-in-safety-training">The same quantifier, in safety training</a></li>
+  <li><a href="#what-this-small-experiment-does-not-settle" id="toc-what-this-small-experiment-does-not-settle" class="nav-link" data-scroll-target="#what-this-small-experiment-does-not-settle">What this small experiment does not settle</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/robustness-numbers-are-upper-bounds/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Every Robustness Number Is an Upper Bound</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Adversarial Robustness</div>
+    <div class="quarto-category">Evaluation</div>
+    <div class="quarto-category">Security</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Reported robustness is a minimum over the attacks you thought to run, which makes weak search look like strength, in adversarial examples and in safety training alike.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Diego Filippo Marino </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 14, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A robustness result is a claim about a quantifier. The quantity people care about is</p>
+<p><span id="eq-adv-true"><span class="math display">
+R(f) = \Pr_{(x,y)}\Bigl[\,\forall\,\delta \in \mathcal{B}:\; f(x + \delta) = y\,\Bigr],
+\tag{1}</span></span></p>
+<p>the fraction of inputs on which <em>no</em> admissible perturbation changes the answer. The quantity anyone can compute is</p>
+<p><span id="eq-adv-measured"><span class="math display">
+\widehat R(f; \mathcal{A}) = \Pr_{(x,y)}\Bigl[\,\forall\,a \in \mathcal{A}:\; f(a(x)) = y\,\Bigr],
+\tag{2}</span></span></p>
+<p>where <span class="math inline">\mathcal{A}</span> is the finite set of attacks that were actually run. Since <span class="math inline">\mathcal{A}</span> ranges over a subset of the perturbations <span class="math inline">\mathcal{B}</span> allows,</p>
+<p><span id="eq-adv-bound"><span class="math display">
+\widehat R(f;\mathcal{A}) \;\ge\; R(f)
+\qquad\text{always, with equality only if } \mathcal{A} \text{ found the worst case.}
+\tag{3}</span></span></p>
+<p>Equation <a href="#eq-adv-bound" class="quarto-xref">Equation&nbsp;3</a> is not a subtlety. It is the entire epistemic situation of empirical robustness. Every published number is an upper bound on the truth, and the gap is the optimization failure of the evaluator. A defense can lower that gap by being robust, or it can raise the reported number by making the attack search harder without removing a single adversarial example. Athalye, Carlini and Wagner named the second strategy obfuscated gradients and showed that seven of the nine non-certified defenses at one ICLR were doing it <span class="citation" data-cites="athalye2018obfuscated">(<a href="#ref-athalye2018obfuscated" role="doc-biblioref">Athalye et al. 2018</a>)</span>; Tramèr and coauthors then showed that thirteen more defenses, all of which had run what they called adaptive evaluations, were still overestimating themselves <span class="citation" data-cites="tramer2020adaptive">(<a href="#ref-tramer2020adaptive" role="doc-biblioref">Tramèr et al. 2020</a>)</span>.</p>
+<p>This article builds a miniature version of that situation: one dataset, one architecture, three defenses, and a battery of attacks and diagnostics, all in NumPy. Then it does two things the security literature implies but rarely writes down side by side. It compares the empirical numbers against a certificate on the same model, which is the only quantity in the whole exercise that is a lower bound rather than an upper bound. And it applies <a href="#eq-adv-bound" class="quarto-xref">Equation&nbsp;3</a> to safety training, where the same quantifier structure produces the same failure with none of the same vocabulary.</p>
+<section id="a-model-and-a-real-attack" class="level2">
+<h2 class="anchored" data-anchor-id="a-model-and-a-real-attack">A model and a real attack</h2>
+<p>The data is a three-class spiral embedded in twenty dimensions, eighteen of which are noise, classified by a small ReLU network. The threat model is <span class="math inline">\ell_\infty</span> perturbations of size <span class="math inline">\varepsilon = 0.5</span>, which is large relative to the class separation and therefore genuinely damaging when an attacker finds it.</p>
+<div id="adv-setup" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>DIM, CLASSES, EPS <span class="op">=</span> <span class="dv">20</span>, <span class="dv">3</span>, <span class="fl">0.5</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_data(rng, n):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    label <span class="op">=</span> rng.integers(<span class="dv">0</span>, CLASSES, size<span class="op">=</span>n)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    radius <span class="op">=</span> rng.uniform(<span class="fl">0.4</span>, <span class="fl">1.0</span>, size<span class="op">=</span>n)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> label <span class="op">/</span> CLASSES <span class="op">+</span> <span class="fl">3.2</span> <span class="op">*</span> radius</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    core <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> np.stack([radius <span class="op">*</span> np.cos(angle), radius <span class="op">*</span> np.sin(angle)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    core <span class="op">+=</span> <span class="fl">0.10</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>core.shape)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.concatenate([core, <span class="fl">0.5</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, DIM <span class="op">-</span> <span class="dv">2</span>))], axis<span class="op">=</span><span class="dv">1</span>), label</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> init_params(rng, hidden<span class="op">=</span><span class="dv">96</span>):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"W1"</span>: rng.normal(size<span class="op">=</span>(DIM, hidden)) <span class="op">/</span> np.sqrt(DIM),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"b1"</span>: np.zeros(hidden),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"W2"</span>: rng.normal(size<span class="op">=</span>(hidden, CLASSES)) <span class="op">/</span> np.sqrt(hidden),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"b2"</span>: np.zeros(CLASSES)}</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logits(par, X):</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.maximum(X <span class="op">@</span> par[<span class="st">"W1"</span>] <span class="op">+</span> par[<span class="st">"b1"</span>], <span class="fl">0.0</span>) <span class="op">@</span> par[<span class="st">"W2"</span>] <span class="op">+</span> par[<span class="st">"b2"</span>]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax(z):</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> z <span class="op">-</span> z.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    e <span class="op">=</span> np.exp(z)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> e <span class="op">/</span> e.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> backprop(par, X, y):</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    pre <span class="op">=</span> X <span class="op">@</span> par[<span class="st">"W1"</span>] <span class="op">+</span> par[<span class="st">"b1"</span>]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    hid <span class="op">=</span> np.maximum(pre, <span class="fl">0.0</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    probs <span class="op">=</span> softmax(hid <span class="op">@</span> par[<span class="st">"W2"</span>] <span class="op">+</span> par[<span class="st">"b2"</span>])</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    dz <span class="op">=</span> probs.copy()</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    dz[np.arange(<span class="bu">len</span>(y)), y] <span class="op">-=</span> <span class="fl">1.0</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    dz <span class="op">/=</span> <span class="bu">len</span>(y)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    grads <span class="op">=</span> {<span class="st">"W2"</span>: hid.T <span class="op">@</span> dz, <span class="st">"b2"</span>: dz.<span class="bu">sum</span>(<span class="dv">0</span>)}</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    dpre <span class="op">=</span> (dz <span class="op">@</span> par[<span class="st">"W2"</span>].T) <span class="op">*</span> (pre <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    grads[<span class="st">"W1"</span>] <span class="op">=</span> X.T <span class="op">@</span> dpre</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    grads[<span class="st">"b1"</span>] <span class="op">=</span> dpre.<span class="bu">sum</span>(<span class="dv">0</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> grads, dpre <span class="op">@</span> par[<span class="st">"W1"</span>].T</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train(par, X, y, steps<span class="op">=</span><span class="dv">3000</span>, lr<span class="op">=</span><span class="fl">3e-3</span>, perturb<span class="op">=</span><span class="va">None</span>, rng<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> {k: np.zeros_like(v) <span class="cf">for</span> k, v <span class="kw">in</span> par.items()}</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> {k: np.zeros_like(w) <span class="cf">for</span> k, w <span class="kw">in</span> par.items()}</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, steps <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        batch <span class="op">=</span> X <span class="cf">if</span> perturb <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> perturb(par, X, y, rng)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        g, _ <span class="op">=</span> backprop(par, batch, y)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> par:</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            m[k] <span class="op">=</span> <span class="fl">0.9</span> <span class="op">*</span> m[k] <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> g[k]</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            v[k] <span class="op">=</span> <span class="fl">0.999</span> <span class="op">*</span> v[k] <span class="op">+</span> <span class="fl">0.001</span> <span class="op">*</span> g[k] <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>            par[k] <span class="op">-=</span> lr <span class="op">*</span> (m[k] <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> <span class="fl">0.9</span> <span class="op">**</span> s)) <span class="op">/</span> (np.sqrt(v[k] <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> <span class="fl">0.999</span> <span class="op">**</span> s)) <span class="op">+</span> <span class="fl">1e-8</span>)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> par</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> input_gradient(par, X, y):</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> backprop(par, X, y)[<span class="dv">1</span>]</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>X_train, y_train <span class="op">=</span> make_data(rng, <span class="dv">3000</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>X_test, y_test <span class="op">=</span> make_data(rng, <span class="dv">1500</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> train(init_params(rng), X_train, y_train)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"clean test accuracy: </span><span class="sc">{</span>np<span class="sc">.</span>mean(np.argmax(logits(base, X_test), axis<span class="op">=</span><span class="dv">1</span>) <span class="op">==</span> y_test)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>clean test accuracy: 0.993</code></pre>
+</div>
+</div>
+<p>Projected gradient descent is the reference first-order attack: start from a random point in the ball, repeatedly step along the sign of the input gradient, and project back <span class="citation" data-cites="madry2018towards">(<a href="#ref-madry2018towards" role="doc-biblioref">Madry et al. 2018</a>)</span>.</p>
+<div id="adv-attacks" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pgd(par, X, y, eps<span class="op">=</span>EPS, steps<span class="op">=</span><span class="dv">50</span>, rng<span class="op">=</span><span class="va">None</span>, defense<span class="op">=</span><span class="va">None</span>, mode<span class="op">=</span><span class="st">"true"</span>, eot<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Projected gradient descent against a possibly-defended classifier.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">    mode = "true" differentiates the deployed pipeline, which for a quantizing</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">    preprocessor means a gradient of exactly zero almost everywhere.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">    mode = "bpda" runs the forward pass through the defense and the backward pass</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">    through the identity.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">    eot &gt; 1 averages the gradient over draws of the defense's randomness.</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> rng <span class="kw">or</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> eps <span class="op">/</span> <span class="fl">10.0</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    delta <span class="op">=</span> rng.uniform(<span class="op">-</span>eps, eps, size<span class="op">=</span>X.shape)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(steps):</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        total <span class="op">=</span> np.zeros_like(X)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(eot):</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            point <span class="op">=</span> X <span class="op">+</span> delta</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> defense <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> input_gradient(par, point, y)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> mode <span class="op">==</span> <span class="st">"bpda"</span>:</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> input_gradient(par, defense(point, rng), y)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> defense.<span class="va">__name__</span> <span class="op">==</span> <span class="st">"quantize"</span>:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> <span class="fl">0.0</span>            <span class="co"># the deployed pipeline is piecewise constant</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                total <span class="op">+=</span> input_gradient(par, defense(point, rng), y)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        delta <span class="op">=</span> np.clip(delta <span class="op">+</span> alpha <span class="op">*</span> np.sign(total), <span class="op">-</span>eps, eps)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X <span class="op">+</span> delta</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fgsm(par, X, y, eps<span class="op">=</span>EPS):</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X <span class="op">+</span> eps <span class="op">*</span> np.sign(input_gradient(par, X, y))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> random_search(predict, X, y, eps<span class="op">=</span>EPS, tries<span class="op">=</span><span class="dv">400</span>, rng<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Attack with no gradients at all: sample the ball and keep any success."""</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> rng <span class="kw">or</span> np.random.default_rng(<span class="dv">1</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    still_right <span class="op">=</span> predict(X) <span class="op">==</span> y</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(tries):</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        cand <span class="op">=</span> X <span class="op">+</span> rng.uniform(<span class="op">-</span>eps, eps, size<span class="op">=</span>X.shape)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        still_right <span class="op">&amp;=</span> predict(cand) <span class="op">==</span> y</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.mean(still_right))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="three-defenses-one-of-which-is-real" class="level2">
+<h2 class="anchored" data-anchor-id="three-defenses-one-of-which-is-real">Three defenses, one of which is real</h2>
+<p>The three defenses are chosen to instantiate the three sub-types of obfuscated gradients that the original taxonomy identifies, plus the one defense that survived it.</p>
+<p><em>Input quantization</em> rounds every coordinate onto a grid. The deployed function is piecewise constant, so its gradient is zero almost everywhere: this is a <strong>shattered gradient</strong>, and the matching attack is the backward pass differentiable approximation, which runs the forward pass through the real preprocessor and the backward pass through the identity, exploiting the fact that rounding is close to the identity <span class="citation" data-cites="athalye2018obfuscated">(<a href="#ref-athalye2018obfuscated" role="doc-biblioref">Athalye et al. 2018</a>)</span>.</p>
+<p><em>Randomized preprocessing</em> adds uniform noise and averages the logits over several draws at inference. The single-sample gradient an attacker computes is then a noisy estimate of the gradient of the deployed classifier: this is the <strong>stochastic gradient</strong> case, and the matching attack is expectation over transformation, which averages the gradient over draws of the randomness at every step, using <span class="math inline">\nabla_x \mathbb{E}_t[f(t(x))] = \mathbb{E}_t[\nabla_x f(t(x))]</span>. Whether this actually masks anything turns out to depend on the attack budget, and the experiment below is a useful negative result on that point.</p>
+<p><em>Adversarial training</em> solves the saddle-point problem directly, training on perturbations generated by an inner PGD loop <span class="citation" data-cites="madry2018towards">(<a href="#ref-madry2018towards" role="doc-biblioref">Madry et al. 2018</a>)</span>. It offers no certificate, but it does not hide anything either.</p>
+<div id="adv-defenses" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>QUANT <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>NOISE <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>VOTES <span class="op">=</span> <span class="dv">15</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> quantize(X, rng<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">round</span>(X <span class="op">/</span> QUANT) <span class="op">*</span> QUANT</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> randomize(X, rng):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X <span class="op">+</span> rng.uniform(<span class="op">-</span>NOISE, NOISE, size<span class="op">=</span>X.shape)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_plain(par):</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">lambda</span> X, rng<span class="op">=</span><span class="va">None</span>: np.argmax(logits(par, X), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_quantized(par):</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">lambda</span> X, rng<span class="op">=</span><span class="va">None</span>: np.argmax(logits(par, quantize(X)), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_randomized(par, votes<span class="op">=</span>VOTES, seed<span class="op">=</span><span class="dv">7</span>):</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> inner(X, rng<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        local <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        acc <span class="op">=</span> np.zeros((<span class="bu">len</span>(X), CLASSES))</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(votes):</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>            acc <span class="op">+=</span> softmax(logits(par, randomize(X, local)))</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.argmax(acc, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> inner</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pgd_trainer(par, X, y, rng):</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pgd(par, X, y, eps<span class="op">=</span>EPS, steps<span class="op">=</span><span class="dv">7</span>, rng<span class="op">=</span>rng)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>robust <span class="op">=</span> train(init_params(np.random.default_rng(<span class="dv">2</span>)), X_train, y_train,</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>               perturb<span class="op">=</span>pgd_trainer, rng<span class="op">=</span>np.random.default_rng(<span class="dv">3</span>))</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"adversarially trained clean accuracy: "</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>mean(predict_plain(robust)(X_test) <span class="op">==</span> y_test)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>adversarially trained clean accuracy: 1.000</code></pre>
+</div>
+</div>
+<p>Now the evaluation grid. Each defense is measured against each attack, and every number is an instance of <a href="#eq-adv-measured" class="quarto-xref">Equation&nbsp;2</a> with a different <span class="math inline">\mathcal{A}</span>.</p>
+<div id="cell-fig-adv-grid" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>attack_rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>surrogate <span class="op">=</span> train(init_params(np.random.default_rng(<span class="dv">5</span>)), X_train, y_train)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> {}</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># undefended</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> predict_plain(base)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>rows[<span class="st">"undefended"</span>] <span class="op">=</span> {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"clean"</span>: <span class="bu">float</span>(np.mean(p(X_test) <span class="op">==</span> y_test)),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"FGSM"</span>: <span class="bu">float</span>(np.mean(p(fgsm(base, X_test, y_test)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PGD"</span>: <span class="bu">float</span>(np.mean(p(pgd(base, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transfer"</span>: <span class="bu">float</span>(np.mean(p(pgd(surrogate, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random search"</span>: random_search(p, X_test, y_test, rng<span class="op">=</span>attack_rng),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"matched"</span>: <span class="bu">float</span>(np.mean(p(pgd(base, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># input quantization</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> predict_quantized(base)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>rows[<span class="st">"input quantization"</span>] <span class="op">=</span> {</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"clean"</span>: <span class="bu">float</span>(np.mean(p(X_test) <span class="op">==</span> y_test)),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"FGSM"</span>: <span class="bu">float</span>(np.mean(p(X_test <span class="op">+</span> EPS <span class="op">*</span> np.sign(np.zeros_like(X_test))) <span class="op">==</span> y_test)),</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PGD"</span>: <span class="bu">float</span>(np.mean(p(pgd(base, X_test, y_test, rng<span class="op">=</span>attack_rng,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                              defense<span class="op">=</span>quantize, mode<span class="op">=</span><span class="st">"true"</span>)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transfer"</span>: <span class="bu">float</span>(np.mean(p(pgd(surrogate, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random search"</span>: random_search(p, X_test, y_test, rng<span class="op">=</span>attack_rng),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"matched"</span>: <span class="bu">float</span>(np.mean(p(pgd(base, X_test, y_test, rng<span class="op">=</span>attack_rng,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>                                   defense<span class="op">=</span>quantize, mode<span class="op">=</span><span class="st">"bpda"</span>)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># randomized preprocessing</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> predict_randomized(base)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>rows[<span class="st">"randomized input"</span>] <span class="op">=</span> {</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"clean"</span>: <span class="bu">float</span>(np.mean(p(X_test) <span class="op">==</span> y_test)),</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">"FGSM"</span>: <span class="bu">float</span>(np.mean(p(fgsm(base, randomize(X_test, attack_rng), y_test)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PGD"</span>: <span class="bu">float</span>(np.mean(p(pgd(base, X_test, y_test, rng<span class="op">=</span>attack_rng,</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>                              defense<span class="op">=</span>randomize, mode<span class="op">=</span><span class="st">"true"</span>, eot<span class="op">=</span><span class="dv">1</span>)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transfer"</span>: <span class="bu">float</span>(np.mean(p(pgd(surrogate, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random search"</span>: random_search(p, X_test, y_test, rng<span class="op">=</span>attack_rng),</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"matched"</span>: <span class="bu">float</span>(np.mean(p(pgd(base, X_test, y_test, rng<span class="op">=</span>attack_rng,</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>                                   defense<span class="op">=</span>randomize, mode<span class="op">=</span><span class="st">"true"</span>, eot<span class="op">=</span><span class="dv">20</span>)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co"># adversarial training</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> predict_plain(robust)</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>rows[<span class="st">"adversarial training"</span>] <span class="op">=</span> {</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">"clean"</span>: <span class="bu">float</span>(np.mean(p(X_test) <span class="op">==</span> y_test)),</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    <span class="st">"FGSM"</span>: <span class="bu">float</span>(np.mean(p(fgsm(robust, X_test, y_test)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PGD"</span>: <span class="bu">float</span>(np.mean(p(pgd(robust, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transfer"</span>: <span class="bu">float</span>(np.mean(p(pgd(surrogate, X_test, y_test, rng<span class="op">=</span>attack_rng)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random search"</span>: random_search(p, X_test, y_test, rng<span class="op">=</span>attack_rng),</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    <span class="st">"matched"</span>: <span class="bu">float</span>(np.mean(p(pgd(robust, X_test, y_test, rng<span class="op">=</span>attack_rng,</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>                                   steps<span class="op">=</span><span class="dv">200</span>)) <span class="op">==</span> y_test)),</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>names <span class="op">=</span> <span class="bu">list</span>(rows)</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">"clean"</span>, <span class="st">"FGSM"</span>, <span class="st">"PGD"</span>, <span class="st">"transfer"</span>, <span class="st">"random search"</span>, <span class="st">"matched"</span>]</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.array([[rows[n][c] <span class="cf">for</span> c <span class="kw">in</span> cols] <span class="cf">for</span> n <span class="kw">in</span> names])</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">8.6</span>, <span class="fl">3.4</span>))</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.imshow(grid, cmap<span class="op">=</span><span class="st">"RdYlGn"</span>, vmin<span class="op">=</span><span class="fl">0.0</span>, vmax<span class="op">=</span><span class="fl">1.0</span>, aspect<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(cols)), cols, rotation<span class="op">=</span><span class="dv">20</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(names)), names)</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(grid.shape[<span class="dv">0</span>]):</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(grid.shape[<span class="dv">1</span>]):</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>        ax.text(j, i, <span class="ss">f"</span><span class="sc">{</span>grid[i, j]<span class="sc">:.2f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Accuracy under attack, $</span><span class="ch">\\</span><span class="st">ell_</span><span class="ch">\\</span><span class="st">infty$ budget 0.5"</span>)</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>fig.colorbar(im, ax<span class="op">=</span>ax, fraction<span class="op">=</span><span class="fl">0.03</span>, label<span class="op">=</span><span class="st">"accuracy"</span>)</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-adv-grid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-adv-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-adv-grid-output-1.png" width="824" height="318" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-adv-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Accuracy under attack for four models. Each row is a defense, each column an attack. The quantizing defense looks strong under the attacks a naive evaluation would run and collapses under the attack matched to its mechanism.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The quantization row is the textbook case, and it is stark. Under PGD, the attack that a paper claiming “we evaluated against a strong iterative white-box adversary” would run, the defense keeps 93% accuracy at a perturbation budget where the undefended model keeps 13%. Under the same attack with the backward pass replaced by the identity, it keeps 17%. The defense removed no adversarial example whatsoever. The input that fools the undefended model still fools the quantized one. What it removed was the attacker’s gradient.</p>
+<p>The randomized row does not behave as the taxonomy would lead one to expect, and that is worth reporting rather than smoothing over. Plain PGD already breaks it, and expectation over transformation improves the attack only slightly. The reason is visible when the attack budget is varied.</p>
+<div id="adv-eot" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'steps'</span><span class="sc">:&gt;6}{</span><span class="st">'EOT=1'</span><span class="sc">:&gt;10}{</span><span class="st">'EOT=20'</span><span class="sc">:&gt;10}</span><span class="ss">"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> steps <span class="kw">in</span> (<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">50</span>):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    line <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>steps<span class="sc">:&gt;6}</span><span class="ss">"</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> eot <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">20</span>):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        adv <span class="op">=</span> pgd(base, X_test, y_test, rng<span class="op">=</span>np.random.default_rng(<span class="dv">11</span>), steps<span class="op">=</span>steps,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                  defense<span class="op">=</span>randomize, mode<span class="op">=</span><span class="st">"true"</span>, eot<span class="op">=</span>eot)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        line <span class="op">+=</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">float</span>(np.mean(predict_randomized(base)(adv) <span class="op">==</span> y_test))<span class="sc">:&gt;10.3f}</span><span class="ss">"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(line)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> steps     EOT=1    EOT=20
+     5     0.752     0.729
+    10     0.513     0.454
+    50     0.181     0.163</code></pre>
+</div>
+</div>
+<p>Averaging the gradient over twenty draws helps by two to six accuracy points. Running five times as many steps helps by thirty. In this setting the randomness does not mask the gradient, it only adds variance to a descent that has enough iterations to average the variance away by itself. That is a real limitation of the miniature: the defenses that expectation over transformation famously broke operated on high-dimensional images where a single noisy gradient step is far less informative, and they were evaluated with attack budgets small enough that the noise never averaged out.</p>
+<p>It also happens to reproduce the most mundane item on the adaptive-attack checklist. Among thirteen defenses examined by Tramèr and coauthors, one was broken from 48% to 0% by nothing more sophisticated than raising the step count and the step size, and the paper repeatedly notes running PGD for 400 steps where the original evaluation used 40 <span class="citation" data-cites="tramer2020adaptive">(<a href="#ref-tramer2020adaptive" role="doc-biblioref">Tramèr et al. 2020</a>)</span>. The cheapest way to tighten <a href="#eq-adv-bound" class="quarto-xref">Equation&nbsp;3</a> is usually to search longer, and it is the one most often skipped.</p>
+<p>The adversarial training row is the one that behaves the way a genuine defense should. Its accuracy under a fifty-step attack and under a two-hundred-step attack agree to a fraction of a percent, its transfer number is no better than its white-box number, and the gap between its clean accuracy and its attacked accuracy is a real cost paid in a real currency. It is also the only row whose robustness would survive the discovery of a better optimizer, at least to the extent that the number was never propped up by the optimizer being bad.</p>
+</section>
+<section id="the-diagnostics-run-as-code" class="level2">
+<h2 class="anchored" data-anchor-id="the-diagnostics-run-as-code">The diagnostics, run as code</h2>
+<p>The obfuscated-gradients paper offers five behavioural signs that a defense is masking rather than defending. They are usually quoted as a checklist. They are more useful as a script, since each one is a comparison between two numbers that any evaluation already produces.</p>
+<div id="cell-fig-adv-flags" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> unbounded(predict, par, X, y, big<span class="op">=</span><span class="fl">6.0</span>, rng<span class="op">=</span><span class="va">None</span>, defense<span class="op">=</span><span class="va">None</span>, mode<span class="op">=</span><span class="st">"true"</span>):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    adv <span class="op">=</span> pgd(par, X, y, eps<span class="op">=</span>big, steps<span class="op">=</span><span class="dv">100</span>, rng<span class="op">=</span>rng, defense<span class="op">=</span>defense, mode<span class="op">=</span>mode)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.mean(predict(adv) <span class="op">==</span> y))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sweep_eps(predict, par, X, y, grid, rng, defense<span class="op">=</span><span class="va">None</span>, mode<span class="op">=</span><span class="st">"true"</span>):</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array([<span class="bu">float</span>(np.mean(predict(pgd(par, X, y, eps<span class="op">=</span>e, steps<span class="op">=</span><span class="dv">40</span>, rng<span class="op">=</span>rng,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                                               defense<span class="op">=</span>defense, mode<span class="op">=</span>mode)) <span class="op">==</span> y))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                     <span class="cf">for</span> e <span class="kw">in</span> grid])</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>eps_grid <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.7</span>])</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>configs <span class="op">=</span> {</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"undefended"</span>: (predict_plain(base), base, <span class="va">None</span>, <span class="st">"true"</span>),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"input quantization"</span>: (predict_quantized(base), base, quantize, <span class="st">"true"</span>),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"randomized input"</span>: (predict_randomized(base), base, randomize, <span class="st">"true"</span>),</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"adversarial training"</span>: (predict_plain(robust), robust, <span class="va">None</span>, <span class="st">"true"</span>),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>flag_names <span class="op">=</span> [<span class="st">"FGSM beats PGD"</span>, <span class="st">"transfer beats white-box"</span>, <span class="st">"unbounded attack fails"</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>              <span class="st">"random search beats PGD"</span>, <span class="st">"not monotone in budget"</span>]</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>flags <span class="op">=</span> np.zeros((<span class="bu">len</span>(configs), <span class="bu">len</span>(flag_names)))</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (name, (pred, par, defense, mode)) <span class="kw">in</span> <span class="bu">enumerate</span>(configs.items()):</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> rows[name]</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> sweep_eps(pred, par, X_test, y_test, eps_grid, attack_rng, defense, mode)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    flags[i, <span class="dv">0</span>] <span class="op">=</span> r[<span class="st">"FGSM"</span>] <span class="op">&lt;</span> r[<span class="st">"PGD"</span>] <span class="op">-</span> <span class="fl">0.02</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    flags[i, <span class="dv">1</span>] <span class="op">=</span> r[<span class="st">"transfer"</span>] <span class="op">&lt;</span> r[<span class="st">"PGD"</span>] <span class="op">-</span> <span class="fl">0.02</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    flags[i, <span class="dv">2</span>] <span class="op">=</span> unbounded(pred, par, X_test, y_test, rng<span class="op">=</span>attack_rng,</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                            defense<span class="op">=</span>defense, mode<span class="op">=</span>mode) <span class="op">&gt;</span> <span class="fl">0.05</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    flags[i, <span class="dv">3</span>] <span class="op">=</span> r[<span class="st">"random search"</span>] <span class="op">&lt;</span> r[<span class="st">"PGD"</span>] <span class="op">-</span> <span class="fl">0.02</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    flags[i, <span class="dv">4</span>] <span class="op">=</span> <span class="bu">bool</span>(np.<span class="bu">any</span>(np.diff(curve) <span class="op">&gt;</span> <span class="fl">0.02</span>))</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">8.2</span>, <span class="fl">3.0</span>))</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>ax.imshow(flags, cmap<span class="op">=</span><span class="st">"Reds"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="fl">1.4</span>, aspect<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(flag_names)), flag_names, rotation<span class="op">=</span><span class="dv">18</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(configs)), <span class="bu">list</span>(configs))</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(flags.shape[<span class="dv">0</span>]):</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(flags.shape[<span class="dv">1</span>]):</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>        ax.text(j, i, <span class="st">"fired"</span> <span class="cf">if</span> flags[i, j] <span class="cf">else</span> <span class="st">"clear"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Gradient-masking diagnostics"</span>)</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-adv-flags" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-adv-flags-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-adv-flags-output-1.png" width="785" height="281" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-adv-flags-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: The five gradient-masking diagnostics evaluated for each defense. The quantizing defense trips three of the five. The other three models, including the one whose randomness turned out not to mask anything, trip none.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The quantizing defense trips three flags: a transfer attack from a separately trained surrogate beats the white-box attack, an attack with a twelve-fold larger budget still fails to drive accuracy to zero, and blind random sampling of the perturbation ball outperforms gradient descent. Any one of these would be enough to reject the evaluation. The other three models trip none, including the randomized one, which is the correct verdict given that its gradients carry usable signal here.</p>
+<p>The reason the flags work is worth stating in the language of <a href="#eq-adv-bound" class="quarto-xref">Equation&nbsp;3</a>. Each one compares two estimators of the same upper bound whose ordering is guaranteed by logic. A one-step attack is a special case of a multi-step attack, so PGD should never do worse than FGSM. A black-box attacker has strictly less information than a white-box one, so transfer should never do better. An unbounded perturbation can reach any point in input space, so accuracy should reach zero. When a weaker search outperforms a stronger one, a guaranteed ordering has been violated, and the only available explanation is that the stronger search is failing for reasons unrelated to the difficulty of the underlying problem.</p>
+<p>That is also why the diagnostics are one-sided. Passing them is not evidence of robustness. Tramèr and coauthors make this exact point with an informal no-free-lunch theorem: for any fixed attack, one can construct a non-robust defense that stops it, for instance by detecting the attack’s own output distribution <span class="citation" data-cites="tramer2020adaptive">(<a href="#ref-tramer2020adaptive" role="doc-biblioref">Tramèr et al. 2020</a>)</span>. A defense that survives your favourite attack has told you almost nothing, which is why their conclusion is that adaptive attacks must be hand-designed per defense and cannot be automated.</p>
+</section>
+<section id="the-one-number-that-is-a-lower-bound" class="level2">
+<h2 class="anchored" data-anchor-id="the-one-number-that-is-a-lower-bound">The one number that is a lower bound</h2>
+<p>Everything above is an upper bound. The way out is to compute something that is not.</p>
+<p>Randomized smoothing replaces the classifier <span class="math inline">f</span> with the smoothed classifier</p>
+<p><span id="eq-adv-smoothed"><span class="math display">
+g(x) = \arg\max_{c}\; \Pr_{\varepsilon \sim \mathcal{N}(0, \sigma^2 I)}\bigl[f(x + \varepsilon) = c\bigr],
+\tag{4}</span></span></p>
+<p>and comes with a tight guarantee: if the top class has probability at least <span class="math inline">\underline{p_A}</span> and every other class at most <span class="math inline">\overline{p_B}</span> under the noise, then <span class="math inline">g</span> is constant on the <span class="math inline">\ell_2</span> ball of radius</p>
+<p><span id="eq-adv-radius"><span class="math display">
+R = \frac{\sigma}{2}\bigl(\Phi^{-1}(\underline{p_A}) - \Phi^{-1}(\overline{p_B})\bigr),
+\tag{5}</span></span></p>
+<p>with <span class="math inline">\Phi^{-1}</span> the standard normal quantile function <span class="citation" data-cites="cohen2019certified">(<a href="#ref-cohen2019certified" role="doc-biblioref">Cohen et al. 2019</a>)</span>. The bound assumes nothing about <span class="math inline">f</span>, which is what lets it apply to networks that satisfy no Lipschitz or smoothness condition. Since <span class="math inline">\underline{p_A}</span> must be estimated by sampling, the honest version uses a Clopper-Pearson lower confidence bound, and the certificate then holds with the stated confidence.</p>
+<div id="cell-fig-adv-certified" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> erf, lgamma</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>LOG_FACT <span class="op">=</span> np.concatenate([[<span class="fl">0.0</span>], np.cumsum(np.log(np.arange(<span class="dv">1</span>, <span class="dv">4001</span>)))])</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normal_quantile(p):</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Acklam's rational approximation to the inverse standard normal CDF."""</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> [<span class="op">-</span><span class="fl">3.969683028665376e+01</span>, <span class="fl">2.209460984245205e+02</span>, <span class="op">-</span><span class="fl">2.759285104469687e+02</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>         <span class="fl">1.383577518672690e+02</span>, <span class="op">-</span><span class="fl">3.066479806614716e+01</span>, <span class="fl">2.506628277459239e+00</span>]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> [<span class="op">-</span><span class="fl">5.447609879822406e+01</span>, <span class="fl">1.615858368580409e+02</span>, <span class="op">-</span><span class="fl">1.556989798598866e+02</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>         <span class="fl">6.680131188771972e+01</span>, <span class="op">-</span><span class="fl">1.328068155288572e+01</span>]</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> [<span class="op">-</span><span class="fl">7.784894002430293e-03</span>, <span class="op">-</span><span class="fl">3.223964580411365e-01</span>, <span class="op">-</span><span class="fl">2.400758277161838e+00</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>         <span class="op">-</span><span class="fl">2.549732539343734e+00</span>, <span class="fl">4.374664141464968e+00</span>, <span class="fl">2.938163982698783e+00</span>]</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> [<span class="fl">7.784695709041462e-03</span>, <span class="fl">3.224671290700398e-01</span>, <span class="fl">2.445134137142996e+00</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>         <span class="fl">3.754408661907416e+00</span>]</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> <span class="bu">float</span>(np.clip(p, <span class="fl">1e-12</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">1e-12</span>))</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> p <span class="op">&lt;</span> <span class="fl">0.02425</span>:</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        q <span class="op">=</span> np.sqrt(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> np.log(p))</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (((((c[<span class="dv">0</span>]<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">1</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">2</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">3</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">4</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">5</span>]) <span class="op">/</span> <span class="op">\</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>               ((((d[<span class="dv">0</span>]<span class="op">*</span>q<span class="op">+</span>d[<span class="dv">1</span>])<span class="op">*</span>q<span class="op">+</span>d[<span class="dv">2</span>])<span class="op">*</span>q<span class="op">+</span>d[<span class="dv">3</span>])<span class="op">*</span>q<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> p <span class="op">&gt;</span> <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.02425</span>:</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        q <span class="op">=</span> np.sqrt(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> p))</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>(((((c[<span class="dv">0</span>]<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">1</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">2</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">3</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">4</span>])<span class="op">*</span>q<span class="op">+</span>c[<span class="dv">5</span>]) <span class="op">/</span> <span class="op">\</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>                ((((d[<span class="dv">0</span>]<span class="op">*</span>q<span class="op">+</span>d[<span class="dv">1</span>])<span class="op">*</span>q<span class="op">+</span>d[<span class="dv">2</span>])<span class="op">*</span>q<span class="op">+</span>d[<span class="dv">3</span>])<span class="op">*</span>q<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> p <span class="op">-</span> <span class="fl">0.5</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> q <span class="op">*</span> q</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (((((a[<span class="dv">0</span>]<span class="op">*</span>r<span class="op">+</span>a[<span class="dv">1</span>])<span class="op">*</span>r<span class="op">+</span>a[<span class="dv">2</span>])<span class="op">*</span>r<span class="op">+</span>a[<span class="dv">3</span>])<span class="op">*</span>r<span class="op">+</span>a[<span class="dv">4</span>])<span class="op">*</span>r<span class="op">+</span>a[<span class="dv">5</span>])<span class="op">*</span>q <span class="op">/</span> <span class="op">\</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>           (((((b[<span class="dv">0</span>]<span class="op">*</span>r<span class="op">+</span>b[<span class="dv">1</span>])<span class="op">*</span>r<span class="op">+</span>b[<span class="dv">2</span>])<span class="op">*</span>r<span class="op">+</span>b[<span class="dv">3</span>])<span class="op">*</span>r<span class="op">+</span>b[<span class="dv">4</span>])<span class="op">*</span>r<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> binom_tail(k, n, p):</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Exact P(X &gt;= k) for X ~ Binomial(n, p), computed in log space."""</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> k <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">1.0</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> np.arange(k, n <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    logs <span class="op">=</span> (LOG_FACT[n] <span class="op">-</span> LOG_FACT[i] <span class="op">-</span> LOG_FACT[n <span class="op">-</span> i]</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> i <span class="op">*</span> np.log(p) <span class="op">+</span> (n <span class="op">-</span> i) <span class="op">*</span> np.log1p(<span class="op">-</span>p))</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    top <span class="op">=</span> logs.<span class="bu">max</span>()</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.exp(top <span class="op">+</span> np.log(np.<span class="bu">sum</span>(np.exp(logs <span class="op">-</span> top)))))</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clopper_pearson_lower(k, n, alpha<span class="op">=</span><span class="fl">0.01</span>):</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Largest p with P(X &gt;= k) &lt;= alpha, by bisection."""</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> k <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">0.0</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">1.0</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">60</span>):</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>        mid <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (lo <span class="op">+</span> hi)</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> binom_tail(k, n, mid) <span class="op">&lt;</span> alpha:</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>            lo <span class="op">=</span> mid</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>            hi <span class="op">=</span> mid</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> lo</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> smoothed_counts(par, X, sigma, draws, rng):</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> np.zeros((<span class="bu">len</span>(X), CLASSES), dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(draws):</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> np.argmax(logits(par, X <span class="op">+</span> sigma <span class="op">*</span> rng.normal(size<span class="op">=</span>X.shape)), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>        counts[np.arange(<span class="bu">len</span>(X)), pred] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> counts</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>radii <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.6</span>, <span class="dv">40</span>)</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">400</span>)</span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">4.1</span>))</span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sigma, color <span class="kw">in</span> <span class="bu">zip</span>([<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>], [<span class="st">"#a4553a"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#2a6e6e"</span>]):</span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>    smooth_base <span class="op">=</span> train(init_params(np.random.default_rng(<span class="dv">9</span>)), X_train, y_train,</span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>                        perturb<span class="op">=</span><span class="kw">lambda</span> p, Xb, yb, r: Xb <span class="op">+</span> sigma <span class="op">*</span> r.normal(size<span class="op">=</span>Xb.shape),</span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>                        rng<span class="op">=</span>np.random.default_rng(<span class="dv">10</span>))</span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>    draws <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> smoothed_counts(smooth_base, X_test[subset], sigma, draws,</span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>                             np.random.default_rng(<span class="dv">21</span>))</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>    top <span class="op">=</span> counts.argmax(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>    cache <span class="op">=</span> {}</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>    certified <span class="op">=</span> np.zeros(<span class="bu">len</span>(top))</span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, k <span class="kw">in</span> <span class="bu">enumerate</span>(counts[np.arange(<span class="bu">len</span>(top)), top]):</span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> k <span class="kw">not</span> <span class="kw">in</span> cache:</span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>            cache[k] <span class="op">=</span> clopper_pearson_lower(<span class="bu">int</span>(k), draws)</span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>        pa <span class="op">=</span> cache[k]</span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a>        certified[i] <span class="op">=</span> sigma <span class="op">*</span> normal_quantile(pa) <span class="cf">if</span> pa <span class="op">&gt;</span> <span class="fl">0.5</span> <span class="cf">else</span> <span class="op">-</span><span class="fl">1.0</span></span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a>    correct <span class="op">=</span> top <span class="op">==</span> y_test[subset]</span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> [<span class="bu">float</span>(np.mean(correct <span class="op">&amp;</span> (certified <span class="op">&gt;=</span> r))) <span class="cf">for</span> r <span class="kw">in</span> radii]</span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a>    ax.plot(radii, curve, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color, label<span class="op">=</span><span class="vs">fr"</span><span class="dv">$\s</span><span class="vs">igma = </span><span class="sc">{</span>sigma<span class="sc">}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a>ax.axvline(EPS <span class="op">*</span> np.sqrt(DIM), color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>,</span>
+<span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="vs">r"</span><span class="dv">$</span><span class="er">\</span><span class="vs">ell_2</span><span class="dv">$</span><span class="vs"> size of the </span><span class="dv">$</span><span class="er">\</span><span class="vs">ell_</span><span class="er">\</span><span class="vs">infty</span><span class="dv">$</span><span class="vs"> ball used above"</span>)</span>
+<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="vs">r"</span><span class="dv">$</span><span class="er">\</span><span class="vs">ell_2</span><span class="dv">$</span><span class="vs"> radius"</span>, ylabel<span class="op">=</span><span class="st">"certified accuracy"</span>,</span>
+<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Certified accuracy of the smoothed classifier"</span>)</span>
+<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-adv-certified" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-adv-certified-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-adv-certified-output-1.png" width="721" height="383" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-adv-certified-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Certified accuracy against L2 radius for the smoothed classifier at three noise levels, using exact Clopper-Pearson bounds at 99% confidence. Larger noise certifies further but classifies less well, and no attack was run to produce any point on this plot.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Two observations, one encouraging and one sobering.</p>
+<p>The encouraging one is that nothing on this plot depends on an attack. The certificate follows from <a href="#eq-adv-radius" class="quarto-xref">Equation&nbsp;5</a> and a confidence interval, so a stronger adversary discovered next year cannot move any of these curves. The tradeoff visible across the three lines is the honest one: larger <span class="math inline">\sigma</span> certifies further out and classifies worse, because a base classifier that must survive heavy noise is a blunter classifier.</p>
+<p>The sobering one is the vertical line. The <span class="math inline">\ell_\infty</span> ball of radius <span class="math inline">0.5</span> used throughout the empirical section contains points at <span class="math inline">\ell_2</span> distance <span class="math inline">0.5\sqrt{20} \approx 2.2</span>, well beyond where any of these curves still certifies anything. This is not a defect of the experiment, it is the state of the field: certified radii remain far smaller than the budgets at which empirical robustness is reported, which is why adversarial training remains the practical baseline despite offering no guarantee, and why the two lines of work are usually described as complementary rather than competing.</p>
+</section>
+<section id="the-same-quantifier-in-safety-training" class="level2">
+<h2 class="anchored" data-anchor-id="the-same-quantifier-in-safety-training">The same quantifier, in safety training</h2>
+<p>Now change domains without changing <a href="#eq-adv-bound" class="quarto-xref">Equation&nbsp;3</a>.</p>
+<p>Behavioural safety training reports something of the form: after fine-tuning, the model does not produce the unwanted behaviour on any prompt in the evaluation set. That is <a href="#eq-adv-measured" class="quarto-xref">Equation&nbsp;2</a> with <span class="math inline">\mathcal{A}</span> a set of elicitation prompts rather than a set of perturbations, and it is an upper bound on the true rate for exactly the same reason.</p>
+<p>The Sleeper Agents study is the clearest instance <span class="citation" data-cites="hubinger2024sleeper">(<a href="#ref-hubinger2024sleeper" role="doc-biblioref"><span class="nocase">Hubinger et al.</span> 2024</a>)</span>. Models were deliberately backdoored to behave badly under a trigger, then subjected to supervised fine-tuning, reinforcement learning from human feedback, and adversarial red-team training. The behaviour survived all three. The detail that matters here is what adversarial training accomplished: red-team prompts did elicit the behaviour without the literal trigger, and training on those prompts drove the rate on that distribution to near zero, while the rate under the real trigger stayed around 99%.</p>
+<p>Read through the lens of this article, that is not a surprising result about deception. It is gradient masking with a different search space. The evaluation set <span class="math inline">\mathcal{A}</span> was the red-team distribution. Training against <span class="math inline">\mathcal{A}</span> reduced <span class="math inline">\widehat R</span> measured on <span class="math inline">\mathcal{A}</span>. The gap between <span class="math inline">\widehat R</span> and <span class="math inline">R</span> was never touched, because the trigger was never in <span class="math inline">\mathcal{A}</span>, and the optimization sharpened the model’s ability to distinguish the two.</p>
+<p>The structural parallel goes further than the analogy suggests, in three respects.</p>
+<div id="tbl-adv-parallel" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-adv-parallel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: One quantifier structure, two literatures.
+</figcaption>
+<div aria-describedby="tbl-adv-parallel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Adversarial examples</th>
+<th style="text-align: left;">Behavioural safety training</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Search space <span class="math inline">\mathcal{A}</span></td>
+<td style="text-align: left;">perturbations an attack finds</td>
+<td style="text-align: left;">prompts a red team writes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Masking mechanism</td>
+<td style="text-align: left;">gradient carries no signal</td>
+<td style="text-align: left;">trigger is absent from the search</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Effect of training on <span class="math inline">\mathcal{A}</span></td>
+<td style="text-align: left;">can lower true robustness below the baseline</td>
+<td style="text-align: left;">sharpens discrimination of the trigger</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Available lower bound</td>
+<td style="text-align: left;">certified radius</td>
+<td style="text-align: left;">no analogue in general use</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The third row is the one people find least intuitive in both fields. In the adversarial case, Tramèr and coauthors observe repeatedly that combining a defense with adversarial training, where the inner attack is weak, produces <em>worse</em> robustness than adversarial training alone: if the inner maximization cannot find adversarial examples, the model never learns to resist them. In the safety case, training against an incomplete elicitation set produces a model that behaves better on that set and is harder to audit off it. In both cases, optimizing against a weak search does not merely fail to help. It can move the model in a direction that widens the gap between the number you report and the number you care about.</p>
+<p>The fourth row is where the fields differ, and it is the more useful observation. Certified robustness exists because someone was willing to accept a much smaller guaranteed radius in exchange for a bound that no future adversary can invalidate. The analogous move in safety would be a guarantee that holds over an entire class of inputs rather than an enumerated set, and the honest position is that no such guarantee is available at present for behavioural properties of language models. Until it is, every published safety evaluation should be read the way <a href="#eq-adv-bound" class="quarto-xref">Equation&nbsp;3</a> says to read it: as the best case, established by whoever searched, with the size of the remaining gap unknown.</p>
+</section>
+<section id="what-this-small-experiment-does-not-settle" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-small-experiment-does-not-settle">What this small experiment does not settle</h2>
+<p>The dataset is synthetic and low-dimensional, and the attacks are the textbook ones. That is enough to demonstrate the quantifier structure and reproduce the taxonomy, and not enough to say anything about which defenses work at scale. The literature’s own conclusion on that question is discouraging in a specific way: the breaks in the thirteen-defense study required no new techniques, only the methodological discipline of forming a hypothesis about where each defense is weakest and targeting it. What was missing was never the tooling.</p>
+<p>If there is one transferable habit, it is to report the attack set alongside the number, and to treat any evaluation whose diagnostics fire as unfinished rather than as evidence. A robustness result without its <span class="math inline">\mathcal{A}</span> is not a measurement. It is an upper bound with the bound left off.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-athalye2018obfuscated" class="csl-entry" role="listitem">
+Athalye, Anish, Nicholas Carlini, and David Wagner. 2018. <span>“Obfuscated Gradients Give a False Sense of Security: Circumventing Defenses to Adversarial Examples.”</span> <em>Proceedings of the 35th International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/1802.00420">https://arxiv.org/abs/1802.00420</a>.
+</div>
+<div id="ref-cohen2019certified" class="csl-entry" role="listitem">
+Cohen, Jeremy M., Elan Rosenfeld, and J. Zico Kolter. 2019. <span>“Certified Adversarial Robustness via Randomized Smoothing.”</span> <em>Proceedings of the 36th International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/1902.02918">https://arxiv.org/abs/1902.02918</a>.
+</div>
+<div id="ref-hubinger2024sleeper" class="csl-entry" role="listitem">
+<span class="nocase">Hubinger, Evan, Carson Denison, Jesse Mu, et al.</span> 2024. <span>“Sleeper Agents: Training Deceptive <span>LLMs</span> That Persist Through Safety Training.”</span> <em>arXiv Preprint arXiv:2401.05566</em>. <a href="https://arxiv.org/abs/2401.05566">https://arxiv.org/abs/2401.05566</a>.
+</div>
+<div id="ref-madry2018towards" class="csl-entry" role="listitem">
+Madry, Aleksander, Aleksandar Makelov, Ludwig Schmidt, Dimitris Tsipras, and Adrian Vladu. 2018. <span>“Towards Deep Learning Models Resistant to Adversarial Attacks.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/1706.06083">https://arxiv.org/abs/1706.06083</a>.
+</div>
+<div id="ref-tramer2020adaptive" class="csl-entry" role="listitem">
+Tramèr, Florian, Nicholas Carlini, Wieland Brendel, and Aleksander Madry. 2020. <span>“On Adaptive Attacks to Adversarial Example Defenses.”</span> <em>Advances in Neural Information Processing Systems 33</em>. <a href="https://arxiv.org/abs/2002.08347">https://arxiv.org/abs/2002.08347</a>.
+</div>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
+  author = {Marino, Diego Filippo},
+  title = {Every {Robustness} {Number} {Is} an {Upper} {Bound}},
+  date = {2026-08-14},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Marino, Diego Filippo. 2026. <span>“Every Robustness Number Is an Upper
+Bound.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/">https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/diegofilippomarino\.github\.io\/Eigenholm\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "DiegoFilippoMarino/Eigenholm";
+    script.dataset.repoId = "R_kgDOTEzjQw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOTEzjQ84C_3sV";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/robustness-numbers-are-upper-bounds/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Diego Filippo Marino">
+<meta name="dcterms.date" content="2026-08-14">
+<meta name="description" content="Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins.">
+
+<title>The Arithmetic of Editing a Fact – Eigenholm</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4728301da8b9bab53516c2cdd3b118ae.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="The Arithmetic of Editing a Fact – Eigenholm">
+<meta property="og:description" content="Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins.">
+<meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/index_files/figure-html/fig-mem-capacity-output-1.png">
+<meta property="og:site_name" content="Eigenholm">
+<meta property="og:image:height" content="746">
+<meta property="og:image:width" content="1399">
+<meta name="twitter:title" content="The Arithmetic of Editing a Fact – Eigenholm">
+<meta name="twitter:description" content="Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins.">
+<meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/index_files/figure-html/fig-mem-capacity-output-1.png">
+<meta name="twitter:image-height" content="746">
+<meta name="twitter:image-width" content="1399">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Eigenholm</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Writing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/index.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes/index.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about/index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/DiegoFilippoMarino/Eigenholm"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a-linear-associative-memory-and-its-capacity" id="toc-a-linear-associative-memory-and-its-capacity" class="nav-link active" data-scroll-target="#a-linear-associative-memory-and-its-capacity">A linear associative memory and its capacity</a></li>
+  <li><a href="#the-edit-as-a-constrained-projection" id="toc-the-edit-as-a-constrained-projection" class="nav-link" data-scroll-target="#the-edit-as-a-constrained-projection">The edit as a constrained projection</a></li>
+  <li><a href="#reading-the-collateral-damage-off-the-formula" id="toc-reading-the-collateral-damage-off-the-formula" class="nav-link" data-scroll-target="#reading-the-collateral-damage-off-the-formula">Reading the collateral damage off the formula</a></li>
+  <li><a href="#edits-accumulate" id="toc-edits-accumulate" class="nav-link" data-scroll-target="#edits-accumulate">Edits accumulate</a></li>
+  <li><a href="#the-alternative-is-to-not-store-it-in-the-weights" id="toc-the-alternative-is-to-not-store-it-in-the-weights" class="nav-link" data-scroll-target="#the-alternative-is-to-not-store-it-in-the-weights">The alternative is to not store it in the weights</a></li>
+  <li><a href="#limits" id="toc-limits" class="nav-link" data-scroll-target="#limits">Limits</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/arithmetic-of-editing-a-fact/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">The Arithmetic of Editing a Fact</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Interpretability</div>
+    <div class="quarto-category">Linear Algebra</div>
+    <div class="quarto-category">Retrieval</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Diego Filippo Marino </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 14, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Causal tracing localizes factual recall in a transformer to a specific place: the middle-layer feed-forward blocks, read at the last token of the subject <span class="citation" data-cites="meng2022rome">(<a href="#ref-meng2022rome" role="doc-biblioref">Meng et al. 2022</a>)</span>. Corrupt the subject embeddings, restore one hidden state at a time, and the states that recover the prediction cluster there. The follow-up move is to treat the down-projection of that feed-forward block as a linear key-value store and write a new association into it with a closed-form rank-one update.</p>
+<p>The rank-one formula is usually quoted as a result. It is more useful as a derivation, because the derivation says something the formula alone does not: it tells you exactly which other facts the edit disturbs, and by how much. That quantity has a clean form, it depends on a whitening matrix that is often described as a technical detail, and it predicts the shape of the degradation curve when edits are applied one after another.</p>
+<p>This article derives the update from a constrained least-squares problem, reads the collateral damage off the Lagrange multiplier, checks both against simulation, and then compares the whole approach against the alternative of keeping facts outside the weights entirely. A companion piece on this blog, <a href="../../posts/rank-of-memory/index.html">The Rank of Memory</a>, looks at a different bottleneck, how much information crosses a sequence boundary. The bottleneck here is orthogonal to it: how many independent associations a fixed weight matrix can hold before they start reading each other’s mail.</p>
+<section id="a-linear-associative-memory-and-its-capacity" class="level2">
+<h2 class="anchored" data-anchor-id="a-linear-associative-memory-and-its-capacity">A linear associative memory and its capacity</h2>
+<p>Take a matrix <span class="math inline">W \in \mathbb{R}^{d_{\text{out}} \times d}</span> used as a lookup table. Keys <span class="math inline">k_i \in \mathbb{R}^{d}</span> go in, values <span class="math inline">v_i \in \mathbb{R}^{d_{\text{out}}}</span> come out, and storage means arranging that <span class="math inline">W k_i \approx v_i</span> for all <span class="math inline">i</span>. With <span class="math inline">K = [k_1,\dots,k_m]</span> and <span class="math inline">V = [v_1,\dots,v_m]</span>, the least-squares solution is <span class="math inline">W = VK^{+}</span>.</p>
+<p>The capacity question is what happens as <span class="math inline">m</span> grows. Consider the simplest case, random unit-norm keys and the Hebbian construction <span class="math inline">W = \sum_j v_j k_j^\top</span>. Reading with key <span class="math inline">k_i</span> gives</p>
+<p><span id="eq-mem-crosstalk"><span class="math display">
+W k_i \;=\; v_i \underbrace{(k_i^\top k_i)}_{=1} \;+\; \sum_{j \ne i} v_j\,(k_j^\top k_i),
+\tag{1}</span></span></p>
+<p>so the retrieved vector is the target plus a sum of <span class="math inline">m-1</span> interference terms weighted by key overlaps. For independent random unit vectors in <span class="math inline">\mathbb{R}^d</span>, <span class="math inline">\mathbb{E}[(k_j^\top k_i)^2] = 1/d</span>, so the expected squared norm of the interference is <span class="math inline">(m-1)/d</span> times the typical value norm. Signal-to-noise degrades like <span class="math inline">d/m</span>, and the memory saturates when <span class="math inline">m</span> approaches <span class="math inline">d</span>.</p>
+<p>Least squares does better than the Hebbian rule, exactly until it cannot. For <span class="math inline">m \le d</span>, random keys are linearly independent with probability one, so <span class="math inline">W = VK^{+}</span> achieves <span class="math inline">Wk_i = v_i</span> exactly for every <span class="math inline">i</span>. Past <span class="math inline">m = d</span> the system is overdetermined and errors appear. The transition is sharp and worth seeing.</p>
+<div id="cell-fig-mem-capacity" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>DIM, VALUE_DIM <span class="op">=</span> <span class="dv">64</span>, <span class="dv">32</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> store(m, rule, rng):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> rng.normal(size<span class="op">=</span>(DIM, m))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    K <span class="op">/=</span> np.linalg.norm(K, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> K.T <span class="cf">if</span> rule <span class="op">==</span> <span class="st">"hebbian"</span> <span class="cf">else</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> W <span class="op">@</span> K <span class="op">-</span> V</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.mean(np.<span class="bu">sum</span>(residual <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.<span class="bu">sum</span>(V <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>)))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>loads <span class="op">=</span> np.unique(np.<span class="bu">round</span>(np.geomspace(<span class="dv">2</span>, <span class="dv">400</span>, <span class="dv">34</span>)).astype(<span class="bu">int</span>))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {}</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> (<span class="st">"least squares"</span>, <span class="st">"hebbian"</span>):</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    curves[rule] <span class="op">=</span> [np.mean([store(m, rule, np.random.default_rng(<span class="dv">97</span> <span class="op">*</span> t <span class="op">+</span> m))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                             <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>)]) <span class="cf">for</span> m <span class="kw">in</span> loads]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"least squares"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="st">"least squares"</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"hebbian"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="st">"outer-product rule"</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, np.maximum(loads <span class="op">-</span> <span class="dv">1</span>, <span class="dv">1</span>) <span class="op">/</span> DIM, <span class="st">"k--"</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>          label<span class="op">=</span><span class="vs">r"crosstalk prediction </span><span class="dv">$</span><span class="kw">(</span><span class="vs">m-1</span><span class="kw">)</span><span class="vs">/d</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">1.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"stored pairs / key dimension"</span>, ylabel<span class="op">=</span><span class="st">"relative retrieval error"</span>,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="ss">f"Capacity of a linear key-value store, d = </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-mem-capacity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-mem-capacity-output-1.png" width="700" height="373" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Retrieval error of a linear associative memory as the number of stored pairs crosses the key dimension. Least squares is exact below the threshold and degrades past it; the Hebbian outer-product rule degrades from the start, at the rate the crosstalk calculation predicts.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The dashed line is <a href="#eq-mem-crosstalk" class="quarto-xref">Equation&nbsp;1</a> with no fitted constants, and the outer-product curve follows it. The least-squares curve sits at numerical zero until the load ratio reaches one and then climbs to meet it. A linear memory of key dimension <span class="math inline">d</span> holds about <span class="math inline">d</span> facts for free and charges interference for every one after that.</p>
+<p>This is the sense in which a feed-forward block can be a factual store, and also the sense in which it is a lossy one. It is worth contrasting with the nonlinear case. A modern Hopfield network stores patterns as minima of an energy whose one-step retrieval is <span class="math inline">\xi^{\text{new}} = X\,\mathrm{softmax}(\beta X^\top \xi)</span>, which is exactly a transformer attention update, and whose capacity is exponential rather than linear in the dimension <span class="citation" data-cites="ramsauer2021hopfield">(<a href="#ref-ramsauer2021hopfield" role="doc-biblioref">Ramsauer et al. 2021</a>)</span>. The softmax is doing the work: it selects rather than superposes, so well-separated patterns do not interfere. Attention layers get the exponential version of this bargain, feed-forward layers get the linear one, and it is the linear one that admits a closed-form edit.</p>
+</section>
+<section id="the-edit-as-a-constrained-projection" class="level2">
+<h2 class="anchored" data-anchor-id="the-edit-as-a-constrained-projection">The edit as a constrained projection</h2>
+<p>Now the question that model editing asks. We have a working memory <span class="math inline">W</span> and want to insert one new association <span class="math inline">(k_*, v_*)</span> while disturbing everything else as little as possible. Written as an optimization, that is</p>
+<p><span id="eq-mem-objective"><span class="math display">
+\widehat W \;=\; \arg\min_{W'}\; \bigl\lVert (W' - W)\,C^{1/2} \bigr\rVert_F^2
+\qquad \text{subject to} \qquad W' k_* = v_* ,
+\tag{2}</span></span></p>
+<p>where <span class="math inline">C</span> is a positive definite matrix defining what “disturbing” means. Solving this is a short calculation. Write <span class="math inline">\Delta = W' - W</span> and <span class="math inline">r = v_* - Wk_*</span>, the residual the current memory leaves on the new key. The constraint is <span class="math inline">\Delta k_* = r</span>. Introducing a Lagrange multiplier <span class="math inline">\lambda \in \mathbb{R}^{d_{\text{out}}}</span>,</p>
+<p><span class="math display">
+\mathcal{L}(\Delta, \lambda) = \operatorname{tr}\bigl(\Delta C \Delta^\top\bigr) - \lambda^\top(\Delta k_* - r),
+</span></p>
+<p>and setting <span class="math inline">\partial \mathcal{L}/\partial \Delta = 2\Delta C - \lambda k_*^\top = 0</span> gives <span class="math inline">\Delta = \tfrac12 \lambda k_*^\top C^{-1}</span>. Substituting into the constraint fixes the multiplier, <span class="math inline">\tfrac12\lambda (k_*^\top C^{-1} k_*) = r</span>, and the solution is</p>
+<p><span id="eq-mem-rankone"><span class="math display">
+\boxed{\;\widehat W \;=\; W \;+\; \frac{\bigl(v_* - Wk_*\bigr)\,\bigl(C^{-1}k_*\bigr)^{\top}}{k_*^{\top} C^{-1} k_*}\;}
+\tag{3}</span></span></p>
+<p>The update in <a href="#eq-mem-rankone" class="quarto-xref">Equation&nbsp;3</a> is rank one, requires no gradient step, and is the exact minimizer of <a href="#eq-mem-objective" class="quarto-xref">Equation&nbsp;2</a>. This is the form the model-editing literature uses, with <span class="math inline">C = KK^\top</span> estimated as an uncentered covariance of keys collected from a large text sample <span class="citation" data-cites="meng2022rome">(<a href="#ref-meng2022rome" role="doc-biblioref">Meng et al. 2022</a>)</span>.</p>
+<p>Why that particular <span class="math inline">C</span>? The objective <a href="#eq-mem-objective" class="quarto-xref">Equation&nbsp;2</a> penalizes <span class="math inline">\lVert \Delta C^{1/2}\rVert_F^2 = \operatorname{tr}(\Delta C \Delta^\top)</span>, and if <span class="math inline">C = \mathbb{E}[kk^\top]</span> over the distribution of keys the model actually sees, then</p>
+<p><span id="eq-mem-expected-damage"><span class="math display">
+\operatorname{tr}\bigl(\Delta\, \mathbb{E}[kk^\top]\, \Delta^\top\bigr)
+= \mathbb{E}_k\bigl[\lVert \Delta k\rVert^2\bigr].
+\tag{4}</span></span></p>
+<p>So <a href="#eq-mem-objective" class="quarto-xref">Equation&nbsp;2</a> is not minimizing the change to the weights. It is minimizing the expected change to the <em>outputs</em>, averaged over the keys that occur in practice. That is a materially different thing, and it is the reason the covariance matters rather than being a numerical nicety.</p>
+</section>
+<section id="reading-the-collateral-damage-off-the-formula" class="level2">
+<h2 class="anchored" data-anchor-id="reading-the-collateral-damage-off-the-formula">Reading the collateral damage off the formula</h2>
+<p>The derivation hands us the damage for free. For any other key <span class="math inline">k</span>, the change in the memory’s output is</p>
+<p><span id="eq-mem-damage"><span class="math display">
+\widehat W k - W k \;=\; \bigl(v_* - Wk_*\bigr)\,\frac{k_*^\top C^{-1} k}{k_*^\top C^{-1} k_*}.
+\tag{5}</span></span></p>
+<p>Three things follow immediately from <a href="#eq-mem-damage" class="quarto-xref">Equation&nbsp;5</a>, and none of them are obvious from the statement that the update is rank one.</p>
+<p>First, the damage direction is the same for every key. Every disturbed fact is pushed toward the new value <span class="math inline">v_*</span>, never in some other arbitrary direction. An edit that inserts one association contaminates its neighbours with that same association rather than scrambling them.</p>
+<p>Second, the damage magnitude is controlled by a <em>whitened</em> inner product <span class="math inline">k_*^\top C^{-1} k</span>, not by the raw similarity <span class="math inline">k_*^\top k</span>. Two keys that look similar in the ambient space but differ along a low-variance direction of <span class="math inline">C</span> will have a large whitened separation and will barely interact. Two keys that differ only along a direction the model rarely uses will interact strongly. The choice of <span class="math inline">C</span> is therefore a choice about which notion of “nearby fact” the edit respects.</p>
+<p>Third, setting <span class="math inline">C = I</span> recovers the naive projection, which minimizes the change to the weights and ignores what the keys look like. Comparing the two is a direct test of whether the whitening earns its keep.</p>
+<div id="cell-fig-mem-specificity" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> anisotropic_keys(rng, n, dim<span class="op">=</span>DIM, decay<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keys drawn from a covariance with a power-law spectrum."""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.arange(<span class="dv">1</span>, dim <span class="op">+</span> <span class="dv">1</span>) <span class="op">**</span> (<span class="op">-</span>decay)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> np.linalg.qr(rng.normal(size<span class="op">=</span>(dim, dim)))[<span class="dv">0</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> basis <span class="op">@</span> np.diag(np.sqrt(spectrum)) <span class="op">@</span> basis.T</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>(dim, n)), root</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> edit(W, k_star, v_star, C_inv):</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> v_star <span class="op">-</span> W <span class="op">@</span> k_star</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    direction <span class="op">=</span> C_inv <span class="op">@</span> k_star</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">+</span> np.outer(residual, direction) <span class="op">/</span> <span class="bu">float</span>(k_star <span class="op">@</span> direction)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> one_trial(decay, rng, m<span class="op">=</span><span class="dv">40</span>):</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span>decay)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> root <span class="op">@</span> root.T</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(C <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, matrix <span class="kw">in</span> ((<span class="st">"whitened"</span>, C_inv), (<span class="st">"identity"</span>, np.eye(DIM))):</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        W_new <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        efficacy <span class="op">=</span> <span class="bu">float</span>(np.linalg.norm(W_new <span class="op">@</span> k_star <span class="op">-</span> v_star) <span class="op">/</span> np.linalg.norm(v_star))</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        damage <span class="op">=</span> <span class="bu">float</span>(np.mean(np.linalg.norm(W_new <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                               <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)))</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        out[name] <span class="op">=</span> (efficacy, damage)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>decays <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>]</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> {<span class="st">"whitened"</span>: [], <span class="st">"identity"</span>: []}</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>efficacy_check <span class="op">=</span> []</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> decay <span class="kw">in</span> decays:</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> [one_trial(decay, np.random.default_rng(<span class="dv">500</span> <span class="op">+</span> <span class="dv">13</span> <span class="op">*</span> t)) <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">40</span>)]</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> summary:</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        summary[name].append(np.mean([t[name][<span class="dv">1</span>] <span class="cf">for</span> t <span class="kw">in</span> trials]))</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    efficacy_check.append(<span class="bu">max</span>(<span class="bu">max</span>(t[name][<span class="dv">0</span>] <span class="cf">for</span> name <span class="kw">in</span> summary) <span class="cf">for</span> t <span class="kw">in</span> trials))</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"whitened"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="vs">r"whitened, </span><span class="dv">$</span><span class="vs">C</span><span class="dv">^</span><span class="vs">{-1}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"identity"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="vs">r"unweighted, </span><span class="dv">$</span><span class="vs">C = I</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"spectral decay of the key covariance"</span>, ylabel<span class="op">=</span><span class="st">"mean damage to stored facts"</span>,</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"One edit, two notions of minimal change"</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"largest post-edit error on the new association: </span><span class="sc">{</span><span class="bu">max</span>(efficacy_check)<span class="sc">:.2e}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-mem-specificity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-specificity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-mem-specificity-output-1.png" width="702" height="374" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-specificity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Efficacy and collateral damage of a single rank-one edit under anisotropic keys. Both variants install the new association exactly, but the whitened update disturbs held-out associations far less, and the advantage grows with the anisotropy of the key distribution.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>largest post-edit error on the new association: 2.59e-15</code></pre>
+</div>
+</div>
+<p>Efficacy is identical by construction: both updates satisfy the constraint in <a href="#eq-mem-objective" class="quarto-xref">Equation&nbsp;2</a> exactly, so the new fact is installed to machine precision either way. What separates them is specificity, and the separation grows with anisotropy. When keys are isotropic the two objectives coincide and the curves meet. As the key covariance develops a spectrum, the unweighted update spends its change budget along directions the keys occupy heavily, and the whitened update does not.</p>
+<p>This is the algebra behind the empirical finding that distinguishes rank-one editing from fine-tuning in the published comparisons. Fine-tuning a fact into the weights achieves efficacy and destroys specificity, because gradient descent on a single example has no term that asks what the change costs on the rest of the key distribution. Equation <a href="#eq-mem-objective" class="quarto-xref">Equation&nbsp;2</a> is that term, written down explicitly.</p>
+</section>
+<section id="edits-accumulate" class="level2">
+<h2 class="anchored" data-anchor-id="edits-accumulate">Edits accumulate</h2>
+<p>A single edit is cheap. The question that decides whether weight editing is a maintenance strategy is what happens after a hundred of them.</p>
+<p>Each edit adds a rank-one term, so after <span class="math inline">n</span> edits the accumulated perturbation has rank at most <span class="math inline">n</span>, and by <a href="#eq-mem-damage" class="quarto-xref">Equation&nbsp;5</a> each one drags every stored fact toward its own new value. There is no cancellation to hope for: the terms are not orthogonal unless the whitened keys happen to be, and successive edits are applied to an already-perturbed matrix, so later residuals <span class="math inline">v_* - Wk_*</span> are computed against a memory that is already degraded.</p>
+<div id="cell-fig-mem-sequential" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sequential_edits(n_edits, m, rng, use_whitening<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(root <span class="op">@</span> root.T <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    matrix <span class="op">=</span> C_inv <span class="cf">if</span> use_whitening <span class="cf">else</span> np.eye(DIM)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    baseline <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> []</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_edits):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        W <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        trace.append(<span class="bu">float</span>(np.mean(err)))</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(trace), baseline</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>n_edits <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.6</span>, <span class="fl">3.9</span>))</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> m, color <span class="kw">in</span> <span class="bu">zip</span>([<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>], [<span class="st">"#2a6e6e"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#a4553a"</span>]):</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, m, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> m))[<span class="dv">0</span>]</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> stored facts"</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, ylabel<span class="op">=</span><span class="st">"mean relative error on stored facts"</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span><span class="ss">f"Whitened edits, key dimension </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> use_white, color, style <span class="kw">in</span> ((<span class="va">True</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"-"</span>), (<span class="va">False</span>, <span class="st">"#a4553a"</span>, <span class="st">"--"</span>)):</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, <span class="dv">32</span>, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> <span class="dv">5</span>), use_white)[<span class="dv">0</span>]</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, style, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="st">"whitened"</span> <span class="cf">if</span> use_white <span class="cf">else</span> <span class="st">"unweighted"</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, title<span class="op">=</span><span class="st">"32 stored facts"</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes:</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-mem-sequential" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-sequential-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-mem-sequential-output-1.png" width="913" height="364" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-sequential-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Degradation of stored associations under a sequence of rank-one edits. Left: three memory loads, where a fuller memory degrades faster. Right: the whitened and unweighted updates at a fixed load, where the whitening advantage is large for the first few edits and gone by the end.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Three readings, one of them a caution about the method rather than about editing.</p>
+<p>Damage rises steeply and then flattens, but it flattens at relative error of order one, which is not a plateau in any comforting sense. It is the level at which the stored outputs have lost their correlation with the targets entirely. Between the first edit and the sixtieth, the memory goes from mostly intact to gone, and at no point does it stabilize somewhere useful.</p>
+<p>The rate depends on how full the memory already was. At a quarter of capacity the first edit costs about 12% relative error on the held-out facts; at three quarters of capacity it costs about 20%, and the gap widens as edits accumulate. This is the capacity result of the first section reappearing: an emptier memory has unused directions for an edit to hide in, and a fuller one does not.</p>
+<p>The whitening advantage is front-loaded. On the first edit the whitened update does roughly twice as well as the unweighted one, which is the specificity result of the previous section. By sixty edits the two are indistinguishable, because both have destroyed everything. Choosing the right notion of minimal change buys a better single edit, not a longer sequence of them.</p>
+<p>That is the structural argument against treating weight editing as a knowledge-maintenance mechanism, and it is independent of how good any particular editing method is. Rank-one edits are a good way to change a fact. They are a poor way to run a database, because a database is defined by the operation being repeatable.</p>
+</section>
+<section id="the-alternative-is-to-not-store-it-in-the-weights" class="level2">
+<h2 class="anchored" data-anchor-id="the-alternative-is-to-not-store-it-in-the-weights">The alternative is to not store it in the weights</h2>
+<p>The other design keeps facts outside the parameters. A retrieval-augmented model pairs a parametric model with a non-parametric index, retrieves at inference, and conditions on what it finds <span class="citation" data-cites="lewis2020rag">(<a href="#ref-lewis2020rag" role="doc-biblioref">Lewis et al. 2020</a>)</span>. RETRO takes this to a two-trillion-token database with a frozen retriever and chunked cross-attention whose cost is linear in the retrieved data, and reports that a model of 7.5B parameters conditioned on that database matches models roughly twenty-five times its size <span class="citation" data-cites="borgeaud2022retro">(<a href="#ref-borgeaud2022retro" role="doc-biblioref"><span class="nocase">Borgeaud et al.</span> 2022</a>)</span>.</p>
+<p>The comparison in the language of this article is direct.</p>
+<div id="tbl-mem-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mem-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Where a fact can live, and what each choice charges for.
+</figcaption>
+<div aria-describedby="tbl-mem-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Parametric memory</th>
+<th style="text-align: left;">Retrieval index</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Capacity</td>
+<td style="text-align: left;">about <span class="math inline">d</span> associations before interference</td>
+<td style="text-align: left;">limited by storage, not by dimension</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cost of one more fact</td>
+<td style="text-align: left;">interference on all others</td>
+<td style="text-align: left;">one more row</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cost of an update</td>
+<td style="text-align: left;">rank-one edit plus accumulating damage</td>
+<td style="text-align: left;">overwrite a row</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Compression across facts</td>
+<td style="text-align: left;">automatic, shared structure is exploited</td>
+<td style="text-align: left;">none, unless the encoder provides it</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Retrieval cost</td>
+<td style="text-align: left;">one matrix multiply</td>
+<td style="text-align: left;">nearest-neighbour search plus attention over the results</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Read down the columns, the tradeoff is not about capability but about which resource is scarce. A parametric memory is a compressor: it exploits structure shared between facts, which is exactly why a language model can answer questions it never saw verbatim, and it pays for that with interference and with an update path that degrades. An index is a lookup table: it has no interference and a trivial update path, and it exploits no structure at all beyond whatever the encoder put into the keys.</p>
+<p>That predicts where each should be used, and the prediction matches practice. Facts that are numerous, mutually independent, and volatile belong in an index, because they get no benefit from compression and their update cost dominates. Regularities that generalize belong in the weights, because that is where sharing happens and there is nothing to update. The awkward middle is a fact that is both volatile and load-bearing for generalization, and neither mechanism handles that well.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What causal tracing does and does not establish
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is worth separating two claims that are easy to merge. Causal tracing shows that certain hidden states are <em>causally decisive</em> for a prediction under a corrupt-and-restore intervention, with the average indirect effect concentrated at mid-layer feed-forward modules at the last subject token. Rank-one editing shows that a weight update at that same location changes the fact with both generalization and specificity. Together these are strong evidence that the location participates in factual recall.</p>
+<p>They do not establish that the fact is stored only there, that the mapping between facts and weight directions is one to one, or that the linear key-value picture is the whole computation. The original work is explicit that any middle layer could equivalently store the fact. The linear associative memory here is a model of a mechanism, and the arithmetic above inherits whatever error that model carries.</p>
+</div>
+</div>
+</section>
+<section id="limits" class="level2">
+<h2 class="anchored" data-anchor-id="limits">Limits</h2>
+<p>Three worth naming.</p>
+<p>The keys in a real transformer are not drawn from a fixed Gaussian, and the residual <span class="math inline">v_* - Wk_*</span> is not a free parameter. Choosing <span class="math inline">v_*</span> is itself an optimization, run to maximize the probability of the new object while holding the subject’s other properties in place, and the closed-form update is applied only afterwards. The simulations above skip that step entirely.</p>
+<p>The damage metric here is the error on stored associations, which is a proxy for the specificity metrics used in practice, where the question is whether a nearby subject’s unrelated facts survive. Those metrics involve the full network downstream of the edited layer, and a small change in the feed-forward output can be amplified or absorbed by later layers.</p>
+<p>And the sequential-edit result is a statement about repeated application of <a href="#eq-mem-rankone" class="quarto-xref">Equation&nbsp;3</a>, not about the best possible batched procedure. Solving for many associations jointly is a different and better-conditioned problem than solving for them one at a time, which is the direction later mass-editing methods take. The point that survives is the capacity bound in the first section: whatever procedure writes the facts, a linear store of key dimension <span class="math inline">d</span> has about <span class="math inline">d</span> independent directions to write them into, and edits beyond that are borrowing from facts already there.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-borgeaud2022retro" class="csl-entry" role="listitem">
+<span class="nocase">Borgeaud, Sebastian, Arthur Mensch, Jordan Hoffmann, et al.</span> 2022. <span>“Improving Language Models by Retrieving from Trillions of Tokens.”</span> <em>Proceedings of the 39th International Conference on Machine Learning</em>. <a href="https://arxiv.org/abs/2112.04426">https://arxiv.org/abs/2112.04426</a>.
+</div>
+<div id="ref-lewis2020rag" class="csl-entry" role="listitem">
+Lewis, Patrick, Ethan Perez, Aleksandra Piktus, et al. 2020. <span>“Retrieval-Augmented Generation for Knowledge-Intensive <span>NLP</span> Tasks.”</span> <em>Advances in Neural Information Processing Systems 33</em>. <a href="https://arxiv.org/abs/2005.11401">https://arxiv.org/abs/2005.11401</a>.
+</div>
+<div id="ref-meng2022rome" class="csl-entry" role="listitem">
+Meng, Kevin, David Bau, Alex Andonian, and Yonatan Belinkov. 2022. <span>“Locating and Editing Factual Associations in <span>GPT</span>.”</span> <em>Advances in Neural Information Processing Systems 35</em>. <a href="https://arxiv.org/abs/2202.05262">https://arxiv.org/abs/2202.05262</a>.
+</div>
+<div id="ref-ramsauer2021hopfield" class="csl-entry" role="listitem">
+Ramsauer, Hubert, Bernhard Schäfl, Johannes Lehner, et al. 2021. <span>“Hopfield Networks Is All You Need.”</span> <em>International Conference on Learning Representations</em>. <a href="https://arxiv.org/abs/2008.02217">https://arxiv.org/abs/2008.02217</a>.
+</div>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
+  author = {Marino, Diego Filippo},
+  title = {The {Arithmetic} of {Editing} a {Fact}},
+  date = {2026-08-14},
+  url = {https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-marino2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Marino, Diego Filippo. 2026. <span>“The Arithmetic of Editing a
+Fact.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/">https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/diegofilippomarino\.github\.io\/Eigenholm\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "DiegoFilippoMarino/Eigenholm";
+    script.dataset.repoId = "R_kgDOTEzjQw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOTEzjQ84C_3sV";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Eigenholm · <a href="../../colophon/">Colophon</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/arithmetic-of-editing-a-fact/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

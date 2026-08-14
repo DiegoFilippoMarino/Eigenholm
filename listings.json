@@ -1,8 +1,20 @@
 [
   {
-    "listing": "/notes/index.html",
+    "listing": "/index.html",
     "items": [
-      "/notes/speculative-sampling/index.html"
+      "/posts/rank-of-memory/index.html",
+      "/posts/generalization-gap-privacy-audit/index.html",
+      "/posts/straight-paths-cheap-samplers/index.html",
+      "/posts/graph-networks-two-failures/index.html",
+      "/posts/robustness-numbers-are-upper-bounds/index.html",
+      "/posts/test-time-compute-ceilings/index.html",
+      "/posts/preference-likelihood-two-jobs/index.html",
+      "/posts/arithmetic-of-editing-a-fact/index.html",
+      "/posts/three-ways-a-curve-bends/index.html",
+      "/posts/quantization-one-quadratic-form/index.html",
+      "/posts/rope-geometry/index.html",
+      "/posts/attention-from-logits-to-context/index.html",
+      "/posts/flashattention-io-aware/index.html"
     ]
   },
   {
@@ -12,16 +24,9 @@
     ]
   },
   {
-    "listing": "/index.html",
+    "listing": "/notes/index.html",
     "items": [
-      "/posts/test-time-compute-ceilings/index.html",
-      "/posts/rank-of-memory/index.html",
-      "/posts/generalization-gap-privacy-audit/index.html",
-      "/posts/straight-paths-cheap-samplers/index.html",
-      "/posts/graph-networks-two-failures/index.html",
-      "/posts/rope-geometry/index.html",
-      "/posts/attention-from-logits-to-context/index.html",
-      "/posts/flashattention-io-aware/index.html"
+      "/notes/speculative-sampling/index.html"
     ]
   }
 ]
