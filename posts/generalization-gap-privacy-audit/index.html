@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -421,6 +425,7 @@ window.Quarto = {
   <li><a href="#differential-privacy-answers-a-narrower-stronger-question" id="toc-differential-privacy-answers-a-narrower-stronger-question" class="nav-link" data-scroll-target="#differential-privacy-answers-a-narrower-stronger-question">Differential privacy answers a narrower, stronger question</a></li>
   <li><a href="#an-audit-matrix" id="toc-an-audit-matrix" class="nav-link" data-scroll-target="#an-audit-matrix">An audit matrix</a></li>
   <li><a href="#what-these-experiments-do-not-establish" id="toc-what-these-experiments-do-not-establish" class="nav-link" data-scroll-target="#what-these-experiments-do-not-establish">What these experiments do not establish</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/generalization-gap-privacy-audit/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -745,6 +750,14 @@ Figure&nbsp;2: Exact canary continuation in a smoothed count model. Repetition s
 <p>Random Fourier regression is not a language model, and a count-based <span class="math inline">n</span>-gram model has no distributed representation. The experiments are deliberately mechanism probes. They demonstrate that membership signal can vary sharply around interpolation and that duplication and context specificity are independent axes of extractability.</p>
 <p>They do not estimate the leakage of a deployed model. That requires attacks calibrated to the model family, held-out nonmembers from the same distribution, attention to low false-positive regimes, and canaries that reflect plausible sensitive formats without using real secrets.</p>
 <p>The main lesson is methodological. Good average generalization is compatible with dangerous tail behavior. Failed unprompted extraction is compatible with prefix-conditioned memorization. Deduplication is compatible with unique-record leakage. A privacy claim is only as precise as its threat model, adjacency unit, and audit procedure.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/three-ways-a-curve-bends/index.html">Three Ways a Curve Bends</a> revisits generalization where the curve itself misbehaves.</li>
+<li><a href="../../posts/arithmetic-of-editing-a-fact/index.html">The Arithmetic of Editing a Fact</a> asks where a memorized fact physically sits.</li>
+<li><a href="../../posts/robustness-numbers-are-upper-bounds/index.html">Every Robustness Number Is an Upper Bound</a> shares the structure: an audit is only as strong as its search.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

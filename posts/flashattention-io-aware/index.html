@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -420,6 +424,7 @@ window.Quarto = {
   <li><a href="#flashattention-2-changes-the-work-partition" id="toc-flashattention-2-changes-the-work-partition" class="nav-link" data-scroll-target="#flashattention-2-changes-the-work-partition">FlashAttention-2 changes the work partition</a></li>
   <li><a href="#arithmetic-intensity-and-the-roofline" id="toc-arithmetic-intensity-and-the-roofline" class="nav-link" data-scroll-target="#arithmetic-intensity-and-the-roofline">Arithmetic intensity and the roofline</a></li>
   <li><a href="#boundaries" id="toc-boundaries" class="nav-link" data-scroll-target="#boundaries">Boundaries</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/flashattention-io-aware/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -705,6 +710,14 @@ L_i=m_i+\log\ell_i,
 <h2 class="anchored" data-anchor-id="boundaries">Boundaries</h2>
 <p>FlashAttention does not make dense attention asymptotically linear in compute. It makes memory usage linear and reduces IO. Dense arithmetic remains quadratic in sequence length. It also does not replace the KV cache during autoregressive decoding. FlashAttention optimizes the attention kernel; KV-cache paging manages persistent state across requests.</p>
 <p>That distinction is worth keeping. Similar words such as memory-efficient can refer to activation memory, persistent cache capacity, allocator fragmentation, or bandwidth traffic. These are different constraints with different remedies.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/attention-from-logits-to-context/index.html">Attention, from Logits to Context</a> derives the operation this article reschedules.</li>
+<li><a href="../../posts/quantization-one-quadratic-form/index.html">Four Quantizers, One Quadratic Form</a> attacks the same bandwidth bound from the precision side.</li>
+<li><a href="../../projects/paged-kv-cache-simulator/index.html">A Paged KV-Cache Allocator, Built from First Principles</a> takes the memory argument to the serving layer.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

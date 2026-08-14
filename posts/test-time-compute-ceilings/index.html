@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -420,6 +424,7 @@ window.Quarto = {
   <li><a href="#rl-with-verifiable-rewards-changes-the-proposal" id="toc-rl-with-verifiable-rewards-changes-the-proposal" class="nav-link" data-scroll-target="#rl-with-verifiable-rewards-changes-the-proposal">RL with verifiable rewards changes the proposal</a></li>
   <li><a href="#compute-optimal-allocation-needs-two-confidence-estimates" id="toc-compute-optimal-allocation-needs-two-confidence-estimates" class="nav-link" data-scroll-target="#compute-optimal-allocation-needs-two-confidence-estimates">Compute-optimal allocation needs two confidence estimates</a></li>
   <li><a href="#what-the-toy-model-omits" id="toc-what-the-toy-model-omits" class="nav-link" data-scroll-target="#what-the-toy-model-omits">What the toy model omits</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/test-time-compute-ceilings/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -489,7 +494,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="first-ceiling-samples-are-correlated">First ceiling: samples are correlated</h2>
 <p>Equation <a href="#eq-independent-passk" class="quarto-xref">Equation&nbsp;1</a> assumes that each attempt is an independent Bernoulli trial with the same fixed <span class="math inline">p</span>. A simple alternative gives each problem a latent success rate</p>
 <p><span id="eq-beta-binomial"><span class="math display">
-P\sim\operatorname{Beta}(\alpha,\beta),qquad
+P\sim\operatorname{Beta}(\alpha,\beta),\qquad
 Y_i\mid P\sim\operatorname{Bernoulli}(P).
 \tag{3}</span></span></p>
 <p>Marginally, attempts have mean success probability <span class="math inline">p=\alpha/(\alpha+\beta)</span> and positive pairwise correlation</p>
@@ -673,6 +678,14 @@ J(\theta)=\mathbb E_{y\sim\pi_\theta(\cdot\mid x)}[V(x,y)],
 <li><strong>compute efficiency:</strong> how much new information did each additional candidate add?</li>
 </ol>
 <p>More inference compute is valuable when it explores genuinely different possibilities and when the selection mechanism remains reliable over the expanded search distribution. If either condition fails, scaling <span class="math inline">N</span> is not reasoning harder. It is paying to repeat a mistake or to find a new way to fool the judge.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/preference-likelihood-two-jobs/index.html">One Likelihood, Two Jobs</a> examines the verifier this argument depends on.</li>
+<li><a href="../../posts/robustness-numbers-are-upper-bounds/index.html">Every Robustness Number Is an Upper Bound</a> generalizes the point that a reported number is an optimum over a search.</li>
+<li><a href="../../notes/speculative-sampling/index.html">Speculative Sampling Preserves the Target Distribution</a> covers the sampling machinery underneath.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -421,6 +425,7 @@ window.Quarto = {
   <li><a href="#multi-scale-edges-are-a-physical-design-choice" id="toc-multi-scale-edges-are-a-physical-design-choice" class="nav-link" data-scroll-target="#multi-scale-edges-are-a-physical-design-choice">Multi-scale edges are a physical design choice</a></li>
   <li><a href="#expressivity-is-not-usefulness" id="toc-expressivity-is-not-usefulness" class="nav-link" data-scroll-target="#expressivity-is-not-usefulness">Expressivity is not usefulness</a></li>
   <li><a href="#a-better-architecture-question" id="toc-a-better-architecture-question" class="nav-link" data-scroll-target="#a-better-architecture-question">A better architecture question</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/graph-networks-two-failures/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -477,15 +482,15 @@ window.Quarto = {
 <section id="message-passing-as-a-local-invariant-program" class="level2">
 <h2 class="anchored" data-anchor-id="message-passing-as-a-local-invariant-program">Message passing as a local invariant program</h2>
 <p>A message-passing GNN updates node <span class="math inline">v</span> by</p>
-<p><span class="math display">
-m_v^{(\ell)}=operatorname{AGG}^{(\ell)}
-\left(\left\{h_u^{(\ell)}:u\in\mathcal N(v)\right\}\right),
-</span></p>
 <p><span id="eq-mpnn"><span class="math display">
-h_v^{(\ell+1)}=operatorname{UPDATE}^{(\ell)}
+\begin{aligned}
+m_v^{(\ell)}&amp;=\operatorname{AGG}^{(\ell)}
+\left(\left\{\!\left\{h_u^{(\ell)}:u\in\mathcal N(v)\right\}\!\right\}\right),\\[2pt]
+h_v^{(\ell+1)}&amp;=\operatorname{UPDATE}^{(\ell)}
 \left(h_v^{(\ell)},m_v^{(\ell)}\right).
+\end{aligned}
 \tag{1}</span></span></p>
-<p>The braces denote a multiset. Permuting the neighbors cannot change the aggregate. This is the correct symmetry for an unlabeled graph, and it imposes an information constraint.</p>
+<p>The doubled braces denote a multiset. Permuting the neighbors cannot change the aggregate, so <span class="math inline">\operatorname{AGG}^{(\ell)}</span> must be a function on multisets rather than on ordered tuples. This is the correct symmetry for an unlabeled graph, and it imposes an information constraint: whatever <a href="#eq-mpnn" class="quarto-xref">Equation&nbsp;1</a> cannot separate at layer <span class="math inline">\ell</span> stays merged at every later layer.</p>
 <p>Xu et al.&nbsp;showed that neighborhood-aggregation GNNs are at most as discriminative as the one-dimensional Weisfeiler-Lehman test, usually called 1-WL <span class="citation" data-cites="xu2019gin">(<a href="#ref-xu2019gin" role="doc-biblioref">Xu et al. 2019</a>)</span>. A model reaches that bound only when its aggregation and readout are injective over multisets. Sum aggregation can be injective under suitable conditions. Mean and max discard multiplicity information.</p>
 </section>
 <section id="failure-one-indistinguishable-structures" class="level2">
@@ -726,6 +731,13 @@ H^{(\ell+1)}=\operatorname{MLP}
 <li>Which distant variables must communicate, through how many independent channels, and at what spatial scales?</li>
 </ol>
 <p>The first question chooses invariants and encodings. The second chooses edges, hierarchy, state width, and global mixing. A graph transformer becomes convincing when its answer to both is explicit. Otherwise, global attention is only an expensive way to make every node adjacent to every other node.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/rank-of-memory/index.html">The Rank of Memory</a> makes the bottleneck argument algebraic for sequences.</li>
+<li><a href="../../posts/attention-from-logits-to-context/index.html">Attention, from Logits to Context</a> gives the attention operation used as the global fix.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

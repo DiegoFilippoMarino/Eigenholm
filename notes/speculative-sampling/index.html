@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -421,6 +425,7 @@ window.Quarto = {
   <li><a href="#empirical-sanity-check" id="toc-empirical-sanity-check" class="nav-link" data-scroll-target="#empirical-sanity-check">Empirical sanity check</a></li>
   <li><a href="#where-the-speedup-comes-from" id="toc-where-the-speedup-comes-from" class="nav-link" data-scroll-target="#where-the-speedup-comes-from">Where the speedup comes from</a></li>
   <li><a href="#takeaway" id="toc-takeaway" class="nav-link" data-scroll-target="#takeaway">Takeaway</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/notes/speculative-sampling/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -586,7 +591,7 @@ S(\alpha,\gamma,c)
 <img src="index_files/figure-html/fig-speculation-length-output-1.png" width="663" height="355" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-speculation-length-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Idealized speedup from Equation 5 as speculation length changes. The draft cost is 5 percent of a target invocation.
+Figure&nbsp;2: Idealized speedup from the throughput model above as speculation length changes. The draft cost is 5 percent of a target invocation.
 </figcaption>
 </figure>
 </div>
@@ -670,6 +675,13 @@ Figure&nbsp;3: Monte Carlo check with 300,000 speculative samples. Error bars sh
 <section id="takeaway" class="level2">
 <h2 class="anchored" data-anchor-id="takeaway">Takeaway</h2>
 <p>The draft model is a performance hint. Equations <a href="#eq-accepted-mass" class="quarto-xref">Equation&nbsp;2</a> and <a href="#eq-rejection" class="quarto-xref">Equation&nbsp;3</a> show why it has no authority over the final distribution: accepted overlap plus rejected residual reconstructs the target exactly.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/test-time-compute-ceilings/index.html">Inference Compute Has Two Ceilings</a> puts a budget on the tokens this machinery produces.</li>
+<li><a href="../../projects/paged-kv-cache-simulator/index.html">A Paged KV-Cache Allocator, Built from First Principles</a> handles the memory these extra sequences need.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

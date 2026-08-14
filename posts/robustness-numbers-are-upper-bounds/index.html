@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -419,6 +423,7 @@ window.Quarto = {
   <li><a href="#the-one-number-that-is-a-lower-bound" id="toc-the-one-number-that-is-a-lower-bound" class="nav-link" data-scroll-target="#the-one-number-that-is-a-lower-bound">The one number that is a lower bound</a></li>
   <li><a href="#the-same-quantifier-in-safety-training" id="toc-the-same-quantifier-in-safety-training" class="nav-link" data-scroll-target="#the-same-quantifier-in-safety-training">The same quantifier, in safety training</a></li>
   <li><a href="#what-this-small-experiment-does-not-settle" id="toc-what-this-small-experiment-does-not-settle" class="nav-link" data-scroll-target="#what-this-small-experiment-does-not-settle">What this small experiment does not settle</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/robustness-numbers-are-upper-bounds/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -944,7 +949,7 @@ Figure&nbsp;3: Certified accuracy against L2 radius for the smoothed classifier 
 </div>
 </div>
 <p>Two observations, one encouraging and one sobering.</p>
-<p>The encouraging one is that nothing on this plot depends on an attack. The certificate follows from <a href="#eq-adv-radius" class="quarto-xref">Equation&nbsp;5</a> and a confidence interval, so a stronger adversary discovered next year cannot move any of these curves. The tradeoff visible across the three lines is the honest one: larger <span class="math inline">\sigma</span> certifies further out and classifies worse, because a base classifier that must survive heavy noise is a blunter classifier.</p>
+<p>The encouraging one is that nothing on this plot depends on an attack. The certificate follows from <a href="#eq-adv-radius" class="quarto-xref">Equation&nbsp;5</a> and a confidence interval, so a stronger adversary discovered next year cannot move any of these curves. The tradeoff visible across the three lines is the honest one: larger <span class="math inline">\sigma</span> certifies further out and classifies worse, because a base classifier that must survive heavy noise is a blunter classifier. The two larger noise levels reach the same maximum radius, which is an artifact worth naming: with a thousand samples the Clopper-Pearson bound cannot push <span class="math inline">\underline{p_A}</span> past about 0.994, so the factor <span class="math inline">\Phi^{-1}(\underline{p_A})</span> saturates near 2.5 and the certificate becomes limited by the sampling budget rather than by the classifier.</p>
 <p>The sobering one is the vertical line. The <span class="math inline">\ell_\infty</span> ball of radius <span class="math inline">0.5</span> used throughout the empirical section contains points at <span class="math inline">\ell_2</span> distance <span class="math inline">0.5\sqrt{20} \approx 2.2</span>, well beyond where any of these curves still certifies anything. This is not a defect of the experiment, it is the state of the field: certified radii remain far smaller than the budgets at which empirical robustness is reported, which is why adversarial training remains the practical baseline despite offering no guarantee, and why the two lines of work are usually described as complementary rather than competing.</p>
 </section>
 <section id="the-same-quantifier-in-safety-training" class="level2">
@@ -1006,6 +1011,14 @@ Table&nbsp;1: One quantifier structure, two literatures.
 <h2 class="anchored" data-anchor-id="what-this-small-experiment-does-not-settle">What this small experiment does not settle</h2>
 <p>The dataset is synthetic and low-dimensional, and the attacks are the textbook ones. That is enough to demonstrate the quantifier structure and reproduce the taxonomy, and not enough to say anything about which defenses work at scale. The literature’s own conclusion on that question is discouraging in a specific way: the breaks in the thirteen-defense study required no new techniques, only the methodological discipline of forming a hypothesis about where each defense is weakest and targeting it. What was missing was never the tooling.</p>
 <p>If there is one transferable habit, it is to report the attack set alongside the number, and to treat any evaluation whose diagnostics fire as unfinished rather than as evidence. A robustness result without its <span class="math inline">\mathcal{A}</span> is not a measurement. It is an upper bound with the bound left off.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/preference-likelihood-two-jobs/index.html">One Likelihood, Two Jobs</a> traces the same problem through alignment training.</li>
+<li><a href="../../posts/generalization-gap-privacy-audit/index.html">A Generalization Gap Is Not a Privacy Audit</a> runs the argument for privacy audits.</li>
+<li><a href="../../posts/test-time-compute-ceilings/index.html">Inference Compute Has Two Ceilings</a> covers what happens when the search set grows instead.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

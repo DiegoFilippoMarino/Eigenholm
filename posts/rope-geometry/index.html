@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -420,6 +424,7 @@ window.Quarto = {
   <li><a href="#three-ways-to-extend-context-and-what-each-one-breaks" id="toc-three-ways-to-extend-context-and-what-each-one-breaks" class="nav-link" data-scroll-target="#three-ways-to-extend-context-and-what-each-one-breaks">Three ways to extend context, and what each one breaks</a></li>
   <li><a href="#numerical-and-implementation-details" id="toc-numerical-and-implementation-details" class="nav-link" data-scroll-target="#numerical-and-implementation-details">Numerical and implementation details</a></li>
   <li><a href="#what-rope-buys" id="toc-what-rope-buys" class="nav-link" data-scroll-target="#what-rope-buys">What RoPE buys</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rope-geometry/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -629,6 +634,13 @@ Figure&nbsp;2: Number of rotations observed by each coordinate pair at context l
 <h2 class="anchored" data-anchor-id="what-rope-buys">What RoPE buys</h2>
 <p>RoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate <span class="math inline">Q</span> and <span class="math inline">K</span>, leave <span class="math inline">V</span> unchanged, and preserve the rest of the attention kernel.</p>
 <p>The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/attention-from-logits-to-context/index.html">Attention, from Logits to Context</a> sets up the dot product these rotations act on.</li>
+<li><a href="../../posts/rank-of-memory/index.html">The Rank of Memory</a> covers the other way long context gets expensive.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -420,6 +424,7 @@ window.Quarto = {
   <li><a href="#associative-memory-and-compression" id="toc-associative-memory-and-compression" class="nav-link" data-scroll-target="#associative-memory-and-compression">Associative memory and compression</a></li>
   <li><a href="#hardware-does-not-erase-algebra" id="toc-hardware-does-not-erase-algebra" class="nav-link" data-scroll-target="#hardware-does-not-erase-algebra">Hardware does not erase algebra</a></li>
   <li><a href="#what-this-model-leaves-out" id="toc-what-this-model-leaves-out" class="nav-link" data-scroll-target="#what-this-model-leaves-out">What this model leaves out</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/rank-of-memory/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -475,7 +480,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="unrolling-a-recurrence-into-a-matrix">Unrolling a recurrence into a matrix</h2>
 <p>Consider a time-varying linear state-space model</p>
 <p><span id="eq-ssm-recurrence"><span class="math display">
-h_i=A_i h_{i-1}+B_i x_i,qquad y_i=C_i^\top h_i,
+h_i=A_i h_{i-1}+B_i x_i,\qquad y_i=C_i^\top h_i,
 \tag{1}</span></span></p>
 <p>where <span class="math inline">h_i\in\mathbb R^N</span>. Unrolling <a href="#eq-ssm-recurrence" class="quarto-xref">Equation&nbsp;1</a> gives</p>
 <p><span id="eq-ssm-unrolled"><span class="math display">
@@ -484,7 +489,7 @@ y_i=\sum_{j\le i} C_i^\top
 \tag{2}</span></span></p>
 <p>The complete sequence operator is therefore a lower-triangular matrix <span class="math inline">M</span> with entries</p>
 <p><span id="eq-ssm-matrix"><span class="math display">
-M_{ij}=C_i^\top A_iA_{i-1}\cdots A_{j+1}B_j,qquad j\le i.
+M_{ij}=C_i^\top A_iA_{i-1}\cdots A_{j+1}B_j,\qquad j\le i.
 \tag{3}</span></span></p>
 <p>This is the matrix side of state-space duality <span class="citation" data-cites="dao2024transformers">(<a href="#ref-dao2024transformers" role="doc-biblioref">Dao and Gu 2024</a>)</span>. Computing <span class="math inline">Mx</span> directly looks like masked attention. Evaluating <a href="#eq-ssm-recurrence" class="quarto-xref">Equation&nbsp;1</a> is a linear scan. They are two schedules for the same operator.</p>
 <p>Mamba makes <span class="math inline">A_i</span>, <span class="math inline">B_i</span>, and <span class="math inline">C_i</span> depend on the current input, which restores content-dependent selection while retaining a recurrent evaluation <span class="citation" data-cites="gu2023mamba">(<a href="#ref-gu2023mamba" role="doc-biblioref">Gu and Dao 2023</a>)</span>. Mamba-2 takes the matrix view seriously. Its structured state-space duality algorithm mixes recurrent computation across blocks with matrix multiplication inside blocks <span class="citation" data-cites="dao2024transformers">(<a href="#ref-dao2024transformers" role="doc-biblioref">Dao and Gu 2024</a>)</span>.</p>
@@ -499,7 +504,7 @@ P_{ij}=C_i^\top
 </span></p>
 <p>Collecting the left and right factors yields</p>
 <p><span class="math display">
-P=LR,qquad L\in\mathbb R^{(n-s)\times N},quad
+P=LR,\qquad L\in\mathbb R^{(n-s)\times N},\quad
 R\in\mathbb R^{N\times s},
 </span></p>
 <p>so</p>
@@ -622,7 +627,7 @@ Figure&nbsp;2: Normalized cross-boundary singular spectra. Full attention retain
 </div>
 <p>This comparison also clarifies linear attention. Kernel attention can be written with a running state such as</p>
 <p><span class="math display">
-S_i=\sum_{j\le i}\phi(k_j)v_j^\top,qquad
+S_i=\sum_{j\le i}\phi(k_j)v_j^\top,\qquad
 z_i=\sum_{j\le i}\phi(k_j),
 </span></p>
 <p>followed by <span class="math inline">y_i=\phi(q_i)^\top S_i/(\phi(q_i)^\top z_i)</span>. Its efficiency comes from a finite sufficient statistic. Performer improves the approximation to the softmax kernel, but the recurrent state still fixes the number of channels carried through time <span class="citation" data-cites="choromanski2021performer">(<a href="#ref-choromanski2021performer" role="doc-biblioref">Choromanski et al. 2021</a>)</span>.</p>
@@ -677,6 +682,14 @@ z_i=\sum_{j\le i}\phi(k_j),
 <p>Real sequence models are nonlinear, layered, data-dependent, and residual. A Jacobian at one input replaces the fixed linear operator used here, and ranks can change from layer to layer. Finite precision also makes numerical rank a spectrum rather than a sharp integer.</p>
 <p>Still, every recurrent layer must communicate through its state at each cut. The local Jacobian of that communication factors through the state, so the bottleneck survives linearization. Residual depth can compose and reroute information, but it cannot make a single fixed-size boundary state behave exactly like an arbitrarily large key-value store.</p>
 <p>The practical question is therefore not whether recurrence can remember. It can. The question is whether the task’s useful past admits a compact sufficient statistic. State-space models are strongest when the answer is yes. Attention remains valuable when future queries need many independently addressable facts whose relevance was impossible to predict when they first arrived.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/attention-from-logits-to-context/index.html">Attention, from Logits to Context</a> derives the attention operation compared here.</li>
+<li><a href="../../posts/arithmetic-of-editing-a-fact/index.html">The Arithmetic of Editing a Fact</a> measures the other memory bottleneck, capacity rather than bandwidth across time.</li>
+<li><a href="../../posts/graph-networks-two-failures/index.html">Graph Networks Fail on Two Axes</a> finds the same bottleneck argument on graphs.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

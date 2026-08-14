@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -419,6 +423,7 @@ window.Quarto = {
   <li><a href="#edits-accumulate" id="toc-edits-accumulate" class="nav-link" data-scroll-target="#edits-accumulate">Edits accumulate</a></li>
   <li><a href="#the-alternative-is-to-not-store-it-in-the-weights" id="toc-the-alternative-is-to-not-store-it-in-the-weights" class="nav-link" data-scroll-target="#the-alternative-is-to-not-store-it-in-the-weights">The alternative is to not store it in the weights</a></li>
   <li><a href="#limits" id="toc-limits" class="nav-link" data-scroll-target="#limits">Limits</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/arithmetic-of-editing-a-fact/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -780,6 +785,13 @@ Table&nbsp;1: Where a fact can live, and what each choice charges for.
 <p>The keys in a real transformer are not drawn from a fixed Gaussian, and the residual <span class="math inline">v_* - Wk_*</span> is not a free parameter. Choosing <span class="math inline">v_*</span> is itself an optimization, run to maximize the probability of the new object while holding the subject’s other properties in place, and the closed-form update is applied only afterwards. The simulations above skip that step entirely.</p>
 <p>The damage metric here is the error on stored associations, which is a proxy for the specificity metrics used in practice, where the question is whether a nearby subject’s unrelated facts survive. Those metrics involve the full network downstream of the edited layer, and a small change in the feed-forward output can be amplified or absorbed by later layers.</p>
 <p>And the sequential-edit result is a statement about repeated application of <a href="#eq-mem-rankone" class="quarto-xref">Equation&nbsp;3</a>, not about the best possible batched procedure. Solving for many associations jointly is a different and better-conditioned problem than solving for them one at a time, which is the direction later mass-editing methods take. The point that survives is the capacity bound in the first section: whatever procedure writes the facts, a linear store of key dimension <span class="math inline">d</span> has about <span class="math inline">d</span> independent directions to write them into, and edits beyond that are borrowing from facts already there.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/quantization-one-quadratic-form/index.html">Four Quantizers, One Quadratic Form</a> minimizes the same kind of quadratic form under a different constraint.</li>
+<li><a href="../../posts/generalization-gap-privacy-audit/index.html">A Generalization Gap Is Not a Privacy Audit</a> asks what a stored fact leaks.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

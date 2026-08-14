@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -420,6 +424,7 @@ window.Quarto = {
   <li><a href="#the-calibration-experiment" id="toc-the-calibration-experiment" class="nav-link" data-scroll-target="#the-calibration-experiment">The calibration experiment</a></li>
   <li><a href="#where-the-activation-side-changes-the-problem" id="toc-where-the-activation-side-changes-the-problem" class="nav-link" data-scroll-target="#where-the-activation-side-changes-the-problem">Where the activation side changes the problem</a></li>
   <li><a href="#what-the-common-form-does-not-capture" id="toc-what-the-common-form-does-not-capture" class="nav-link" data-scroll-target="#what-the-common-form-does-not-capture">What the common form does not capture</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/quantization-one-quadratic-form/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -931,6 +936,14 @@ Figure&nbsp;4: SmoothQuant migration strength for 8-bit weights and 8-bit activa
 <p>The uniform round-error model used in <a href="#eq-awq-kink" class="quarto-xref">Equation&nbsp;5</a> is an approximation. At 3 bits and below, errors are neither small nor independent of the weights, and clipping interacts with the group maximum in ways the second-moment analysis misses. The empirical curves above hold anyway, which suggests the approximation is adequate for locating kinks rather than predicting absolute error.</p>
 <p>The format itself is a design variable this framing takes as given. QLoRA’s NF4 changes the grid rather than the coordinates: it places the <span class="math inline">2^k</span> levels at equal-probability quantiles of a standard normal, which is optimal for zero-mean normally distributed weights and beats integer and float grids bit for bit <span class="citation" data-cites="dettmers2023qlora">(<a href="#ref-dettmers2023qlora" role="doc-biblioref">Dettmers et al. 2023</a>)</span>. That is a fifth answer to the same question, and it composes with all four constraints above rather than competing with them. The training-time analogue is fine-grained FP8 scaling, where the tile-level scales in DeepSeek-V3 play exactly the role of <span class="math inline">S</span> in <a href="#eq-equivalent-transform" class="quarto-xref">Equation&nbsp;3</a>, applied to sub-tensors rather than channels <span class="citation" data-cites="deepseekai2024v3">(<a href="#ref-deepseekai2024v3" role="doc-biblioref">DeepSeek-AI 2024</a>)</span>.</p>
 <p>What survives is a modest but useful claim. Post-training quantization is one least-squares problem in a metric set by the activations. The methods differ in whether they move the weights, the coordinates, or the precision boundary, and in how many numbers they fit to the calibration set. The last of those is the axis nobody reports, and it is the one that predicts what happens when the deployment distribution stops matching the calibration corpus.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/arithmetic-of-editing-a-fact/index.html">The Arithmetic of Editing a Fact</a> solves a closely related problem, least squares in a data-defined metric.</li>
+<li><a href="../../posts/flashattention-io-aware/index.html">FlashAttention Is an IO Algorithm</a> explains the bandwidth bound that makes low-bit weights pay.</li>
+<li><a href="../../posts/three-ways-a-curve-bends/index.html">Three Ways a Curve Bends</a> covers the scaling behaviour behind outlier features.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>

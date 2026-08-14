@@ -1,83 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/speculative-sampling/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.220Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.219Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/three-ways-a-curve-bends/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.222Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/preference-likelihood-two-jobs/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.221Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.222Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.221Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/graph-networks-two-failures/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.221Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/generalization-gap-privacy-audit/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.220Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/colophon/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.219Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/projects/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.223Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.223Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/replications/chinchilla-parametric-fit/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.477Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/about/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.219Z</lastmod>
+    <lastmod>2026-08-14T09:32:31.473Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.221Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/projects/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.476Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/straight-paths-cheap-samplers/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.222Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/colophon/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.473Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.222Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.220Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.220Z</lastmod>
-  </url>
-  <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.220Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/preference-likelihood-two-jobs/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.475Z</lastmod>
   </url>
   <url>
     <loc>https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.221Z</lastmod>
+    <lastmod>2026-08-14T09:32:31.475Z</lastmod>
   </url>
   <url>
-    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/index.html</loc>
-    <lastmod>2026-08-14T06:50:42.220Z</lastmod>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/generalization-gap-privacy-audit/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/robustness-numbers-are-upper-bounds/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.475Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.475Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/test-time-compute-ceilings/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.476Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/rank-of-memory/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.475Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/three-ways-a-curve-bends/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.476Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/flashattention-io-aware/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/straight-paths-cheap-samplers/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.476Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/posts/graph-networks-two-failures/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.473Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/projects/paged-kv-cache-simulator/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.476Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/replications/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.477Z</lastmod>
+  </url>
+  <url>
+    <loc>https://diegofilippomarino.github.io/Eigenholm/notes/speculative-sampling/index.html</loc>
+    <lastmod>2026-08-14T09:32:31.474Z</lastmod>
   </url>
 </urlset>

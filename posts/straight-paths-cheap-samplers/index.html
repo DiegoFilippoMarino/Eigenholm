@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ad9839e213080be42d1db59494bcd0a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2f4ea7481c799702ef3f8698aa72e455.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -386,6 +386,10 @@ window.Quarto = {
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../replications/index.html"> 
+<span class="menu-text">Replications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../about/index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -427,6 +431,7 @@ window.Quarto = {
   </ul></li>
   <li><a href="#a-useful-error-decomposition" id="toc-a-useful-error-decomposition" class="nav-link" data-scroll-target="#a-useful-error-decomposition">A useful error decomposition</a></li>
   <li><a href="#limits-of-the-gaussian-experiment" id="toc-limits-of-the-gaussian-experiment" class="nav-link" data-scroll-target="#limits-of-the-gaussian-experiment">Limits of the Gaussian experiment</a></li>
+  <li><a href="#related-reading" id="toc-related-reading" class="nav-link" data-scroll-target="#related-reading">Related reading</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/blob/main/posts/straight-paths-cheap-samplers/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/DiegoFilippoMarino/Eigenholm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -496,7 +501,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="two-gaussian-paths">Two Gaussian paths</h2>
 <p>For diagonal <span class="math inline">\Sigma=\operatorname{diag}(\sigma_1^2,\ldots,\sigma_d^2)</span>, the 2-Wasserstein displacement path is</p>
 <p><span id="eq-ot-path"><span class="math display">
-x_t=t\mu+\left((1-t)I+t\Sigma^{1/2}\right)z,qquad z\sim\mathcal N(0,I).
+x_t=t\mu+\left((1-t)I+t\Sigma^{1/2}\right)z,\qquad z\sim\mathcal N(0,I).
 \tag{3}</span></span></p>
 <p>Each particle follows a straight line at constant speed. Its velocity is <span class="math inline">x_1-x_0</span>.</p>
 <p>Now choose a diffusion-like interpolation with signal coefficient</p>
@@ -510,12 +515,12 @@ p_t=\mathcal N\left(\alpha(t)\mu,
 \tag{4}</span></span></p>
 <p>A deterministic coupling that realizes <a href="#eq-diffusion-path" class="quarto-xref">Equation&nbsp;4</a> is</p>
 <p><span class="math display">
-x_t=\alpha(t)\mu+S(t)z,qquad
+x_t=\alpha(t)\mu+S(t)z,\qquad
 S(t)=\left(\alpha(t)^2\Sigma+(1-\alpha(t)^2)I\right)^{1/2}.
 </span></p>
 <p>Its velocity field is affine:</p>
 <p><span id="eq-gaussian-velocity"><span class="math display">
-v_t(x)=\dot m(t)+\dot S(t)S(t)^{-1}(x-m(t)),qquad m(t)=\alpha(t)\mu.
+v_t(x)=\dot m(t)+\dot S(t)S(t)^{-1}(x-m(t)),\qquad m(t)=\alpha(t)\mu.
 \tag{5}</span></span></p>
 <p>Both paths reach the same Gaussian. Only <a href="#eq-ot-path" class="quarto-xref">Equation&nbsp;3</a> is straight in particle space.</p>
 <div id="cell-fig-path-geometry" class="cell" data-execution_count="1">
@@ -755,6 +760,13 @@ Figure&nbsp;3: Endpoint error versus neural-function evaluations for exact Gauss
 <h2 class="anchored" data-anchor-id="limits-of-the-gaussian-experiment">Limits of the Gaussian experiment</h2>
 <p>The analytic coupling knows which noise sample maps to which data sample. In unconditional image generation there is no given pairing, and conditional vector fields are averaged into a marginal field. Straight conditional paths can still yield curved marginal trajectories. High-dimensional learned fields can also be stiff for reasons that a Gaussian cannot express.</p>
 <p>The experiment nevertheless establishes a narrow result: endpoint distributions do not determine sampling cost. The geometry of the chosen probability path contributes directly to the numerical budget. Before designing a more elaborate solver, it is worth asking whether the model was trained to follow an unnecessarily difficult road.</p>
+</section>
+<section id="related-reading" class="level2">
+<h2 class="anchored" data-anchor-id="related-reading">Related reading</h2>
+<ul>
+<li><a href="../../posts/test-time-compute-ceilings/index.html">Inference Compute Has Two Ceilings</a> asks the parallel question for reasoning: when does more sampling stop paying.</li>
+<li><a href="../../posts/three-ways-a-curve-bends/index.html">Three Ways a Curve Bends</a> looks at what else a smooth curve can hide.</li>
+</ul>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
