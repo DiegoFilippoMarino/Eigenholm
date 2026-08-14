@@ -23,7 +23,9 @@ The site sits between a research notebook and a technical journal. I use it to r
 
 My main subject is deep learning, with a particular interest in language models, efficient training and inference, representation learning, and the mathematical structure behind optimization. Scientific computing and numerical methods appear whenever they are the right tools for making an argument concrete.
 
-Articles are long-form explanations. Projects turn an idea into an executable model or simulator. Notes are narrower investigations, derivations, and results that are useful before they grow into a full article.
+The site has four sections, divided by what a page is rather than what it is about.
+
+**Writing** is long-form: explanations, and attempts to say something that is not already in the literature. **Projects** turn an idea into an executable model or simulator, the kind of thing that could be lifted into a repository. **Notes** are narrower investigations, derivations, and results that are useful before they grow into a full article. **Replications** attempt to reproduce published results as closely as the available compute and data allow, and each one states up front which numbers it targets, what reproduced, and what did not.
 
 ## Method
 
