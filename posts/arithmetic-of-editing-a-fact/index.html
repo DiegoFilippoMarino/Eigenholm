@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/index_files/figure-html/fig-mem-capacity-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="746">
-<meta property="og:image:width" content="1399">
+<meta property="og:image:height" content="1096">
+<meta property="og:image:width" content="2048">
 <meta name="twitter:title" content="The Arithmetic of Editing a Fact – Eigenholm">
 <meta name="twitter:description" content="Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/arithmetic-of-editing-a-fact/index_files/figure-html/fig-mem-capacity-output-1.png">
-<meta name="twitter:image-height" content="746">
-<meta name="twitter:image-width" content="1399">
+<meta name="twitter:image-height" content="1096">
+<meta name="twitter:image-width" content="2048">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -434,7 +434,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">The Arithmetic of Editing a Fact</h1>
+<div class="quarto-title-block"><div><h1 class="title">The Arithmetic of Editing a Fact</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Interpretability</div>
     <div class="quarto-category">Linear Algebra</div>
@@ -485,46 +485,50 @@ W k_i \;=\; v_i \underbrace{(k_i^\top k_i)}_{=1} \;+\; \sum_{j \ne i} v_j\,(k_j^
 \tag{1}</span></span></p>
 <p>so the retrieved vector is the target plus a sum of <span class="math inline">m-1</span> interference terms weighted by key overlaps. For independent random unit vectors in <span class="math inline">\mathbb{R}^d</span>, <span class="math inline">\mathbb{E}[(k_j^\top k_i)^2] = 1/d</span>, so the expected squared norm of the interference is <span class="math inline">(m-1)/d</span> times the typical value norm. Signal-to-noise degrades like <span class="math inline">d/m</span>, and the memory saturates when <span class="math inline">m</span> approaches <span class="math inline">d</span>.</p>
 <p>Least squares does better than the Hebbian rule, exactly until it cannot. For <span class="math inline">m \le d</span>, random keys are linearly independent with probability one, so <span class="math inline">W = VK^{+}</span> achieves <span class="math inline">Wk_i = v_i</span> exactly for every <span class="math inline">i</span>. Past <span class="math inline">m = d</span> the system is overdetermined and errors appear. The transition is sharp and worth seeing.</p>
-<div id="cell-fig-mem-capacity" class="cell" data-execution_count="1">
+<div id="504a8419" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>DIM, VALUE_DIM <span class="op">=</span> <span class="dv">64</span>, <span class="dv">32</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> store(m, rule, rng):</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> rng.normal(size<span class="op">=</span>(DIM, m))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    K <span class="op">/=</span> np.linalg.norm(K, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> K.T <span class="cf">if</span> rule <span class="op">==</span> <span class="st">"hebbian"</span> <span class="cf">else</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> W <span class="op">@</span> K <span class="op">-</span> V</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.mean(np.<span class="bu">sum</span>(residual <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.<span class="bu">sum</span>(V <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>)))</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>loads <span class="op">=</span> np.unique(np.<span class="bu">round</span>(np.geomspace(<span class="dv">2</span>, <span class="dv">400</span>, <span class="dv">34</span>)).astype(<span class="bu">int</span>))</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {}</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> (<span class="st">"least squares"</span>, <span class="st">"hebbian"</span>):</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    curves[rule] <span class="op">=</span> [np.mean([store(m, rule, np.random.default_rng(<span class="dv">97</span> <span class="op">*</span> t <span class="op">+</span> m))</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                             <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>)]) <span class="cf">for</span> m <span class="kw">in</span> loads]</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"least squares"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="st">"least squares"</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"hebbian"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="st">"outer-product rule"</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, np.maximum(loads <span class="op">-</span> <span class="dv">1</span>, <span class="dv">1</span>) <span class="op">/</span> DIM, <span class="st">"k--"</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>          label<span class="op">=</span><span class="vs">r"crosstalk prediction </span><span class="dv">$</span><span class="kw">(</span><span class="vs">m-1</span><span class="kw">)</span><span class="vs">/d</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">1.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"stored pairs / key dimension"</span>, ylabel<span class="op">=</span><span class="st">"relative retrieval error"</span>,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="ss">f"Capacity of a linear key-value store, d = </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>DIM, VALUE_DIM <span class="op">=</span> <span class="dv">64</span>, <span class="dv">32</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> store(m, rule, rng):</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> rng.normal(size<span class="op">=</span>(DIM, m))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    K <span class="op">/=</span> np.linalg.norm(K, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> K.T <span class="cf">if</span> rule <span class="op">==</span> <span class="st">"hebbian"</span> <span class="cf">else</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> W <span class="op">@</span> K <span class="op">-</span> V</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.mean(np.<span class="bu">sum</span>(residual <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.<span class="bu">sum</span>(V <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>)))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>loads <span class="op">=</span> np.unique(np.<span class="bu">round</span>(np.geomspace(<span class="dv">2</span>, <span class="dv">400</span>, <span class="dv">34</span>)).astype(<span class="bu">int</span>))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {}</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> (<span class="st">"least squares"</span>, <span class="st">"hebbian"</span>):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    curves[rule] <span class="op">=</span> [np.mean([store(m, rule, np.random.default_rng(<span class="dv">97</span> <span class="op">*</span> t <span class="op">+</span> m))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>                             <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>)]) <span class="cf">for</span> m <span class="kw">in</span> loads]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-mem-capacity" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"least squares"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="st">"least squares"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"hebbian"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="st">"outer-product rule"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, np.maximum(loads <span class="op">-</span> <span class="dv">1</span>, <span class="dv">1</span>) <span class="op">/</span> DIM, <span class="st">"k--"</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>          label<span class="op">=</span><span class="vs">r"crosstalk prediction </span><span class="dv">$</span><span class="kw">(</span><span class="vs">m-1</span><span class="kw">)</span><span class="vs">/d</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">1.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"stored pairs / key dimension"</span>, ylabel<span class="op">=</span><span class="st">"relative retrieval error"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="ss">f"Capacity of a linear key-value store, d = </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-mem-capacity" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-mem-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-mem-capacity-output-1.png" width="700" height="373" class="figure-img">
+<img src="index_files/figure-html/fig-mem-capacity-output-1.png" width="1024" height="548" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-capacity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Retrieval error of a linear associative memory as the number of stored pairs crosses the key dimension. Least squares is exact below the threshold and degrades past it; the Hebbian outer-product rule degrades from the start, at the rate the crosstalk calculation predicts.
@@ -569,67 +573,67 @@ Figure&nbsp;1: Retrieval error of a linear associative memory as the number of s
 <p>First, the damage direction is the same for every key. Every disturbed fact is pushed toward the new value <span class="math inline">v_*</span>, never in some other arbitrary direction. An edit that inserts one association contaminates its neighbours with that same association rather than scrambling them.</p>
 <p>Second, the damage magnitude is controlled by a <em>whitened</em> inner product <span class="math inline">k_*^\top C^{-1} k</span>, not by the raw similarity <span class="math inline">k_*^\top k</span>. Two keys that look similar in the ambient space but differ along a low-variance direction of <span class="math inline">C</span> will have a large whitened separation and will barely interact. Two keys that differ only along a direction the model rarely uses will interact strongly. The choice of <span class="math inline">C</span> is therefore a choice about which notion of “nearby fact” the edit respects.</p>
 <p>Third, setting <span class="math inline">C = I</span> recovers the naive projection, which minimizes the change to the weights and ignores what the keys look like. Comparing the two is a direct test of whether the whitening earns its keep.</p>
-<div id="cell-fig-mem-specificity" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> anisotropic_keys(rng, n, dim<span class="op">=</span>DIM, decay<span class="op">=</span><span class="fl">1.0</span>):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keys drawn from a covariance with a power-law spectrum."""</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.arange(<span class="dv">1</span>, dim <span class="op">+</span> <span class="dv">1</span>) <span class="op">**</span> (<span class="op">-</span>decay)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> np.linalg.qr(rng.normal(size<span class="op">=</span>(dim, dim)))[<span class="dv">0</span>]</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> basis <span class="op">@</span> np.diag(np.sqrt(spectrum)) <span class="op">@</span> basis.T</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>(dim, n)), root</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> edit(W, k_star, v_star, C_inv):</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> v_star <span class="op">-</span> W <span class="op">@</span> k_star</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    direction <span class="op">=</span> C_inv <span class="op">@</span> k_star</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">+</span> np.outer(residual, direction) <span class="op">/</span> <span class="bu">float</span>(k_star <span class="op">@</span> direction)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> one_trial(decay, rng, m<span class="op">=</span><span class="dv">40</span>):</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span>decay)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> root <span class="op">@</span> root.T</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(C <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, matrix <span class="kw">in</span> ((<span class="st">"whitened"</span>, C_inv), (<span class="st">"identity"</span>, np.eye(DIM))):</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        W_new <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        efficacy <span class="op">=</span> <span class="bu">float</span>(np.linalg.norm(W_new <span class="op">@</span> k_star <span class="op">-</span> v_star) <span class="op">/</span> np.linalg.norm(v_star))</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        damage <span class="op">=</span> <span class="bu">float</span>(np.mean(np.linalg.norm(W_new <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                               <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)))</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        out[name] <span class="op">=</span> (efficacy, damage)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>decays <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>]</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> {<span class="st">"whitened"</span>: [], <span class="st">"identity"</span>: []}</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>efficacy_check <span class="op">=</span> []</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> decay <span class="kw">in</span> decays:</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> [one_trial(decay, np.random.default_rng(<span class="dv">500</span> <span class="op">+</span> <span class="dv">13</span> <span class="op">*</span> t)) <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">40</span>)]</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> summary:</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        summary[name].append(np.mean([t[name][<span class="dv">1</span>] <span class="cf">for</span> t <span class="kw">in</span> trials]))</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    efficacy_check.append(<span class="bu">max</span>(<span class="bu">max</span>(t[name][<span class="dv">0</span>] <span class="cf">for</span> name <span class="kw">in</span> summary) <span class="cf">for</span> t <span class="kw">in</span> trials))</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"whitened"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="vs">r"whitened, </span><span class="dv">$</span><span class="vs">C</span><span class="dv">^</span><span class="vs">{-1}</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"identity"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="vs">r"unweighted, </span><span class="dv">$</span><span class="vs">C = I</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"spectral decay of the key covariance"</span>, ylabel<span class="op">=</span><span class="st">"mean damage to stored facts"</span>,</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"One edit, two notions of minimal change"</span>)</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"largest post-edit error on the new association: </span><span class="sc">{</span><span class="bu">max</span>(efficacy_check)<span class="sc">:.2e}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4ea09eec" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> anisotropic_keys(rng, n, dim<span class="op">=</span>DIM, decay<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keys drawn from a covariance with a power-law spectrum."""</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.arange(<span class="dv">1</span>, dim <span class="op">+</span> <span class="dv">1</span>) <span class="op">**</span> (<span class="op">-</span>decay)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> np.linalg.qr(rng.normal(size<span class="op">=</span>(dim, dim)))[<span class="dv">0</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> basis <span class="op">@</span> np.diag(np.sqrt(spectrum)) <span class="op">@</span> basis.T</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>(dim, n)), root</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> edit(W, k_star, v_star, C_inv):</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> v_star <span class="op">-</span> W <span class="op">@</span> k_star</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    direction <span class="op">=</span> C_inv <span class="op">@</span> k_star</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">+</span> np.outer(residual, direction) <span class="op">/</span> <span class="bu">float</span>(k_star <span class="op">@</span> direction)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> one_trial(decay, rng, m<span class="op">=</span><span class="dv">40</span>):</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span>decay)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> root <span class="op">@</span> root.T</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(C <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, matrix <span class="kw">in</span> ((<span class="st">"whitened"</span>, C_inv), (<span class="st">"identity"</span>, np.eye(DIM))):</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        W_new <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        efficacy <span class="op">=</span> <span class="bu">float</span>(np.linalg.norm(W_new <span class="op">@</span> k_star <span class="op">-</span> v_star) <span class="op">/</span> np.linalg.norm(v_star))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        damage <span class="op">=</span> <span class="bu">float</span>(np.mean(np.linalg.norm(W_new <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>                               <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)))</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        out[name] <span class="op">=</span> (efficacy, damage)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>decays <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>]</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> {<span class="st">"whitened"</span>: [], <span class="st">"identity"</span>: []}</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>efficacy_check <span class="op">=</span> []</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> decay <span class="kw">in</span> decays:</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> [one_trial(decay, np.random.default_rng(<span class="dv">500</span> <span class="op">+</span> <span class="dv">13</span> <span class="op">*</span> t)) <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">40</span>)]</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> summary:</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        summary[name].append(np.mean([t[name][<span class="dv">1</span>] <span class="cf">for</span> t <span class="kw">in</span> trials]))</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    efficacy_check.append(<span class="bu">max</span>(<span class="bu">max</span>(t[name][<span class="dv">0</span>] <span class="cf">for</span> name <span class="kw">in</span> summary) <span class="cf">for</span> t <span class="kw">in</span> trials))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-mem-specificity" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"whitened"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="vs">r"whitened, </span><span class="dv">$</span><span class="vs">C</span><span class="dv">^</span><span class="vs">{-1}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"identity"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="vs">r"unweighted, </span><span class="dv">$</span><span class="vs">C = I</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"spectral decay of the key covariance"</span>, ylabel<span class="op">=</span><span class="st">"mean damage to stored facts"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"One edit, two notions of minimal change"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-mem-specificity" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-mem-specificity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-mem-specificity-output-1.png" width="702" height="374" class="figure-img">
+<img src="index_files/figure-html/fig-mem-specificity-output-1.png" width="1024" height="548" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-specificity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Efficacy and collateral damage of a single rank-one edit under anisotropic keys. Both variants install the new association exactly, but the whitened update disturbs held-out associations far less, and the advantage grows with the anisotropy of the key distribution.
@@ -637,6 +641,9 @@ Figure&nbsp;2: Efficacy and collateral damage of a single rank-one edit under an
 </figure>
 </div>
 </div>
+</div>
+<div id="ba0b7baa" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"largest post-edit error on the new association: </span><span class="sc">{</span><span class="bu">max</span>(efficacy_check)<span class="sc">:.2e}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>largest post-edit error on the new association: 2.59e-15</code></pre>
 </div>
@@ -648,52 +655,52 @@ Figure&nbsp;2: Efficacy and collateral damage of a single rank-one edit under an
 <h2 class="anchored" data-anchor-id="edits-accumulate">Edits accumulate</h2>
 <p>A single edit is cheap. The question that decides whether weight editing is a maintenance strategy is what happens after a hundred of them.</p>
 <p>Each edit adds a rank-one term, so after <span class="math inline">n</span> edits the accumulated perturbation has rank at most <span class="math inline">n</span>, and by <a href="#eq-mem-damage" class="quarto-xref">Equation&nbsp;5</a> each one drags every stored fact toward its own new value. There is no cancellation to hope for: the terms are not orthogonal unless the whitened keys happen to be, and successive edits are applied to an already-perturbed matrix, so later residuals <span class="math inline">v_* - Wk_*</span> are computed against a memory that is already degraded.</p>
-<div id="cell-fig-mem-sequential" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sequential_edits(n_edits, m, rng, use_whitening<span class="op">=</span><span class="va">True</span>):</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(root <span class="op">@</span> root.T <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    matrix <span class="op">=</span> C_inv <span class="cf">if</span> use_whitening <span class="cf">else</span> np.eye(DIM)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    baseline <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> []</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_edits):</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        W <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        trace.append(<span class="bu">float</span>(np.mean(err)))</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(trace), baseline</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>n_edits <span class="op">=</span> <span class="dv">60</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.6</span>, <span class="fl">3.9</span>))</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> m, color <span class="kw">in</span> <span class="bu">zip</span>([<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>], [<span class="st">"#2a6e6e"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#a4553a"</span>]):</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, m, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> m))[<span class="dv">0</span>]</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> stored facts"</span>)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, ylabel<span class="op">=</span><span class="st">"mean relative error on stored facts"</span>,</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span><span class="ss">f"Whitened edits, key dimension </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> use_white, color, style <span class="kw">in</span> ((<span class="va">True</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"-"</span>), (<span class="va">False</span>, <span class="st">"#a4553a"</span>, <span class="st">"--"</span>)):</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, <span class="dv">32</span>, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> <span class="dv">5</span>), use_white)[<span class="dv">0</span>]</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, style, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="st">"whitened"</span> <span class="cf">if</span> use_white <span class="cf">else</span> <span class="st">"unweighted"</span>)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, title<span class="op">=</span><span class="st">"32 stored facts"</span>)</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes:</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="26f219bb" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sequential_edits(n_edits, m, rng, use_whitening<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(root <span class="op">@</span> root.T <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    matrix <span class="op">=</span> C_inv <span class="cf">if</span> use_whitening <span class="cf">else</span> np.eye(DIM)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    baseline <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> []</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_edits):</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        W <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        trace.append(<span class="bu">float</span>(np.mean(err)))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(trace), baseline</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-mem-sequential" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>n_edits <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.6</span>, <span class="fl">3.9</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> m, color <span class="kw">in</span> <span class="bu">zip</span>([<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>], [<span class="st">"#2a6e6e"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#a4553a"</span>]):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, m, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> m))[<span class="dv">0</span>]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> stored facts"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, ylabel<span class="op">=</span><span class="st">"mean relative error on stored facts"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span><span class="ss">f"Whitened edits, key dimension </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> use_white, color, style <span class="kw">in</span> ((<span class="va">True</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"-"</span>), (<span class="va">False</span>, <span class="st">"#a4553a"</span>, <span class="st">"--"</span>)):</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, <span class="dv">32</span>, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> <span class="dv">5</span>), use_white)[<span class="dv">0</span>]</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, style, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="st">"whitened"</span> <span class="cf">if</span> use_white <span class="cf">else</span> <span class="st">"unweighted"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, title<span class="op">=</span><span class="st">"32 stored facts"</span>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-mem-sequential" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-mem-sequential-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-mem-sequential-output-1.png" width="913" height="364" class="figure-img">
+<img src="index_files/figure-html/fig-mem-sequential-output-1.png" width="1332" height="534" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-sequential-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Degradation of stored associations under a sequence of rank-one edits. Left: three memory loads, where a fuller memory degrades faster. Right: the whitened and unweighted updates at a fixed load, where the whitening advantage is large for the first few edits and gone by the end.
@@ -811,6 +818,8 @@ Ramsauer, Hubert, Bernhard Schäfl, Johannes Lehner, et al. 2021. <span>“Hopfi
 </div>
 
 
+<!-- -->
+
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
@@ -907,6 +916,57 @@ Fact.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenho
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1275,7 +1335,322 @@ Fact.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenho
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "The Arithmetic of Editing a Fact"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Deriving the rank-one weight edit from a constrained least-squares problem shows exactly which other facts it damages, and why retrieval eventually wins."</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-14"</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Interpretability, Linear Algebra, Retrieval]</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>Causal tracing localizes factual recall in a transformer to a specific place: the middle-layer feed-forward blocks, read at the last token of the subject <span class="co">[</span><span class="ot">@meng2022rome</span><span class="co">]</span>. Corrupt the subject embeddings, restore one hidden state at a time, and the states that recover the prediction cluster there. The follow-up move is to treat the down-projection of that feed-forward block as a linear key-value store and write a new association into it with a closed-form rank-one update.</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>The rank-one formula is usually quoted as a result. It is more useful as a derivation, because the derivation says something the formula alone does not: it tells you exactly which other facts the edit disturbs, and by how much. That quantity has a clean form, it depends on a whitening matrix that is often described as a technical detail, and it predicts the shape of the degradation curve when edits are applied one after another.</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>This article derives the update from a constrained least-squares problem, reads the collateral damage off the Lagrange multiplier, checks both against simulation, and then compares the whole approach against the alternative of keeping facts outside the weights entirely. A companion piece on this blog, <span class="co">[</span><span class="ot">The Rank of Memory</span><span class="co">](../rank-of-memory/index.qmd)</span>, looks at a different bottleneck, how much information crosses a sequence boundary. The bottleneck here is orthogonal to it: how many independent associations a fixed weight matrix can hold before they start reading each other's mail.</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## A linear associative memory and its capacity</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>Take a matrix $W \in \mathbb{R}^{d_{\text{out}} \times d}$ used as a lookup table. Keys $k_i \in \mathbb{R}^{d}$ go in, values $v_i \in \mathbb{R}^{d_{\text{out}}}$ come out, and storage means arranging that $W k_i \approx v_i$ for all $i$. With $K = <span class="co">[</span><span class="ot">k_1,\dots,k_m</span><span class="co">]</span>$ and $V = <span class="co">[</span><span class="ot">v_1,\dots,v_m</span><span class="co">]</span>$, the least-squares solution is $W = VK^{+}$.</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>The capacity question is what happens as $m$ grows. Consider the simplest case, random unit-norm keys and the Hebbian construction $W = \sum_j v_j k_j^\top$. Reading with key $k_i$ gives</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>W k_i \;=\; v_i \underbrace{(k_i^\top k_i)}_{=1} \;+\; \sum_{j \ne i} v_j\,(k_j^\top k_i),</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>$$ {#eq-mem-crosstalk}</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>so the retrieved vector is the target plus a sum of $m-1$ interference terms weighted by key overlaps. For independent random unit vectors in $\mathbb{R}^d$, $\mathbb{E}<span class="co">[</span><span class="ot">(k_j^\top k_i)^2</span><span class="co">]</span> = 1/d$, so the expected squared norm of the interference is $(m-1)/d$ times the typical value norm. Signal-to-noise degrades like $d/m$, and the memory saturates when $m$ approaches $d$.</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>Least squares does better than the Hebbian rule, exactly until it cannot. For $m \le d$, random keys are linearly independent with probability one, so $W = VK^{+}$ achieves $Wk_i = v_i$ exactly for every $i$. Past $m = d$ the system is overdetermined and errors appear. The transition is sharp and worth seeing.</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>DIM, VALUE_DIM <span class="op">=</span> <span class="dv">64</span>, <span class="dv">32</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> store(m, rule, rng):</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> rng.normal(size<span class="op">=</span>(DIM, m))</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    K <span class="op">/=</span> np.linalg.norm(K, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> K.T <span class="cf">if</span> rule <span class="op">==</span> <span class="st">"hebbian"</span> <span class="cf">else</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> W <span class="op">@</span> K <span class="op">-</span> V</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.mean(np.<span class="bu">sum</span>(residual <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.<span class="bu">sum</span>(V <span class="op">**</span> <span class="dv">2</span>, axis<span class="op">=</span><span class="dv">0</span>)))</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>loads <span class="op">=</span> np.unique(np.<span class="bu">round</span>(np.geomspace(<span class="dv">2</span>, <span class="dv">400</span>, <span class="dv">34</span>)).astype(<span class="bu">int</span>))</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {}</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> (<span class="st">"least squares"</span>, <span class="st">"hebbian"</span>):</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    curves[rule] <span class="op">=</span> [np.mean([store(m, rule, np.random.default_rng(<span class="dv">97</span> <span class="op">*</span> t <span class="op">+</span> m))</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>                             <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>)]) <span class="cf">for</span> m <span class="kw">in</span> loads]</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-mem-capacity</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Retrieval error of a linear associative memory as the number of stored pairs crosses the key dimension. Least squares is exact below the threshold and degrades past it; the Hebbian outer-product rule degrades from the start, at the rate the crosstalk calculation predicts."</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"least squares"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="st">"least squares"</span>)</span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, curves[<span class="st">"hebbian"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="st">"outer-product rule"</span>)</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>ax.loglog(loads <span class="op">/</span> DIM, np.maximum(loads <span class="op">-</span> <span class="dv">1</span>, <span class="dv">1</span>) <span class="op">/</span> DIM, <span class="st">"k--"</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>          label<span class="op">=</span><span class="vs">r"crosstalk prediction </span><span class="dv">$</span><span class="kw">(</span><span class="vs">m-1</span><span class="kw">)</span><span class="vs">/d</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">1.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>)</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"stored pairs / key dimension"</span>, ylabel<span class="op">=</span><span class="st">"relative retrieval error"</span>,</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="ss">f"Capacity of a linear key-value store, d = </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>The dashed line is @eq-mem-crosstalk with no fitted constants, and the outer-product curve follows it. The least-squares curve sits at numerical zero until the load ratio reaches one and then climbs to meet it. A linear memory of key dimension $d$ holds about $d$ facts for free and charges interference for every one after that.</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>This is the sense in which a feed-forward block can be a factual store, and also the sense in which it is a lossy one. It is worth contrasting with the nonlinear case. A modern Hopfield network stores patterns as minima of an energy whose one-step retrieval is $\xi^{\text{new}} = X\,\mathrm{softmax}(\beta X^\top \xi)$, which is exactly a transformer attention update, and whose capacity is exponential rather than linear in the dimension <span class="co">[</span><span class="ot">@ramsauer2021hopfield</span><span class="co">]</span>. The softmax is doing the work: it selects rather than superposes, so well-separated patterns do not interfere. Attention layers get the exponential version of this bargain, feed-forward layers get the linear one, and it is the linear one that admits a closed-form edit.</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="fu">## The edit as a constrained projection</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>Now the question that model editing asks. We have a working memory $W$ and want to insert one new association $(k_*, v_*)$ while disturbing everything else as little as possible. Written as an optimization, that is</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>\widehat W \;=\; \arg\min_{W'}\; \bigl\lVert (W' - W)\,C^{1/2} \bigr\rVert_F^2</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>\qquad \text{subject to} \qquad W' k_* = v_* ,</span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>$$ {#eq-mem-objective}</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>where $C$ is a positive definite matrix defining what "disturbing" means. Solving this is a short calculation. Write $\Delta = W' - W$ and $r = v_* - Wk_*$, the residual the current memory leaves on the new key. The constraint is $\Delta k_* = r$. Introducing a Lagrange multiplier $\lambda \in \mathbb{R}^{d_{\text{out}}}$,</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>\mathcal{L}(\Delta, \lambda) = \operatorname{tr}\bigl(\Delta C \Delta^\top\bigr) - \lambda^\top(\Delta k_* - r),</span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>and setting $\partial \mathcal{L}/\partial \Delta = 2\Delta C - \lambda k_*^\top = 0$ gives $\Delta = \tfrac12 \lambda k_*^\top C^{-1}$. Substituting into the constraint fixes the multiplier, $\tfrac12\lambda (k_*^\top C^{-1} k_*) = r$, and the solution is</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>\boxed{\;\widehat W \;=\; W \;+\; \frac{\bigl(v_* - Wk_*\bigr)\,\bigl(C^{-1}k_*\bigr)^{\top}}{k_*^{\top} C^{-1} k_*}\;}</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>$$ {#eq-mem-rankone}</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>The update in @eq-mem-rankone is rank one, requires no gradient step, and is the exact minimizer of @eq-mem-objective. This is the form the model-editing literature uses, with $C = KK^\top$ estimated as an uncentered covariance of keys collected from a large text sample <span class="co">[</span><span class="ot">@meng2022rome</span><span class="co">]</span>.</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>Why that particular $C$? The objective @eq-mem-objective penalizes $\lVert \Delta C^{1/2}\rVert_F^2 = \operatorname{tr}(\Delta C \Delta^\top)$, and if $C = \mathbb{E}<span class="co">[</span><span class="ot">kk^\top</span><span class="co">]</span>$ over the distribution of keys the model actually sees, then</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>\operatorname{tr}\bigl(\Delta\, \mathbb{E}<span class="co">[</span><span class="ot">kk^\top</span><span class="co">]</span>\, \Delta^\top\bigr)</span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>= \mathbb{E}_k\bigl<span class="co">[</span><span class="ot">\lVert \Delta k\rVert^2\bigr</span><span class="co">]</span>.</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>$$ {#eq-mem-expected-damage}</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>So @eq-mem-objective is not minimizing the change to the weights. It is minimizing the expected change to the *outputs*, averaged over the keys that occur in practice. That is a materially different thing, and it is the reason the covariance matters rather than being a numerical nicety.</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the collateral damage off the formula</span></span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>The derivation hands us the damage for free. For any other key $k$, the change in the memory's output is</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>\widehat W k - W k \;=\; \bigl(v_* - Wk_*\bigr)\,\frac{k_*^\top C^{-1} k}{k_*^\top C^{-1} k_*}.</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>$$ {#eq-mem-damage}</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>Three things follow immediately from @eq-mem-damage, and none of them are obvious from the statement that the update is rank one.</span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>First, the damage direction is the same for every key. Every disturbed fact is pushed toward the new value $v_*$, never in some other arbitrary direction. An edit that inserts one association contaminates its neighbours with that same association rather than scrambling them.</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>Second, the damage magnitude is controlled by a *whitened* inner product $k_*^\top C^{-1} k$, not by the raw similarity $k_*^\top k$. Two keys that look similar in the ambient space but differ along a low-variance direction of $C$ will have a large whitened separation and will barely interact. Two keys that differ only along a direction the model rarely uses will interact strongly. The choice of $C$ is therefore a choice about which notion of "nearby fact" the edit respects.</span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>Third, setting $C = I$ recovers the naive projection, which minimizes the change to the weights and ignores what the keys look like. Comparing the two is a direct test of whether the whitening earns its keep.</span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> anisotropic_keys(rng, n, dim<span class="op">=</span>DIM, decay<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keys drawn from a covariance with a power-law spectrum."""</span></span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.arange(<span class="dv">1</span>, dim <span class="op">+</span> <span class="dv">1</span>) <span class="op">**</span> (<span class="op">-</span>decay)</span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> np.linalg.qr(rng.normal(size<span class="op">=</span>(dim, dim)))[<span class="dv">0</span>]</span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> basis <span class="op">@</span> np.diag(np.sqrt(spectrum)) <span class="op">@</span> basis.T</span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>(dim, n)), root</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> edit(W, k_star, v_star, C_inv):</span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> v_star <span class="op">-</span> W <span class="op">@</span> k_star</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>    direction <span class="op">=</span> C_inv <span class="op">@</span> k_star</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">+</span> np.outer(residual, direction) <span class="op">/</span> <span class="bu">float</span>(k_star <span class="op">@</span> direction)</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> one_trial(decay, rng, m<span class="op">=</span><span class="dv">40</span>):</span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span>decay)</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> root <span class="op">@</span> root.T</span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(C <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a>    k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>    v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, matrix <span class="kw">in</span> ((<span class="st">"whitened"</span>, C_inv), (<span class="st">"identity"</span>, np.eye(DIM))):</span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>        W_new <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>        efficacy <span class="op">=</span> <span class="bu">float</span>(np.linalg.norm(W_new <span class="op">@</span> k_star <span class="op">-</span> v_star) <span class="op">/</span> np.linalg.norm(v_star))</span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a>        damage <span class="op">=</span> <span class="bu">float</span>(np.mean(np.linalg.norm(W_new <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>                               <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)))</span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>        out[name] <span class="op">=</span> (efficacy, damage)</span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>decays <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>]</span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> {<span class="st">"whitened"</span>: [], <span class="st">"identity"</span>: []}</span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>efficacy_check <span class="op">=</span> []</span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> decay <span class="kw">in</span> decays:</span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> [one_trial(decay, np.random.default_rng(<span class="dv">500</span> <span class="op">+</span> <span class="dv">13</span> <span class="op">*</span> t)) <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">40</span>)]</span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> summary:</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>        summary[name].append(np.mean([t[name][<span class="dv">1</span>] <span class="cf">for</span> t <span class="kw">in</span> trials]))</span>
+<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a>    efficacy_check.append(<span class="bu">max</span>(<span class="bu">max</span>(t[name][<span class="dv">0</span>] <span class="cf">for</span> name <span class="kw">in</span> summary) <span class="cf">for</span> t <span class="kw">in</span> trials))</span>
+<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-mem-specificity</span></span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Efficacy and collateral damage of a single rank-one edit under anisotropic keys. Both variants install the new association exactly, but the whitened update disturbs held-out associations far less, and the advantage grows with the anisotropy of the key distribution."</span></span>
+<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"whitened"</span>], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>, label<span class="op">=</span><span class="vs">r"whitened, </span><span class="dv">$</span><span class="vs">C</span><span class="dv">^</span><span class="vs">{-1}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a>ax.plot(decays, summary[<span class="st">"identity"</span>], <span class="st">"s-"</span>, ms<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#a4553a"</span>, label<span class="op">=</span><span class="vs">r"unweighted, </span><span class="dv">$</span><span class="vs">C = I</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"spectral decay of the key covariance"</span>, ylabel<span class="op">=</span><span class="st">"mean damage to stored facts"</span>,</span>
+<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"One edit, two notions of minimal change"</span>)</span>
+<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"largest post-edit error on the new association: </span><span class="sc">{</span><span class="bu">max</span>(efficacy_check)<span class="sc">:.2e}</span><span class="ss">"</span>)</span>
+<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a>Efficacy is identical by construction: both updates satisfy the constraint in @eq-mem-objective exactly, so the new fact is installed to machine precision either way. What separates them is specificity, and the separation grows with anisotropy. When keys are isotropic the two objectives coincide and the curves meet. As the key covariance develops a spectrum, the unweighted update spends its change budget along directions the keys occupy heavily, and the whitened update does not.</span>
+<span id="cb9-211"><a href="#cb9-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a>This is the algebra behind the empirical finding that distinguishes rank-one editing from fine-tuning in the published comparisons. Fine-tuning a fact into the weights achieves efficacy and destroys specificity, because gradient descent on a single example has no term that asks what the change costs on the rest of the key distribution. Equation @eq-mem-objective is that term, written down explicitly.</span>
+<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a><span class="fu">## Edits accumulate</span></span>
+<span id="cb9-215"><a href="#cb9-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-216"><a href="#cb9-216" aria-hidden="true" tabindex="-1"></a>A single edit is cheap. The question that decides whether weight editing is a maintenance strategy is what happens after a hundred of them.</span>
+<span id="cb9-217"><a href="#cb9-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-218"><a href="#cb9-218" aria-hidden="true" tabindex="-1"></a>Each edit adds a rank-one term, so after $n$ edits the accumulated perturbation has rank at most $n$, and by @eq-mem-damage each one drags every stored fact toward its own new value. There is no cancellation to hope for: the terms are not orthogonal unless the whitened keys happen to be, and successive edits are applied to an already-perturbed matrix, so later residuals $v_* - Wk_*$ are computed against a memory that is already degraded.</span>
+<span id="cb9-219"><a href="#cb9-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-222"><a href="#cb9-222" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-223"><a href="#cb9-223" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb9-224"><a href="#cb9-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-225"><a href="#cb9-225" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sequential_edits(n_edits, m, rng, use_whitening<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb9-226"><a href="#cb9-226" aria-hidden="true" tabindex="-1"></a>    K, root <span class="op">=</span> anisotropic_keys(rng, m, decay<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb9-227"><a href="#cb9-227" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> rng.normal(size<span class="op">=</span>(VALUE_DIM, m)) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb9-228"><a href="#cb9-228" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> V <span class="op">@</span> np.linalg.pinv(K)</span>
+<span id="cb9-229"><a href="#cb9-229" aria-hidden="true" tabindex="-1"></a>    C_inv <span class="op">=</span> np.linalg.inv(root <span class="op">@</span> root.T <span class="op">+</span> <span class="fl">1e-8</span> <span class="op">*</span> np.eye(DIM))</span>
+<span id="cb9-230"><a href="#cb9-230" aria-hidden="true" tabindex="-1"></a>    matrix <span class="op">=</span> C_inv <span class="cf">if</span> use_whitening <span class="cf">else</span> np.eye(DIM)</span>
+<span id="cb9-231"><a href="#cb9-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-232"><a href="#cb9-232" aria-hidden="true" tabindex="-1"></a>    baseline <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-233"><a href="#cb9-233" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> []</span>
+<span id="cb9-234"><a href="#cb9-234" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_edits):</span>
+<span id="cb9-235"><a href="#cb9-235" aria-hidden="true" tabindex="-1"></a>        k_star <span class="op">=</span> root <span class="op">@</span> rng.normal(size<span class="op">=</span>DIM)</span>
+<span id="cb9-236"><a href="#cb9-236" aria-hidden="true" tabindex="-1"></a>        v_star <span class="op">=</span> rng.normal(size<span class="op">=</span>VALUE_DIM) <span class="op">/</span> np.sqrt(VALUE_DIM)</span>
+<span id="cb9-237"><a href="#cb9-237" aria-hidden="true" tabindex="-1"></a>        W <span class="op">=</span> edit(W, k_star, v_star, matrix)</span>
+<span id="cb9-238"><a href="#cb9-238" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> np.linalg.norm(W <span class="op">@</span> K <span class="op">-</span> V, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">/</span> np.linalg.norm(V, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-239"><a href="#cb9-239" aria-hidden="true" tabindex="-1"></a>        trace.append(<span class="bu">float</span>(np.mean(err)))</span>
+<span id="cb9-240"><a href="#cb9-240" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(trace), baseline</span>
+<span id="cb9-241"><a href="#cb9-241" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-242"><a href="#cb9-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-245"><a href="#cb9-245" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-246"><a href="#cb9-246" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-mem-sequential</span></span>
+<span id="cb9-247"><a href="#cb9-247" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Degradation of stored associations under a sequence of rank-one edits. Left: three memory loads, where a fuller memory degrades faster. Right: the whitened and unweighted updates at a fixed load, where the whitening advantage is large for the first few edits and gone by the end."</span></span>
+<span id="cb9-248"><a href="#cb9-248" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb9-249"><a href="#cb9-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-250"><a href="#cb9-250" aria-hidden="true" tabindex="-1"></a>n_edits <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb9-251"><a href="#cb9-251" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.6</span>, <span class="fl">3.9</span>))</span>
+<span id="cb9-252"><a href="#cb9-252" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> m, color <span class="kw">in</span> <span class="bu">zip</span>([<span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>], [<span class="st">"#2a6e6e"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#a4553a"</span>]):</span>
+<span id="cb9-253"><a href="#cb9-253" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, m, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> m))[<span class="dv">0</span>]</span>
+<span id="cb9-254"><a href="#cb9-254" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-255"><a href="#cb9-255" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
+<span id="cb9-256"><a href="#cb9-256" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> stored facts"</span>)</span>
+<span id="cb9-257"><a href="#cb9-257" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, ylabel<span class="op">=</span><span class="st">"mean relative error on stored facts"</span>,</span>
+<span id="cb9-258"><a href="#cb9-258" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span><span class="ss">f"Whitened edits, key dimension </span><span class="sc">{</span>DIM<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-259"><a href="#cb9-259" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb9-260"><a href="#cb9-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-261"><a href="#cb9-261" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> use_white, color, style <span class="kw">in</span> ((<span class="va">True</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"-"</span>), (<span class="va">False</span>, <span class="st">"#a4553a"</span>, <span class="st">"--"</span>)):</span>
+<span id="cb9-262"><a href="#cb9-262" aria-hidden="true" tabindex="-1"></a>    traces <span class="op">=</span> np.mean([sequential_edits(n_edits, <span class="dv">32</span>, np.random.default_rng(<span class="dv">11</span> <span class="op">*</span> t <span class="op">+</span> <span class="dv">5</span>), use_white)[<span class="dv">0</span>]</span>
+<span id="cb9-263"><a href="#cb9-263" aria-hidden="true" tabindex="-1"></a>                      <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">25</span>)], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-264"><a href="#cb9-264" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].plot(np.arange(<span class="dv">1</span>, n_edits <span class="op">+</span> <span class="dv">1</span>), traces, style, lw<span class="op">=</span><span class="fl">1.8</span>, color<span class="op">=</span>color,</span>
+<span id="cb9-265"><a href="#cb9-265" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="st">"whitened"</span> <span class="cf">if</span> use_white <span class="cf">else</span> <span class="st">"unweighted"</span>)</span>
+<span id="cb9-266"><a href="#cb9-266" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"edits applied"</span>, title<span class="op">=</span><span class="st">"32 stored facts"</span>)</span>
+<span id="cb9-267"><a href="#cb9-267" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb9-268"><a href="#cb9-268" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb9-269"><a href="#cb9-269" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-270"><a href="#cb9-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-271"><a href="#cb9-271" aria-hidden="true" tabindex="-1"></a>Three readings, one of them a caution about the method rather than about editing.</span>
+<span id="cb9-272"><a href="#cb9-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-273"><a href="#cb9-273" aria-hidden="true" tabindex="-1"></a>Damage rises steeply and then flattens, but it flattens at relative error of order one, which is not a plateau in any comforting sense. It is the level at which the stored outputs have lost their correlation with the targets entirely. Between the first edit and the sixtieth, the memory goes from mostly intact to gone, and at no point does it stabilize somewhere useful.</span>
+<span id="cb9-274"><a href="#cb9-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-275"><a href="#cb9-275" aria-hidden="true" tabindex="-1"></a>The rate depends on how full the memory already was. At a quarter of capacity the first edit costs about 12% relative error on the held-out facts; at three quarters of capacity it costs about 20%, and the gap widens as edits accumulate. This is the capacity result of the first section reappearing: an emptier memory has unused directions for an edit to hide in, and a fuller one does not.</span>
+<span id="cb9-276"><a href="#cb9-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-277"><a href="#cb9-277" aria-hidden="true" tabindex="-1"></a>The whitening advantage is front-loaded. On the first edit the whitened update does roughly twice as well as the unweighted one, which is the specificity result of the previous section. By sixty edits the two are indistinguishable, because both have destroyed everything. Choosing the right notion of minimal change buys a better single edit, not a longer sequence of them.</span>
+<span id="cb9-278"><a href="#cb9-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-279"><a href="#cb9-279" aria-hidden="true" tabindex="-1"></a>That is the structural argument against treating weight editing as a knowledge-maintenance mechanism, and it is independent of how good any particular editing method is. Rank-one edits are a good way to change a fact. They are a poor way to run a database, because a database is defined by the operation being repeatable.</span>
+<span id="cb9-280"><a href="#cb9-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-281"><a href="#cb9-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## The alternative is to not store it in the weights</span></span>
+<span id="cb9-282"><a href="#cb9-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-283"><a href="#cb9-283" aria-hidden="true" tabindex="-1"></a>The other design keeps facts outside the parameters. A retrieval-augmented model pairs a parametric model with a non-parametric index, retrieves at inference, and conditions on what it finds <span class="co">[</span><span class="ot">@lewis2020rag</span><span class="co">]</span>. RETRO takes this to a two-trillion-token database with a frozen retriever and chunked cross-attention whose cost is linear in the retrieved data, and reports that a model of 7.5B parameters conditioned on that database matches models roughly twenty-five times its size <span class="co">[</span><span class="ot">@borgeaud2022retro</span><span class="co">]</span>.</span>
+<span id="cb9-284"><a href="#cb9-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-285"><a href="#cb9-285" aria-hidden="true" tabindex="-1"></a>The comparison in the language of this article is direct.</span>
+<span id="cb9-286"><a href="#cb9-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-287"><a href="#cb9-287" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Parametric memory <span class="pp">|</span> Retrieval index <span class="pp">|</span></span>
+<span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span></span>
+<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Capacity <span class="pp">|</span> about $d$ associations before interference <span class="pp">|</span> limited by storage, not by dimension <span class="pp">|</span></span>
+<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cost of one more fact <span class="pp">|</span> interference on all others <span class="pp">|</span> one more row <span class="pp">|</span></span>
+<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cost of an update <span class="pp">|</span> rank-one edit plus accumulating damage <span class="pp">|</span> overwrite a row <span class="pp">|</span></span>
+<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Compression across facts <span class="pp">|</span> automatic, shared structure is exploited <span class="pp">|</span> none, unless the encoder provides it <span class="pp">|</span></span>
+<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Retrieval cost <span class="pp">|</span> one matrix multiply <span class="pp">|</span> nearest-neighbour search plus attention over the results <span class="pp">|</span></span>
+<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a>: Where a fact can live, and what each choice charges for. {#tbl-mem-comparison}</span>
+<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a>Read down the columns, the tradeoff is not about capability but about which resource is scarce. A parametric memory is a compressor: it exploits structure shared between facts, which is exactly why a language model can answer questions it never saw verbatim, and it pays for that with interference and with an update path that degrades. An index is a lookup table: it has no interference and a trivial update path, and it exploits no structure at all beyond whatever the encoder put into the keys.</span>
+<span id="cb9-298"><a href="#cb9-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-299"><a href="#cb9-299" aria-hidden="true" tabindex="-1"></a>That predicts where each should be used, and the prediction matches practice. Facts that are numerous, mutually independent, and volatile belong in an index, because they get no benefit from compression and their update cost dominates. Regularities that generalize belong in the weights, because that is where sharing happens and there is nothing to update. The awkward middle is a fact that is both volatile and load-bearing for generalization, and neither mechanism handles that well.</span>
+<span id="cb9-300"><a href="#cb9-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-301"><a href="#cb9-301" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb9-302"><a href="#cb9-302" aria-hidden="true" tabindex="-1"></a><span class="fu">## What causal tracing does and does not establish</span></span>
+<span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-304"><a href="#cb9-304" aria-hidden="true" tabindex="-1"></a>It is worth separating two claims that are easy to merge. Causal tracing shows that certain hidden states are *causally decisive* for a prediction under a corrupt-and-restore intervention, with the average indirect effect concentrated at mid-layer feed-forward modules at the last subject token. Rank-one editing shows that a weight update at that same location changes the fact with both generalization and specificity. Together these are strong evidence that the location participates in factual recall.</span>
+<span id="cb9-305"><a href="#cb9-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-306"><a href="#cb9-306" aria-hidden="true" tabindex="-1"></a>They do not establish that the fact is stored only there, that the mapping between facts and weight directions is one to one, or that the linear key-value picture is the whole computation. The original work is explicit that any middle layer could equivalently store the fact. The linear associative memory here is a model of a mechanism, and the arithmetic above inherits whatever error that model carries.</span>
+<span id="cb9-307"><a href="#cb9-307" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-308"><a href="#cb9-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-309"><a href="#cb9-309" aria-hidden="true" tabindex="-1"></a><span class="fu">## Limits</span></span>
+<span id="cb9-310"><a href="#cb9-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-311"><a href="#cb9-311" aria-hidden="true" tabindex="-1"></a>Three worth naming.</span>
+<span id="cb9-312"><a href="#cb9-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-313"><a href="#cb9-313" aria-hidden="true" tabindex="-1"></a>The keys in a real transformer are not drawn from a fixed Gaussian, and the residual $v_* - Wk_*$ is not a free parameter. Choosing $v_*$ is itself an optimization, run to maximize the probability of the new object while holding the subject's other properties in place, and the closed-form update is applied only afterwards. The simulations above skip that step entirely.</span>
+<span id="cb9-314"><a href="#cb9-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-315"><a href="#cb9-315" aria-hidden="true" tabindex="-1"></a>The damage metric here is the error on stored associations, which is a proxy for the specificity metrics used in practice, where the question is whether a nearby subject's unrelated facts survive. Those metrics involve the full network downstream of the edited layer, and a small change in the feed-forward output can be amplified or absorbed by later layers.</span>
+<span id="cb9-316"><a href="#cb9-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-317"><a href="#cb9-317" aria-hidden="true" tabindex="-1"></a>And the sequential-edit result is a statement about repeated application of @eq-mem-rankone, not about the best possible batched procedure. Solving for many associations jointly is a different and better-conditioned problem than solving for them one at a time, which is the direction later mass-editing methods take. The point that survives is the capacity bound in the first section: whatever procedure writes the facts, a linear store of key dimension $d$ has about $d$ independent directions to write them into, and edits beyond that are borrowing from facts already there.</span>
+<span id="cb9-318"><a href="#cb9-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-319"><a href="#cb9-319" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb9-320"><a href="#cb9-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-321"><a href="#cb9-321" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Four Quantizers, One Quadratic Form</span><span class="co">](../../posts/quantization-one-quadratic-form/index.qmd)</span> minimizes the same kind of quadratic form under a different constraint.</span>
+<span id="cb9-322"><a href="#cb9-322" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">A Generalization Gap Is Not a Privacy Audit</span><span class="co">](../../posts/generalization-gap-privacy-audit/index.qmd)</span> asks what a stored fact leaks.</span>
+<span id="cb9-323"><a href="#cb9-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-324"><a href="#cb9-324" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb9-325"><a href="#cb9-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-326"><a href="#cb9-326" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb9-327"><a href="#cb9-327" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

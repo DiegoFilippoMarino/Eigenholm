@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index_files/figure-html/fig-scaling-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="670">
-<meta property="og:image:width" content="1326">
+<meta property="og:image:height" content="984">
+<meta property="og:image:width" content="1936">
 <meta name="twitter:title" content="Attention, from Logits to Context – Eigenholm">
 <meta name="twitter:description" content="A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/attention-from-logits-to-context/index_files/figure-html/fig-scaling-output-1.png">
-<meta name="twitter:image-height" content="670">
-<meta name="twitter:image-width" content="1326">
+<meta name="twitter:image-height" content="984">
+<meta name="twitter:image-width" content="1936">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -436,7 +436,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Attention, from Logits to Context</h1>
+<div class="quarto-title-block"><div><h1 class="title">Attention, from Logits to Context</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Transformers</div>
     <div class="quarto-category">Attention</div>
@@ -507,39 +507,43 @@ M_{ij}=\begin{cases}
 =d_k.
 </span></p>
 <p>The unscaled logit has standard deviation <span class="math inline">\sqrt{d_k}</span>. As the head dimension grows, the largest logit tends to dominate the softmax, reducing its entropy and concentrating the Jacobian near zero. Scaling restores an order-one logit variance.</p>
-<div id="cell-fig-scaling" class="cell" data-execution_count="1">
+<div id="e6edd948" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>dims <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>])</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>entropy_scaled, entropy_raw <span class="op">=</span> [], []</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, d))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">64</span>, d))</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> np.einsum(<span class="st">"bd,bnd-&gt;bn"</span>, q, k)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> values, scale <span class="kw">in</span> ((entropy_raw, <span class="fl">1.0</span>), (entropy_scaled, np.sqrt(d))):</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> logits <span class="op">/</span> scale</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        z <span class="op">-=</span> z.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> np.exp(z)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        p <span class="op">/=</span> p.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        values.append(np.mean(<span class="op">-</span>np.<span class="bu">sum</span>(p <span class="op">*</span> np.log(p <span class="op">+</span> <span class="fl">1e-30</span>), axis<span class="op">=</span><span class="dv">1</span>)))</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_raw, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"unscaled"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_scaled, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"scaled by </span><span class="dv">$\s</span><span class="vs">qrt{d_k}</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ax.axhline(np.log(<span class="dv">64</span>), color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="dv">1</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"uniform entropy"</span>)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>, ylabel<span class="op">=</span><span class="st">"entropy (nats)"</span>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dims <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>])</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>entropy_scaled, entropy_raw <span class="op">=</span> [], []</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, d))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">64</span>, d))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> np.einsum(<span class="st">"bd,bnd-&gt;bn"</span>, q, k)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> values, scale <span class="kw">in</span> ((entropy_raw, <span class="fl">1.0</span>), (entropy_scaled, np.sqrt(d))):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> logits <span class="op">/</span> scale</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        z <span class="op">-=</span> z.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> np.exp(z)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        p <span class="op">/=</span> p.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        values.append(np.mean(<span class="op">-</span>np.<span class="bu">sum</span>(p <span class="op">*</span> np.log(p <span class="op">+</span> <span class="fl">1e-30</span>), axis<span class="op">=</span><span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-scaling" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_raw, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"unscaled"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_scaled, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"scaled by </span><span class="dv">$\s</span><span class="vs">qrt{d_k}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ax.axhline(np.log(<span class="dv">64</span>), color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="dv">1</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"uniform entropy"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>, ylabel<span class="op">=</span><span class="st">"entropy (nats)"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-scaling" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-scaling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-scaling-output-1.png" width="663" height="335" class="figure-img">
+<img src="index_files/figure-html/fig-scaling-output-1.png" width="968" height="492" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-scaling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Mean attention entropy with and without the square-root scaling. Each point averages 400 random attention rows over 64 keys.
@@ -568,10 +572,10 @@ J_{\text{softmax}}=\operatorname{diag}(p)-pp^\top.
 <p>and its spectral norm is bounded by <span class="math inline">\max_ip_i</span>. Both vanish as the row approaches a one-hot vector, where <span class="math inline">\|p\|_2^2\to1</span>. The collapse is not a numerical accident that better precision could fix; it is the derivative of a function that has become locally constant. A row that has committed to one key cannot report how it would have preferred a different key, so no gradient signal flows back to the logits that produced the commitment.</p>
 <p>This gives the <span class="math inline">\sqrt{d_k}</span> argument teeth. The scaling is not cosmetic normalization: it keeps <span class="math inline">\|p\|_2^2</span> away from one at initialization, and <a href="#eq-jacobian-trace" class="quarto-xref">Equation&nbsp;3</a> is the quantity it protects. It also explains why entropy is the right diagnostic to plot. Entropy and <span class="math inline">1-\|p\|_2^2</span> are different measures of the same concentration, and the second is proportional to the gradient the row can still transmit.</p>
 <p>The same invariance explains the standard stable implementation</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax(x, axis<span class="op">=-</span><span class="dv">1</span>):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    shifted <span class="op">=</span> x <span class="op">-</span> x.<span class="bu">max</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> np.exp(shifted)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> weights <span class="op">/</span> weights.<span class="bu">sum</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax(x, axis<span class="op">=-</span><span class="dv">1</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    shifted <span class="op">=</span> x <span class="op">-</span> x.<span class="bu">max</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> np.exp(shifted)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> weights <span class="op">/</span> weights.<span class="bu">sum</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Subtracting the maximum changes neither <span class="math inline">P</span> nor the gradient, but prevents overflow in the exponential.</p>
 </section>
 <section id="multi-head-attention-is-a-structured-factorization" class="level2">
@@ -596,40 +600,48 @@ J_{\text{softmax}}=\operatorname{diag}(p)-pp^\top.
 \tag{4}</span></span></p>
 <p>no matter how long the sequence is. At <span class="math inline">n=4096</span> and <span class="math inline">d_k=64</span>, a head chooses its score matrix from a set of measure zero inside <span class="math inline">\mathbb R^{n\times n}</span>. Softmax then acts row-wise, and because each row is invariant to an additive constant, the reachable set is described by row-centered logit matrices of rank at most <span class="math inline">d_k</span>.</p>
 <p>That immediately raises a question the formula cannot answer on its own: which attention patterns actually need many dimensions? Some familiar ones need remarkably few.</p>
-<div id="cell-fig-logit-rank" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">128</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>i, j <span class="op">=</span> np.arange(n)[:, <span class="va">None</span>], np.arange(n)[<span class="va">None</span>, :]</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pairing <span class="op">=</span> rng.permutation(n)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> {</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"distance decay"</span>: <span class="op">-</span>np.<span class="bu">abs</span>(i <span class="op">-</span> j) <span class="op">/</span> <span class="fl">8.0</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"periodic, period 16"</span>: <span class="dv">3</span> <span class="op">*</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> (i <span class="op">-</span> j) <span class="op">/</span> <span class="dv">16</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"content match (random)"</span>: rng.normal(size<span class="op">=</span>(n, n)),</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arbitrary pairing"</span>: <span class="fl">6.0</span> <span class="op">*</span> (j <span class="op">==</span> pairing[:, <span class="va">None</span>]),</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>head_dims <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>])</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, target <span class="kw">in</span> targets.items():</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    centered <span class="op">=</span> target <span class="op">-</span> target.mean(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)   <span class="co"># row shifts are free</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.linalg.svd(centered, compute_uv<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    tail <span class="op">=</span> np.sqrt(np.cumsum(spectrum[::<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="dv">2</span>)[::<span class="op">-</span><span class="dv">1</span>]) <span class="op">/</span> np.linalg.norm(centered)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(head_dims, np.maximum(tail[head_dims], <span class="fl">1e-6</span>), <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, label<span class="op">=</span>name)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>ax.set_xscale(<span class="st">"log"</span>, base<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>,</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative error of best rank-$d_k$ fit"</span>, ylim<span class="op">=</span>(<span class="fl">5e-7</span>, <span class="dv">3</span>))</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="fl">1e-6</span>, color<span class="op">=</span><span class="st">"0.6"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">":"</span>)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">1.05</span>, <span class="fl">1.4e-6</span>, <span class="st">"exact (clipped)"</span>, fontsize<span class="op">=</span><span class="dv">7</span>, color<span class="op">=</span><span class="st">"0.4"</span>)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="f602a3df" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">128</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>i, j <span class="op">=</span> np.arange(n)[:, <span class="va">None</span>], np.arange(n)[<span class="va">None</span>, :]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pairing <span class="op">=</span> rng.permutation(n)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"distance decay"</span>: <span class="op">-</span>np.<span class="bu">abs</span>(i <span class="op">-</span> j) <span class="op">/</span> <span class="fl">8.0</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"periodic, period 16"</span>: <span class="dv">3</span> <span class="op">*</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> (i <span class="op">-</span> j) <span class="op">/</span> <span class="dv">16</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"content match (random)"</span>: rng.normal(size<span class="op">=</span>(n, n)),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arbitrary pairing"</span>: <span class="fl">6.0</span> <span class="op">*</span> (j <span class="op">==</span> pairing[:, <span class="va">None</span>]),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>head_dims <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>])</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Best rank-r approximation error in Frobenius norm is the norm of the discarded</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># singular values, so the whole curve comes from one spectrum per target.</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>residual <span class="op">=</span> {}</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, target <span class="kw">in</span> targets.items():</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    centered <span class="op">=</span> target <span class="op">-</span> target.mean(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)   <span class="co"># row shifts are free</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.linalg.svd(centered, compute_uv<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    tail <span class="op">=</span> np.sqrt(np.cumsum(spectrum[::<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="dv">2</span>)[::<span class="op">-</span><span class="dv">1</span>]) <span class="op">/</span> np.linalg.norm(centered)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    residual[name] <span class="op">=</span> tail[head_dims]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-logit-rank" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, tail <span class="kw">in</span> residual.items():</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(head_dims, np.maximum(tail, <span class="fl">1e-6</span>), <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, label<span class="op">=</span>name)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ax.set_xscale(<span class="st">"log"</span>, base<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative error of best rank-$d_k$ fit"</span>, ylim<span class="op">=</span>(<span class="fl">5e-7</span>, <span class="dv">3</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="fl">1e-6</span>, color<span class="op">=</span><span class="st">"0.6"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">":"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">1.05</span>, <span class="fl">1.4e-6</span>, <span class="st">"exact (clipped)"</span>, fontsize<span class="op">=</span><span class="dv">7</span>, color<span class="op">=</span><span class="st">"0.4"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-logit-rank" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-logit-rank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-logit-rank-output-1.png" width="661" height="354" class="figure-img">
+<img src="index_files/figure-html/fig-logit-rank-output-1.png" width="968" height="520" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-logit-rank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Best achievable error when a target logit matrix is realized by a head of dimension <span class="math inline">d_k</span>, measured as the relative Frobenius norm of the discarded singular values after row centering. Structured relative-position patterns are cheap; arbitrary token-to-token pairings are not.
@@ -681,6 +693,8 @@ Vaswani, Ashish, Noam Shazeer, Niki Parmar, et al. 2017. <span>“Attention Is A
 </div>
 </div>
 
+
+<!-- -->
 
 </section>
 
@@ -778,6 +792,57 @@ Context.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eige
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1146,7 +1211,252 @@ Context.”</span> August 13. <a href="https://diegofilippomarino.github.io/Eige
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Attention, from Logits to Context"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "A derivation of scaled dot-product and multi-head attention, including variance, masking, gradients, and computational cost."</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-13"</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Transformers, Attention, Mathematics]</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>The compact formula for attention hides three separate operations: a learned similarity metric, a row-wise probability model, and a content lookup. Pulling those pieces apart is useful because most later improvements change only one of them.</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## The operation and its shapes</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>Let a sequence be represented by $X\in\mathbb{R}^{n\times d_{\text{model}}}$. A single head forms</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>Q=XW^Q,\qquad K=XW^K,\qquad V=XW^V,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>where $Q,K\in\mathbb{R}^{n\times d_k}$ and $V\in\mathbb{R}^{n\times d_v}$. Scaled dot-product attention is <span class="co">[</span><span class="ot">@vaswani2017attention</span><span class="co">]</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>S=\frac{QK^\top}{\sqrt{d_k}},\qquad</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>P=\operatorname{softmax}_{\text{row}}(S+M),\qquad</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>O=PV.</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>$$ {#eq-attention}</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>The score $S_{ij}$ measures how strongly query position $i$ selects key position $j$. Each row of $P$ is a categorical distribution. The output $o_i$ is therefore a data-dependent convex combination of value vectors.</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>For causal self-attention, the mask is</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>M_{ij}=\begin{cases}</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>0,&amp;j\le i,<span class="sc">\\</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>-\infty,&amp;j&gt;i.</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>\end{cases}</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>Adding the mask before softmax makes every illegal probability exactly zero in ideal arithmetic. In finite precision, implementations use either negative infinity or a sufficiently negative representable value.</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why divide by $\sqrt{d_k}$?</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>Suppose the components of $q$ and $k$ are independent, centered, and have unit variance. Then</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(q^\top k)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>=\operatorname{Var}\left(\sum_{r=1}^{d_k}q_rk_r\right)</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>=d_k.</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>The unscaled logit has standard deviation $\sqrt{d_k}$. As the head dimension grows, the largest logit tends to dominate the softmax, reducing its entropy and concentrating the Jacobian near zero. Scaling restores an order-one logit variance.</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>dims <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>])</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>entropy_scaled, entropy_raw <span class="op">=</span> [], []</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, d))</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">64</span>, d))</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> np.einsum(<span class="st">"bd,bnd-&gt;bn"</span>, q, k)</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> values, scale <span class="kw">in</span> ((entropy_raw, <span class="fl">1.0</span>), (entropy_scaled, np.sqrt(d))):</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> logits <span class="op">/</span> scale</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>        z <span class="op">-=</span> z.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> np.exp(z)</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>        p <span class="op">/=</span> p.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>        values.append(np.mean(<span class="op">-</span>np.<span class="bu">sum</span>(p <span class="op">*</span> np.log(p <span class="op">+</span> <span class="fl">1e-30</span>), axis<span class="op">=</span><span class="dv">1</span>)))</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-scaling</span></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Mean attention entropy with and without the square-root scaling. Each point averages 400 random attention rows over 64 keys."</span></span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_raw, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"unscaled"</span>)</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>ax.plot(dims, entropy_scaled, <span class="st">"o-"</span>, label<span class="op">=</span><span class="vs">r"scaled by </span><span class="dv">$\s</span><span class="vs">qrt{d_k}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>ax.axhline(np.log(<span class="dv">64</span>), color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="dv">1</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"uniform entropy"</span>)</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>, ylabel<span class="op">=</span><span class="st">"entropy (nats)"</span>)</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>The experiment is deliberately distributional rather than model-specific. It isolates the argument behind the normalization in @eq-attention: without it, increasing width changes the effective temperature of attention.</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## The softmax Jacobian</span></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>For one row $p=\operatorname{softmax}(s)$,</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>\frac{\partial p_i}{\partial s_j}=p_i(\delta_{ij}-p_j),</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>J_{\text{softmax}}=\operatorname{diag}(p)-pp^\top.</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>$$ {#eq-softmax-jacobian}</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>This matrix is positive semidefinite and has a null direction along the all-ones vector. Adding a constant to every logit does not change the distribution.</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>Two scalar summaries of @eq-softmax-jacobian explain the previous section quantitatively. Its trace is</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>\operatorname{tr}(J_{\text{softmax}})</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>=\sum_ip_i(1-p_i)</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>=1-<span class="sc">\|</span>p<span class="sc">\|</span>_2^2,</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>$$ {#eq-jacobian-trace}</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>and its spectral norm is bounded by $\max_ip_i$. Both vanish as the row approaches a one-hot vector, where $<span class="sc">\|</span>p<span class="sc">\|</span>_2^2\to1$. The collapse is not a numerical accident that better precision could fix; it is the derivative of a function that has become locally constant. A row that has committed to one key cannot report how it would have preferred a different key, so no gradient signal flows back to the logits that produced the commitment.</span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>This gives the $\sqrt{d_k}$ argument teeth. The scaling is not cosmetic normalization: it keeps $<span class="sc">\|</span>p<span class="sc">\|</span>_2^2$ away from one at initialization, and @eq-jacobian-trace is the quantity it protects. It also explains why entropy is the right diagnostic to plot. Entropy and $1-<span class="sc">\|</span>p<span class="sc">\|</span>_2^2$ are different measures of the same concentration, and the second is proportional to the gradient the row can still transmit.</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>The same invariance explains the standard stable implementation</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax(x, axis<span class="op">=-</span><span class="dv">1</span>):</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>    shifted <span class="op">=</span> x <span class="op">-</span> x.<span class="bu">max</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> np.exp(shifted)</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> weights <span class="op">/</span> weights.<span class="bu">sum</span>(axis<span class="op">=</span>axis, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>Subtracting the maximum changes neither $P$ nor the gradient, but prevents overflow in the exponential.</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a><span class="fu">## Multi-head attention is a structured factorization</span></span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>With $h$ heads,</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>\operatorname{MHA}(X)</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>=\operatorname{Concat}(O_1,\ldots,O_h)W^O,</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>where each $O_r$ has its own projected queries, keys, and values. For the common choice $d_k=d_v=d_{\text{model}}/h$, the projection and attention FLOP counts remain approximately constant as $h$ changes:</span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>\underbrace{4nd_{\text{model}}^2}_{Q,K,V,O\text{ projections}}</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>+\underbrace{2n^2d_{\text{model}}}_{QK^\top\text{ and }PV}.</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>Heads do not provide free capacity. They partition the channel dimension into several learned similarity spaces. Very small $d_k$ constrains each compatibility function, while a single wide head forces one attention distribution to serve every subspace.</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a><span class="fu">## What a head can and cannot express</span></span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>The constraint imposed by small $d_k$ can be made precise. Since $S=QK^\top/\sqrt{d_k}$ is a product through a $d_k$-dimensional space,</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>\operatorname{rank}(S)\le d_k,</span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a>$$ {#eq-score-rank}</span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>no matter how long the sequence is. At $n=4096$ and $d_k=64$, a head chooses its score matrix from a set of measure zero inside $\mathbb R^{n\times n}$. Softmax then acts row-wise, and because each row is invariant to an additive constant, the reachable set is described by row-centered logit matrices of rank at most $d_k$.</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>That immediately raises a question the formula cannot answer on its own: which attention patterns actually need many dimensions? Some familiar ones need remarkably few.</span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">128</span></span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a>i, j <span class="op">=</span> np.arange(n)[:, <span class="va">None</span>], np.arange(n)[<span class="va">None</span>, :]</span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a>pairing <span class="op">=</span> rng.permutation(n)</span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> {</span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a>    <span class="st">"distance decay"</span>: <span class="op">-</span>np.<span class="bu">abs</span>(i <span class="op">-</span> j) <span class="op">/</span> <span class="fl">8.0</span>,</span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a>    <span class="st">"periodic, period 16"</span>: <span class="dv">3</span> <span class="op">*</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> (i <span class="op">-</span> j) <span class="op">/</span> <span class="dv">16</span>),</span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a>    <span class="st">"content match (random)"</span>: rng.normal(size<span class="op">=</span>(n, n)),</span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arbitrary pairing"</span>: <span class="fl">6.0</span> <span class="op">*</span> (j <span class="op">==</span> pairing[:, <span class="va">None</span>]),</span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a>head_dims <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>])</span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a><span class="co"># Best rank-r approximation error in Frobenius norm is the norm of the discarded</span></span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a><span class="co"># singular values, so the whole curve comes from one spectrum per target.</span></span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a>residual <span class="op">=</span> {}</span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, target <span class="kw">in</span> targets.items():</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a>    centered <span class="op">=</span> target <span class="op">-</span> target.mean(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)   <span class="co"># row shifts are free</span></span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>    spectrum <span class="op">=</span> np.linalg.svd(centered, compute_uv<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a>    tail <span class="op">=</span> np.sqrt(np.cumsum(spectrum[::<span class="op">-</span><span class="dv">1</span>] <span class="op">**</span> <span class="dv">2</span>)[::<span class="op">-</span><span class="dv">1</span>]) <span class="op">/</span> np.linalg.norm(centered)</span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>    residual[name] <span class="op">=</span> tail[head_dims]</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-logit-rank</span></span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Best achievable error when a target logit matrix is realized by a head of dimension $d_k$, measured as the relative Frobenius norm of the discarded singular values after row centering. Structured relative-position patterns are cheap; arbitrary token-to-token pairings are not."</span></span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.8</span>))</span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, tail <span class="kw">in</span> residual.items():</span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(head_dims, np.maximum(tail, <span class="fl">1e-6</span>), <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, label<span class="op">=</span>name)</span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a>ax.set_xscale(<span class="st">"log"</span>, base<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="vs">r"head dimension </span><span class="dv">$</span><span class="vs">d_k</span><span class="dv">$</span><span class="vs">"</span>,</span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative error of best rank-$d_k$ fit"</span>, ylim<span class="op">=</span>(<span class="fl">5e-7</span>, <span class="dv">3</span>))</span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="fl">1e-6</span>, color<span class="op">=</span><span class="st">"0.6"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">":"</span>)</span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">1.05</span>, <span class="fl">1.4e-6</span>, <span class="st">"exact (clipped)"</span>, fontsize<span class="op">=</span><span class="dv">7</span>, color<span class="op">=</span><span class="st">"0.4"</span>)</span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a>The periodic pattern is exactly rank two, because $\cos\left(\omega(i-j)\right)=\cos\omega i\cos\omega j+\sin\omega i\sin\omega j$. One frequency of relative position costs one coordinate pair, which is precisely the accounting behind rotary embeddings. A smooth distance bias is nearly as cheap: eight dimensions reproduce it to about two percent.</span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a>An arbitrary pairing is the opposite. Sending each query to one unrelated key is essentially a permutation matrix, and 64 dimensions still leave 70 percent of it unexplained. Nothing about that pattern is complicated to describe; it is simply incompressible, and @eq-score-rank is a compression budget.</span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a>This is the honest version of the claim that attention is a lookup table. It is a lookup table whose addressing function must factor through $d_k$ dimensions. Structured, reusable relations are affordable, arbitrary correspondences are not, and the useful patterns of language mostly live at the cheap end. It is also the reason heads are the right unit of capacity: $h$ heads give a sum of $h$ separately softmaxed rank-$d_k$ operators, which is a strictly richer object than one rank-$hd_k$ operator <span class="co">[</span><span class="ot">@bhojanapalli2020lowrank</span><span class="co">]</span>.</span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a><span class="fu">## Memory is not the same as arithmetic</span></span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a>The two matrix multiplications require $O(n^2d)$ arithmetic. A literal implementation also writes $S$ and $P$, each with $n^2$ entries. At sequence length 16,384, one FP16 matrix for one batch-head pair occupies 512 MiB. The quadratic intermediate, not only the quadratic FLOP count, is the systems problem.</span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a>This distinction leads directly to IO-aware kernels such as FlashAttention: equation @eq-attention stays unchanged, but its evaluation order is reorganized so that $S$ and $P$ never reside in high-bandwidth memory as complete matrices.</span>
+<span id="cb6-225"><a href="#cb6-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-226"><a href="#cb6-226" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the equation does not guarantee</span></span>
+<span id="cb6-227"><a href="#cb6-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-228"><a href="#cb6-228" aria-hidden="true" tabindex="-1"></a>Attention weights are conditional routing coefficients, not a causal explanation. A high value of $P_{ij}$ says that value $v_j$ contributes strongly to output $o_i$ under the current parameterization. Residual connections, value projections, later layers, and correlated features complicate any interpretation beyond that statement.</span>
+<span id="cb6-229"><a href="#cb6-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-230"><a href="#cb6-230" aria-hidden="true" tabindex="-1"></a>The normalization also creates competition. Increasing one logit decreases other probabilities in the row, even when those keys are unrelated. This coupling is useful for selection, but it means that attention is not a set of independent relevance scores.</span>
+<span id="cb6-231"><a href="#cb6-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-232"><a href="#cb6-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical checks</span></span>
+<span id="cb6-233"><a href="#cb6-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-234"><a href="#cb6-234" aria-hidden="true" tabindex="-1"></a>A minimal implementation should satisfy three invariants:</span>
+<span id="cb6-235"><a href="#cb6-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-236"><a href="#cb6-236" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Every unmasked row sums to one within numerical tolerance.</span>
+<span id="cb6-237"><a href="#cb6-237" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Masked probabilities are zero.</span>
+<span id="cb6-238"><a href="#cb6-238" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Shifting a complete score row by any scalar leaves the output unchanged.</span>
+<span id="cb6-239"><a href="#cb6-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-240"><a href="#cb6-240" aria-hidden="true" tabindex="-1"></a>Those tests catch axis errors and many masking mistakes before they become training pathologies.</span>
+<span id="cb6-241"><a href="#cb6-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-242"><a href="#cb6-242" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb6-243"><a href="#cb6-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-244"><a href="#cb6-244" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">The Geometry of Rotary Position Embeddings</span><span class="co">](../../posts/rope-geometry/index.qmd)</span> adds the position structure that plain attention lacks.</span>
+<span id="cb6-245"><a href="#cb6-245" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">FlashAttention Is an IO Algorithm</span><span class="co">](../../posts/flashattention-io-aware/index.qmd)</span> keeps this function and changes only its evaluation schedule.</span>
+<span id="cb6-246"><a href="#cb6-246" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">The Rank of Memory</span><span class="co">](../../posts/rank-of-memory/index.qmd)</span> asks what recurrence gives up relative to the lookup done here.</span>
+<span id="cb6-247"><a href="#cb6-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-248"><a href="#cb6-248" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb6-249"><a href="#cb6-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-250"><a href="#cb6-250" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb6-251"><a href="#cb6-251" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

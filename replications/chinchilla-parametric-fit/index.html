@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="Reproducing the compute-optimal allocation implied by the published loss constants: the scaling exponents come out exactly, the token-to-parameter ratio does not.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/replications/chinchilla-parametric-fit/index_files/figure-html/fig-chin-ratio-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="766">
-<meta property="og:image:width" content="1399">
+<meta property="og:image:height" content="1124">
+<meta property="og:image:width" content="2048">
 <meta name="twitter:title" content="Chinchilla’s Parametric Fit Does Not Imply Twenty Tokens per Parameter – Eigenholm">
 <meta name="twitter:description" content="Reproducing the compute-optimal allocation implied by the published loss constants: the scaling exponents come out exactly, the token-to-parameter ratio does not.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/replications/chinchilla-parametric-fit/index_files/figure-html/fig-chin-ratio-output-1.png">
-<meta name="twitter:image-height" content="766">
-<meta name="twitter:image-width" content="1399">
+<meta name="twitter:image-height" content="1124">
+<meta name="twitter:image-width" content="2048">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -434,7 +434,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Chinchilla’s Parametric Fit Does Not Imply Twenty Tokens per Parameter</h1>
+<div class="quarto-title-block"><div><h1 class="title">Chinchilla’s Parametric Fit Does Not Imply Twenty Tokens per Parameter</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Scaling Laws</div>
     <div class="quarto-category">Replication</div>
@@ -521,24 +521,26 @@ a = \frac{\beta}{\alpha + \beta},\quad b = \frac{\alpha}{\alpha + \beta} .
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>FITS <span class="op">=</span> {</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hoffmann et al. 2022"</span>: <span class="bu">dict</span>(E<span class="op">=</span><span class="fl">1.69</span>, A<span class="op">=</span><span class="fl">406.4</span>, B<span class="op">=</span><span class="fl">410.7</span>, alpha<span class="op">=</span><span class="fl">0.34</span>, beta<span class="op">=</span><span class="fl">0.28</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                                 reported<span class="op">=</span>(<span class="fl">0.454</span>, <span class="fl">0.546</span>)),</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Besiroglu et al. 2024"</span>: <span class="bu">dict</span>(E<span class="op">=</span><span class="fl">1.82</span>, A<span class="op">=</span><span class="fl">514.0</span>, B<span class="op">=</span><span class="fl">2115.2</span>, alpha<span class="op">=</span><span class="fl">0.35</span>, beta<span class="op">=</span><span class="fl">0.37</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                                  reported<span class="op">=</span>(<span class="fl">0.512</span>, <span class="fl">0.488</span>)),</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exponents(fit):</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> fit[<span class="st">"beta"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">+</span> fit[<span class="st">"beta"</span>])</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a, <span class="fl">1.0</span> <span class="op">-</span> a</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'fit'</span><span class="sc">:&gt;24}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'a derived'</span><span class="sc">:&gt;10}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'a reported'</span><span class="sc">:&gt;11}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'b derived'</span><span class="sc">:&gt;10}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'b reported'</span><span class="sc">:&gt;11}</span><span class="ss">"</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    a, b <span class="op">=</span> exponents(fit)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    ra, rb <span class="op">=</span> fit[<span class="st">"reported"</span>]</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">  </span><span class="sc">{</span>a<span class="sc">:&gt;10.4f}</span><span class="ss">  </span><span class="sc">{</span>ra<span class="sc">:&gt;11.3f}</span><span class="ss">  </span><span class="sc">{</span>b<span class="sc">:&gt;10.4f}</span><span class="ss">  </span><span class="sc">{</span>rb<span class="sc">:&gt;11.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>FITS <span class="op">=</span> {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hoffmann et al. 2022"</span>: <span class="bu">dict</span>(E<span class="op">=</span><span class="fl">1.69</span>, A<span class="op">=</span><span class="fl">406.4</span>, B<span class="op">=</span><span class="fl">410.7</span>, alpha<span class="op">=</span><span class="fl">0.34</span>, beta<span class="op">=</span><span class="fl">0.28</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                                 reported<span class="op">=</span>(<span class="fl">0.454</span>, <span class="fl">0.546</span>)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Besiroglu et al. 2024"</span>: <span class="bu">dict</span>(E<span class="op">=</span><span class="fl">1.82</span>, A<span class="op">=</span><span class="fl">514.0</span>, B<span class="op">=</span><span class="fl">2115.2</span>, alpha<span class="op">=</span><span class="fl">0.35</span>, beta<span class="op">=</span><span class="fl">0.37</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                                  reported<span class="op">=</span>(<span class="fl">0.512</span>, <span class="fl">0.488</span>)),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exponents(fit):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> fit[<span class="st">"beta"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">+</span> fit[<span class="st">"beta"</span>])</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a, <span class="fl">1.0</span> <span class="op">-</span> a</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'fit'</span><span class="sc">:&gt;24}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'a derived'</span><span class="sc">:&gt;10}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'a reported'</span><span class="sc">:&gt;11}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'b derived'</span><span class="sc">:&gt;10}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'b reported'</span><span class="sc">:&gt;11}</span><span class="ss">"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    a, b <span class="op">=</span> exponents(fit)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    ra, rb <span class="op">=</span> fit[<span class="st">"reported"</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">  </span><span class="sc">{</span>a<span class="sc">:&gt;10.4f}</span><span class="ss">  </span><span class="sc">{</span>ra<span class="sc">:&gt;11.3f}</span><span class="ss">  </span><span class="sc">{</span>b<span class="sc">:&gt;10.4f}</span><span class="ss">  </span><span class="sc">{</span>rb<span class="sc">:&gt;11.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                     fit   a derived   a reported   b derived   b reported
     Hoffmann et al. 2022      0.4516        0.454      0.5484        0.546
@@ -556,34 +558,33 @@ a = \frac{\beta}{\alpha + \beta},\quad b = \frac{\alpha}{\alpha + \beta} .
 \qquad\text{constant in } N \iff \alpha = \beta .
 \tag{5}</span></span></p>
 <p>The published <span class="math inline">\alpha = 0.34</span> and <span class="math inline">\beta = 0.28</span> are not equal, and not nearly equal: the exponent on the right of <a href="#eq-chin-scalefree" class="quarto-xref">Equation&nbsp;5</a> is <span class="math inline">0.06/0.28 = 0.214</span>. A twenty-fold increase in model size multiplies the optimal token-to-parameter ratio by <span class="math inline">20^{0.214} \approx 1.9</span>. There is no scale-free ratio to quote.</p>
-<div id="cell-fig-chin-ratio" class="cell" data-execution_count="2">
+<div id="87f123d6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokens_per_param(fit, N):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    coef <span class="op">=</span> (fit[<span class="st">"beta"</span>] <span class="op">*</span> fit[<span class="st">"B"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">*</span> fit[<span class="st">"A"</span>])) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> coef <span class="op">*</span> N <span class="op">**</span> ((fit[<span class="st">"alpha"</span>] <span class="op">-</span> fit[<span class="st">"beta"</span>]) <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sizes <span class="op">=</span> np.geomspace(<span class="fl">1e9</span>, <span class="fl">1e12</span>, <span class="dv">200</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.1</span>))</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, fit), color <span class="kw">in</span> <span class="bu">zip</span>(FITS.items(), [<span class="st">"#a4553a"</span>, <span class="st">"#2a6e6e"</span>]):</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ax.loglog(sizes, tokens_per_param(fit, sizes), lw<span class="op">=</span><span class="fl">1.9</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="fl">20.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="st">"20 tokens per parameter"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">7e10</span>, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"Chinchilla, 70B"</span>, xy<span class="op">=</span>(<span class="fl">7e10</span>, <span class="fl">3.5</span>), fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">"#65656d"</span>, ha<span class="op">=</span><span class="st">"center"</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"parameters $N$"</span>, ylabel<span class="op">=</span><span class="st">"optimal tokens per parameter"</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Is the ratio scale-free?"</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    lo, mid, hi <span class="op">=</span> (tokens_per_param(fit, n) <span class="cf">for</span> n <span class="kw">in</span> (<span class="fl">1e9</span>, <span class="fl">7e10</span>, <span class="fl">1e12</span>))</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">   1B: </span><span class="sc">{</span>lo<span class="sc">:6.1f}</span><span class="ss">   70B: </span><span class="sc">{</span>mid<span class="sc">:6.1f}</span><span class="ss">   1T: </span><span class="sc">{</span>hi<span class="sc">:6.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sizes <span class="op">=</span> np.geomspace(<span class="fl">1e9</span>, <span class="fl">1e12</span>, <span class="dv">200</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-chin-ratio" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.1</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, fit), color <span class="kw">in</span> <span class="bu">zip</span>(FITS.items(), [<span class="st">"#a4553a"</span>, <span class="st">"#2a6e6e"</span>]):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    ax.loglog(sizes, tokens_per_param(fit, sizes), lw<span class="op">=</span><span class="fl">1.9</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="fl">20.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="st">"20 tokens per parameter"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">7e10</span>, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"Chinchilla, 70B"</span>, xy<span class="op">=</span>(<span class="fl">7e10</span>, <span class="fl">3.5</span>), fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">"#65656d"</span>, ha<span class="op">=</span><span class="st">"center"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"parameters $N$"</span>, ylabel<span class="op">=</span><span class="st">"optimal tokens per parameter"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Is the ratio scale-free?"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-chin-ratio" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-chin-ratio-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-chin-ratio-output-1.png" width="700" height="383" class="figure-img">
+<img src="index_files/figure-html/fig-chin-ratio-output-1.png" width="1024" height="562" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-chin-ratio-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Optimal tokens per parameter implied by each parametric fit, across three decades of model size. The published Hoffmann constants imply a strongly scale-dependent ratio far above twenty; the re-estimated constants imply a mildly scale-dependent ratio near it.
@@ -591,60 +592,70 @@ Figure&nbsp;1: Optimal tokens per parameter implied by each parametric fit, acro
 </figure>
 </div>
 </div>
+</div>
+<div id="6c88e885" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    lo, mid, hi <span class="op">=</span> (tokens_per_param(fit, n) <span class="cf">for</span> n <span class="kw">in</span> (<span class="fl">1e9</span>, <span class="fl">7e10</span>, <span class="fl">1e12</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">   1B: </span><span class="sc">{</span>lo<span class="sc">:6.1f}</span><span class="ss">   70B: </span><span class="sc">{</span>mid<span class="sc">:6.1f}</span><span class="ss">   1T: </span><span class="sc">{</span>hi<span class="sc">:6.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    Hoffmann et al. 2022   1B:   44.0   70B:  109.4   1T:  193.5
    Besiroglu et al. 2024   1B:   17.3   70B:   13.8   1T:   11.9</code></pre>
 </div>
 </div>
-<p>The published constants put the optimal ratio at 70B parameters somewhere near 124 tokens per parameter, and the ratio climbs with scale. Chinchilla itself was trained at 70B parameters on 1.4T tokens, which is 20. The model the paper trained is not the model the paper’s own third fit recommends.</p>
+<p>The published constants put the optimal ratio at 70B parameters near 109 tokens per parameter, and the ratio climbs with scale. Chinchilla itself was trained at 70B parameters on 1.4T tokens, which is 20. The model the paper trained is not the model the paper’s own third fit recommends.</p>
 </section>
 <section id="check-three-allocation-at-gophers-budget" class="level2">
 <h2 class="anchored" data-anchor-id="check-three-allocation-at-gophers-budget">Check three: allocation at Gopher’s budget</h2>
 <p>The same disagreement shows up in the headline comparison. Chinchilla was trained at the compute budget used for Gopher, about <span class="math inline">5.76 \times 10^{23}</span> FLOPs, and the paper’s argument is that this budget is better spent on 70B parameters and 1.4T tokens than on Gopher’s 280B parameters and 300B tokens.</p>
-<div id="cell-fig-chin-allocation" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>GOPHER_FLOPS <span class="op">=</span> <span class="fl">5.76e23</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loss(fit, N, D):</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fit[<span class="st">"E"</span>] <span class="op">+</span> fit[<span class="st">"A"</span>] <span class="op">/</span> N <span class="op">**</span> fit[<span class="st">"alpha"</span>] <span class="op">+</span> fit[<span class="st">"B"</span>] <span class="op">/</span> D <span class="op">**</span> fit[<span class="st">"beta"</span>]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optimum(fit, C):</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Closed-form minimizer of the parametric loss at fixed compute C = 6ND."""</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    coef <span class="op">=</span> (fit[<span class="st">"beta"</span>] <span class="op">*</span> fit[<span class="st">"B"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">*</span> fit[<span class="st">"A"</span>])) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    power <span class="op">=</span> fit[<span class="st">"alpha"</span>] <span class="op">/</span> fit[<span class="st">"beta"</span>]</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> (C <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> coef)) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> power))</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> N, C <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> N)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.geomspace(<span class="fl">5e9</span>, <span class="fl">6e11</span>, <span class="dv">300</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">4.2</span>))</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, fit), color <span class="kw">in</span> <span class="bu">zip</span>(FITS.items(), [<span class="st">"#a4553a"</span>, <span class="st">"#2a6e6e"</span>]):</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> loss(fit, grid, GOPHER_FLOPS <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> grid))</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    ax.semilogx(grid, curve, lw<span class="op">=</span><span class="fl">1.9</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    N_star, D_star <span class="op">=</span> optimum(fit, GOPHER_FLOPS)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    ax.plot([N_star], [loss(fit, N_star, D_star)], <span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">7</span>, mfc<span class="op">=</span><span class="st">"white"</span>, color<span class="op">=</span>color)</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">  optimal N = </span><span class="sc">{</span>N_star <span class="op">/</span> <span class="fl">1e9</span><span class="sc">:6.1f}</span><span class="ss">B   D = </span><span class="sc">{</span>D_star <span class="op">/</span> <span class="fl">1e12</span><span class="sc">:5.2f}</span><span class="ss">T"</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   ratio = </span><span class="sc">{</span>D_star <span class="op">/</span> N_star<span class="sc">:6.1f}</span><span class="ss">"</span>)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">7e10</span>, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"Chinchilla as trained (70B)"</span>, xy<span class="op">=</span>(<span class="fl">7.4e10</span>, ax.get_ylim()[<span class="dv">1</span>] <span class="op">*</span> <span class="fl">0.995</span>),</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">"#65656d"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"parameters $N$ at fixed compute"</span>, ylabel<span class="op">=</span><span class="st">"predicted loss"</span>,</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="vs">r"Iso-FLOP slice at Gopher's budget, </span><span class="dv">$</span><span class="vs">C = 5</span><span class="dv">.</span><span class="vs">76 </span><span class="ch">\t</span><span class="vs">imes 10</span><span class="dv">^</span><span class="op">{23}</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="89b5adfd" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>GOPHER_FLOPS <span class="op">=</span> <span class="fl">5.76e23</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loss(fit, N, D):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fit[<span class="st">"E"</span>] <span class="op">+</span> fit[<span class="st">"A"</span>] <span class="op">/</span> N <span class="op">**</span> fit[<span class="st">"alpha"</span>] <span class="op">+</span> fit[<span class="st">"B"</span>] <span class="op">/</span> D <span class="op">**</span> fit[<span class="st">"beta"</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optimum(fit, C):</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Closed-form minimizer of the parametric loss at fixed compute C = 6ND."""</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    coef <span class="op">=</span> (fit[<span class="st">"beta"</span>] <span class="op">*</span> fit[<span class="st">"B"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">*</span> fit[<span class="st">"A"</span>])) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    power <span class="op">=</span> fit[<span class="st">"alpha"</span>] <span class="op">/</span> fit[<span class="st">"beta"</span>]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> (C <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> coef)) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> power))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> N, C <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> N)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    N_star, D_star <span class="op">=</span> optimum(fit, GOPHER_FLOPS)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">  optimal N = </span><span class="sc">{</span>N_star <span class="op">/</span> <span class="fl">1e9</span><span class="sc">:6.1f}</span><span class="ss">B   D = </span><span class="sc">{</span>D_star <span class="op">/</span> <span class="fl">1e12</span><span class="sc">:5.2f}</span><span class="ss">T"</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   ratio = </span><span class="sc">{</span>D_star <span class="op">/</span> N_star<span class="sc">:6.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    Hoffmann et al. 2022  optimal N =   32.2B   D =  2.98T   ratio =   92.6
    Besiroglu et al. 2024  optimal N =   83.8B   D =  1.14T   ratio =   13.7</code></pre>
 </div>
+</div>
+<div id="cell-fig-chin-allocation" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.geomspace(<span class="fl">5e9</span>, <span class="fl">6e11</span>, <span class="dv">300</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">4.2</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, fit), color <span class="kw">in</span> <span class="bu">zip</span>(FITS.items(), [<span class="st">"#a4553a"</span>, <span class="st">"#2a6e6e"</span>]):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> loss(fit, grid, GOPHER_FLOPS <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> grid))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    ax.semilogx(grid, curve, lw<span class="op">=</span><span class="fl">1.9</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    N_star, D_star <span class="op">=</span> optimum(fit, GOPHER_FLOPS)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    ax.plot([N_star], [loss(fit, N_star, D_star)], <span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">7</span>, mfc<span class="op">=</span><span class="st">"white"</span>, color<span class="op">=</span>color)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">7e10</span>, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"Chinchilla as trained (70B)"</span>, xy<span class="op">=</span>(<span class="fl">7.4e10</span>, ax.get_ylim()[<span class="dv">1</span>] <span class="op">*</span> <span class="fl">0.995</span>),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">"#65656d"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"parameters $N$ at fixed compute"</span>, ylabel<span class="op">=</span><span class="st">"predicted loss"</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="vs">r"Iso-FLOP slice at Gopher's budget, </span><span class="dv">$</span><span class="vs">C = 5</span><span class="dv">.</span><span class="vs">76 </span><span class="ch">\t</span><span class="vs">imes 10</span><span class="dv">^</span><span class="op">{23}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-chin-allocation" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-chin-allocation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-chin-allocation-output-2.png" width="721" height="393" class="figure-img">
+<img src="index_files/figure-html/fig-chin-allocation-output-1.png" width="1052" height="576" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-chin-allocation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Iso-FLOP slices of each parametric fit at Gopher’s compute budget, with the minimizing model size marked. The two fits disagree about where the optimum sits by more than a factor of two.
@@ -685,6 +696,8 @@ Hoffmann, Jordan, Sebastian Borgeaud, Arthur Mensch, et al. 2022. <span>“Train
 </div>
 </div>
 
+
+<!-- -->
 
 </section>
 
@@ -783,6 +796,57 @@ Imply Twenty Tokens Per Parameter.”</span> August 14. <a href="https://diegofi
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1151,7 +1215,232 @@ Imply Twenty Tokens Per Parameter.”</span> August 14. <a href="https://diegofi
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Chinchilla's Parametric Fit Does Not Imply Twenty Tokens per Parameter"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Reproducing the compute-optimal allocation implied by the published loss constants: the scaling exponents come out exactly, the token-to-parameter ratio does not."</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-14"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Scaling Laws, Replication, Compute-Optimal Training]</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this replicates</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>**Target.** The compute-optimal allocation implied by the parametric loss fit reported in Hoffmann et al. 2022, Approach 3 <span class="co">[</span><span class="ot">@hoffmann2022chinchilla</span><span class="co">]</span>: the exponents $a$ and $b$ in $N_{\text{opt}} \propto C^{a}$ and $D_{\text{opt}} \propto C^{b}$, and the resulting token-to-parameter ratio.</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>**Method.** Analytic minimization of the published loss function under the compute constraint $C = 6ND$, evaluated numerically. No training runs, no data reconstruction from the paper's figures.</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>**Result.** The exponents reproduce to three decimal places. The token-to-parameter ratio does not reproduce: the published constants imply between 44 and 194 tokens per parameter over the relevant range, not the 20 that Chinchilla was actually trained at. An independent replication reached the same conclusion by a different route <span class="co">[</span><span class="ot">@besiroglu2024replication</span><span class="co">]</span>.</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>The Chinchilla paper made two claims that are usually quoted together. The first is a functional form: the loss of a transformer trained to convergence decomposes into an irreducible term plus separate power laws in parameters and tokens. The second is a prescription: at a fixed compute budget, parameters and tokens should be scaled in roughly equal proportion, which at the 70B scale works out to about twenty training tokens per parameter.</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>The prescription came from three estimation procedures. The first two vary model size at fixed compute and read the minimum off the resulting curves. The third fits the parametric form directly. This replication takes the third one, which is the only one whose output is a set of numbers a reader can carry away, and asks whether those numbers imply the prescription.</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## The fit and its constraint</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>The reported form is</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>L(N, D) = E + \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}},</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>$$ {#eq-chin-loss}</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>with published values $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$, $\beta = 0.28$. Training compute for a dense transformer is taken as $C = 6ND$.</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>Minimizing @eq-chin-loss subject to $C = 6ND$ is a two-line Lagrange problem. With multiplier $\lambda$, the stationarity conditions are $\alpha A N^{-\alpha-1} = 6\lambda D$ and $\beta B D^{-\beta-1} = 6\lambda N$. Dividing one by the other and cancelling gives a condition with no $\lambda$ in it:</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>\frac{\alpha A}{N^{\alpha}} = \frac{\beta B}{D^{\beta}} .</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>$$ {#eq-chin-balance}</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>Equation @eq-chin-balance says the optimum equalizes the two reducible loss terms after weighting each by its own exponent. Solving it for $D$ gives the optimal allocation as a curve rather than a point:</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>D_{\text{opt}}(N) = \left(\frac{\beta B}{\alpha A}\right)^{1/\beta} N^{\alpha/\beta},</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>\qquad\text{so}\qquad</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>\frac{D_{\text{opt}}}{N} = \left(\frac{\beta B}{\alpha A}\right)^{1/\beta} N^{\frac{\alpha - \beta}{\beta}} .</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>$$ {#eq-chin-ratio}</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>Substituting into $C = 6ND$ and solving for $N$ gives the compute exponents:</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>N_{\text{opt}} \propto C^{a},\quad D_{\text{opt}} \propto C^{b},</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>a = \frac{\beta}{\alpha + \beta},\quad b = \frac{\alpha}{\alpha + \beta} .</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>$$ {#eq-chin-exponents}</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>Everything below follows from @eq-chin-exponents and @eq-chin-ratio and the five published constants.</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check one: the exponents</span></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: chin-exponents</span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>FITS <span class="op">=</span> {</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hoffmann et al. 2022"</span>: <span class="bu">dict</span>(E<span class="op">=</span><span class="fl">1.69</span>, A<span class="op">=</span><span class="fl">406.4</span>, B<span class="op">=</span><span class="fl">410.7</span>, alpha<span class="op">=</span><span class="fl">0.34</span>, beta<span class="op">=</span><span class="fl">0.28</span>,</span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>                                 reported<span class="op">=</span>(<span class="fl">0.454</span>, <span class="fl">0.546</span>)),</span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Besiroglu et al. 2024"</span>: <span class="bu">dict</span>(E<span class="op">=</span><span class="fl">1.82</span>, A<span class="op">=</span><span class="fl">514.0</span>, B<span class="op">=</span><span class="fl">2115.2</span>, alpha<span class="op">=</span><span class="fl">0.35</span>, beta<span class="op">=</span><span class="fl">0.37</span>,</span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>                                  reported<span class="op">=</span>(<span class="fl">0.512</span>, <span class="fl">0.488</span>)),</span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exponents(fit):</span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> fit[<span class="st">"beta"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">+</span> fit[<span class="st">"beta"</span>])</span>
+<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a, <span class="fl">1.0</span> <span class="op">-</span> a</span>
+<span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'fit'</span><span class="sc">:&gt;24}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'a derived'</span><span class="sc">:&gt;10}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'a reported'</span><span class="sc">:&gt;11}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'b derived'</span><span class="sc">:&gt;10}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'b reported'</span><span class="sc">:&gt;11}</span><span class="ss">"</span>)</span>
+<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
+<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a>    a, b <span class="op">=</span> exponents(fit)</span>
+<span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a>    ra, rb <span class="op">=</span> fit[<span class="st">"reported"</span>]</span>
+<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">  </span><span class="sc">{</span>a<span class="sc">:&gt;10.4f}</span><span class="ss">  </span><span class="sc">{</span>ra<span class="sc">:&gt;11.3f}</span><span class="ss">  </span><span class="sc">{</span>b<span class="sc">:&gt;10.4f}</span><span class="ss">  </span><span class="sc">{</span>rb<span class="sc">:&gt;11.3f}</span><span class="ss">"</span>)</span>
+<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-95"><a href="#cb10-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a>This reproduces. Both papers' reported compute exponents fall out of @eq-chin-exponents given only their own $\alpha$ and $\beta$, to within a fraction of a percent. The residual gap of 0.002 on the first row is consistent with $a$ and $b$ having been fitted independently rather than derived from the other two constants.</span>
+<span id="cb10-97"><a href="#cb10-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-98"><a href="#cb10-98" aria-hidden="true" tabindex="-1"></a>So the parametric fit is internally coherent at the level of exponents, and the derivation above is the right one. That matters, because the next check uses the same derivation and fails.</span>
+<span id="cb10-99"><a href="#cb10-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-100"><a href="#cb10-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check two: tokens per parameter</span></span>
+<span id="cb10-101"><a href="#cb10-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-102"><a href="#cb10-102" aria-hidden="true" tabindex="-1"></a>The prescription "scale parameters and data equally" is a statement about $D/N$ being roughly constant. Equation @eq-chin-ratio says exactly when that holds:</span>
+<span id="cb10-103"><a href="#cb10-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a>\frac{D_{\text{opt}}}{N} \;\propto\; N^{(\alpha - \beta)/\beta},</span>
+<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a>\qquad\text{constant in } N \iff \alpha = \beta .</span>
+<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a>$$ {#eq-chin-scalefree}</span>
+<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-109"><a href="#cb10-109" aria-hidden="true" tabindex="-1"></a>The published $\alpha = 0.34$ and $\beta = 0.28$ are not equal, and not nearly equal: the exponent on the right of @eq-chin-scalefree is $0.06/0.28 = 0.214$. A twenty-fold increase in model size multiplies the optimal token-to-parameter ratio by $20^{0.214} \approx 1.9$. There is no scale-free ratio to quote.</span>
+<span id="cb10-110"><a href="#cb10-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-113"><a href="#cb10-113" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-114"><a href="#cb10-114" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb10-115"><a href="#cb10-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-116"><a href="#cb10-116" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokens_per_param(fit, N):</span>
+<span id="cb10-117"><a href="#cb10-117" aria-hidden="true" tabindex="-1"></a>    coef <span class="op">=</span> (fit[<span class="st">"beta"</span>] <span class="op">*</span> fit[<span class="st">"B"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">*</span> fit[<span class="st">"A"</span>])) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
+<span id="cb10-118"><a href="#cb10-118" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> coef <span class="op">*</span> N <span class="op">**</span> ((fit[<span class="st">"alpha"</span>] <span class="op">-</span> fit[<span class="st">"beta"</span>]) <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
+<span id="cb10-119"><a href="#cb10-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-120"><a href="#cb10-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-121"><a href="#cb10-121" aria-hidden="true" tabindex="-1"></a>sizes <span class="op">=</span> np.geomspace(<span class="fl">1e9</span>, <span class="fl">1e12</span>, <span class="dv">200</span>)</span>
+<span id="cb10-122"><a href="#cb10-122" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-chin-ratio</span></span>
+<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Optimal tokens per parameter implied by each parametric fit, across three decades of model size. The published Hoffmann constants imply a strongly scale-dependent ratio far above twenty; the re-estimated constants imply a mildly scale-dependent ratio near it."</span></span>
+<span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.1</span>))</span>
+<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, fit), color <span class="kw">in</span> <span class="bu">zip</span>(FITS.items(), [<span class="st">"#a4553a"</span>, <span class="st">"#2a6e6e"</span>]):</span>
+<span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a>    ax.loglog(sizes, tokens_per_param(fit, sizes), lw<span class="op">=</span><span class="fl">1.9</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="fl">20.0</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="st">"20 tokens per parameter"</span>)</span>
+<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">7e10</span>, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb10-136"><a href="#cb10-136" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"Chinchilla, 70B"</span>, xy<span class="op">=</span>(<span class="fl">7e10</span>, <span class="fl">3.5</span>), fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">"#65656d"</span>, ha<span class="op">=</span><span class="st">"center"</span>)</span>
+<span id="cb10-137"><a href="#cb10-137" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"parameters $N$"</span>, ylabel<span class="op">=</span><span class="st">"optimal tokens per parameter"</span>,</span>
+<span id="cb10-138"><a href="#cb10-138" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Is the ratio scale-free?"</span>)</span>
+<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
+<span id="cb10-149"><a href="#cb10-149" aria-hidden="true" tabindex="-1"></a>    lo, mid, hi <span class="op">=</span> (tokens_per_param(fit, n) <span class="cf">for</span> n <span class="kw">in</span> (<span class="fl">1e9</span>, <span class="fl">7e10</span>, <span class="fl">1e12</span>))</span>
+<span id="cb10-150"><a href="#cb10-150" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">   1B: </span><span class="sc">{</span>lo<span class="sc">:6.1f}</span><span class="ss">   70B: </span><span class="sc">{</span>mid<span class="sc">:6.1f}</span><span class="ss">   1T: </span><span class="sc">{</span>hi<span class="sc">:6.1f}</span><span class="ss">"</span>)</span>
+<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a>The published constants put the optimal ratio at 70B parameters near 109 tokens per parameter, and the ratio climbs with scale. Chinchilla itself was trained at 70B parameters on 1.4T tokens, which is 20. The model the paper trained is not the model the paper's own third fit recommends.</span>
+<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-155"><a href="#cb10-155" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check three: allocation at Gopher's budget</span></span>
+<span id="cb10-156"><a href="#cb10-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-157"><a href="#cb10-157" aria-hidden="true" tabindex="-1"></a>The same disagreement shows up in the headline comparison. Chinchilla was trained at the compute budget used for Gopher, about $5.76 \times 10^{23}$ FLOPs, and the paper's argument is that this budget is better spent on 70B parameters and 1.4T tokens than on Gopher's 280B parameters and 300B tokens.</span>
+<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-161"><a href="#cb10-161" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb10-163"><a href="#cb10-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-164"><a href="#cb10-164" aria-hidden="true" tabindex="-1"></a>GOPHER_FLOPS <span class="op">=</span> <span class="fl">5.76e23</span></span>
+<span id="cb10-165"><a href="#cb10-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-166"><a href="#cb10-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loss(fit, N, D):</span>
+<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fit[<span class="st">"E"</span>] <span class="op">+</span> fit[<span class="st">"A"</span>] <span class="op">/</span> N <span class="op">**</span> fit[<span class="st">"alpha"</span>] <span class="op">+</span> fit[<span class="st">"B"</span>] <span class="op">/</span> D <span class="op">**</span> fit[<span class="st">"beta"</span>]</span>
+<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-170"><a href="#cb10-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-171"><a href="#cb10-171" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optimum(fit, C):</span>
+<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Closed-form minimizer of the parametric loss at fixed compute C = 6ND."""</span></span>
+<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a>    coef <span class="op">=</span> (fit[<span class="st">"beta"</span>] <span class="op">*</span> fit[<span class="st">"B"</span>] <span class="op">/</span> (fit[<span class="st">"alpha"</span>] <span class="op">*</span> fit[<span class="st">"A"</span>])) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> fit[<span class="st">"beta"</span>])</span>
+<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a>    power <span class="op">=</span> fit[<span class="st">"alpha"</span>] <span class="op">/</span> fit[<span class="st">"beta"</span>]</span>
+<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> (C <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> coef)) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> power))</span>
+<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> N, C <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> N)</span>
+<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, fit <span class="kw">in</span> FITS.items():</span>
+<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a>    N_star, D_star <span class="op">=</span> optimum(fit, GOPHER_FLOPS)</span>
+<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;24}</span><span class="ss">  optimal N = </span><span class="sc">{</span>N_star <span class="op">/</span> <span class="fl">1e9</span><span class="sc">:6.1f}</span><span class="ss">B   D = </span><span class="sc">{</span>D_star <span class="op">/</span> <span class="fl">1e12</span><span class="sc">:5.2f}</span><span class="ss">T"</span></span>
+<span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   ratio = </span><span class="sc">{</span>D_star <span class="op">/</span> N_star<span class="sc">:6.1f}</span><span class="ss">"</span>)</span>
+<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-chin-allocation</span></span>
+<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Iso-FLOP slices of each parametric fit at Gopher's compute budget, with the minimizing model size marked. The two fits disagree about where the optimum sits by more than a factor of two."</span></span>
+<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-192"><a href="#cb10-192" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.geomspace(<span class="fl">5e9</span>, <span class="fl">6e11</span>, <span class="dv">300</span>)</span>
+<span id="cb10-193"><a href="#cb10-193" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">4.2</span>))</span>
+<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, fit), color <span class="kw">in</span> <span class="bu">zip</span>(FITS.items(), [<span class="st">"#a4553a"</span>, <span class="st">"#2a6e6e"</span>]):</span>
+<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a>    curve <span class="op">=</span> loss(fit, grid, GOPHER_FLOPS <span class="op">/</span> (<span class="fl">6.0</span> <span class="op">*</span> grid))</span>
+<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a>    ax.semilogx(grid, curve, lw<span class="op">=</span><span class="fl">1.9</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a>    N_star, D_star <span class="op">=</span> optimum(fit, GOPHER_FLOPS)</span>
+<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a>    ax.plot([N_star], [loss(fit, N_star, D_star)], <span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">7</span>, mfc<span class="op">=</span><span class="st">"white"</span>, color<span class="op">=</span>color)</span>
+<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="fl">7e10</span>, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"Chinchilla as trained (70B)"</span>, xy<span class="op">=</span>(<span class="fl">7.4e10</span>, ax.get_ylim()[<span class="dv">1</span>] <span class="op">*</span> <span class="fl">0.995</span>),</span>
+<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">"#65656d"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"parameters $N$ at fixed compute"</span>, ylabel<span class="op">=</span><span class="st">"predicted loss"</span>,</span>
+<span id="cb10-204"><a href="#cb10-204" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="vs">r"Iso-FLOP slice at Gopher's budget, </span><span class="dv">$</span><span class="vs">C = 5</span><span class="dv">.</span><span class="vs">76 </span><span class="ch">\t</span><span class="vs">imes 10</span><span class="dv">^</span><span class="op">{23}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a>Under the published constants the optimum at this budget is roughly 32B parameters on 3.0T tokens. Under the re-estimated constants it is roughly 84B on 1.1T, which brackets the 70B model that was actually trained. The paper's stated conclusion is reproduced by the second fit and not by the first.</span>
+<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-211"><a href="#cb10-211" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why the first fit fails</span></span>
+<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-213"><a href="#cb10-213" aria-hidden="true" tabindex="-1"></a>The failure is not arithmetic and it is not a misreading of the functional form, since check one used the same algebra and passed. The natural suspicion is that the reported constants are themselves off, and that is what the independent replication concludes.</span>
+<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-215"><a href="#cb10-215" aria-hidden="true" tabindex="-1"></a>Besiroglu and coauthors reconstructed the underlying data from the paper's figures and refit the same parametric form <span class="co">[</span><span class="ot">@besiroglu2024replication</span><span class="co">]</span>. They report three findings: the published Approach 3 estimates are inconsistent with the paper's own Approaches 1 and 2, they fit the reconstructed data poorly, and the confidence intervals reported for them are implausibly narrow, narrow enough to require hundreds of thousands of training runs where the paper describes fewer than five hundred. Their refit gives $E = 1.82$, $A = 514.0$, $B = 2115.2$, $\alpha = 0.35$, $\beta = 0.37$, which is the second row used throughout above, and which restores agreement with the other two procedures.</span>
+<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-217"><a href="#cb10-217" aria-hidden="true" tabindex="-1"></a>Read through @eq-chin-scalefree, the repair has a clean interpretation. The re-estimated exponents satisfy $\alpha \approx \beta$ to within 6%, so the optimal ratio is nearly scale-free, which is precisely the property the twenty-tokens-per-parameter rule of thumb assumes. The original pair differ by 21%, which is enough to make any single ratio wrong almost everywhere.</span>
+<span id="cb10-218"><a href="#cb10-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-219"><a href="#cb10-219" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this replication does and does not establish</span></span>
+<span id="cb10-220"><a href="#cb10-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-221"><a href="#cb10-221" aria-hidden="true" tabindex="-1"></a>It establishes that the arithmetic linking the published constants to the published prescription does not close, and it locates the disagreement in a specific place: the inequality of $\alpha$ and $\beta$.</span>
+<span id="cb10-222"><a href="#cb10-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-223"><a href="#cb10-223" aria-hidden="true" tabindex="-1"></a>It does not establish that Chinchilla is the wrong model to have trained. The compute-optimal claim also rests on Approaches 1 and 2, which the replication paper finds sound, and those approaches support the model that was built. What fails here is one of three estimation routes, and the headline recommendation survives the failure by the other two.</span>
+<span id="cb10-224"><a href="#cb10-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-225"><a href="#cb10-225" aria-hidden="true" tabindex="-1"></a>It also does not touch anything empirical. No models were trained, no losses were measured, and the reconstruction of the paper's underlying data was done by others rather than repeated here. Everything above is a consequence of five numbers and a constraint, which is the narrowest kind of replication there is. Its only real virtue is that it is fully checkable in about forty lines of code, and that it demonstrates the general point that a scaling law's headline prescription and its published parameters can disagree without anyone noticing for two years.</span>
+<span id="cb10-226"><a href="#cb10-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-227"><a href="#cb10-227" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb10-228"><a href="#cb10-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-229"><a href="#cb10-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Three Ways a Curve Bends</span><span class="co">](../../posts/three-ways-a-curve-bends/index.qmd)</span> uses the same scaling-law machinery to ask when a smooth power law can produce an apparently sharp capability transition.</span>
+<span id="cb10-230"><a href="#cb10-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Four Quantizers, One Quadratic Form</span><span class="co">](../../posts/quantization-one-quadratic-form/index.qmd)</span> is a companion in method: take published results, write them in one notation, and check what the notation forces.</span>
+<span id="cb10-231"><a href="#cb10-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-232"><a href="#cb10-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb10-233"><a href="#cb10-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-234"><a href="#cb10-234" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb10-235"><a href="#cb10-235" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

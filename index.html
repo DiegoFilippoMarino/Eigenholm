@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -50,9 +85,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -383,7 +418,7 @@ window.Quarto = {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(13)</span></div><div class="category" data-category="QWR2ZXJzYXJpYWwlMjBSb2J1c3RuZXNz">Adversarial Robustness <span class="quarto-category-count">(1)</span></div><div class="category" data-category="QWxpZ25tZW50">Alignment <span class="quarto-category-count">(1)</span></div><div class="category" data-category="QXR0ZW50aW9u">Attention <span class="quarto-category-count">(2)</span></div><div class="category" data-category="RGlmZmVyZW50aWFsJTIwRXF1YXRpb25z">Differential Equations <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RXZhbHVhdGlvbg==">Evaluation <span class="quarto-category-count">(2)</span></div><div class="category" data-category="R2VuZXJhbGl6YXRpb24=">Generalization <span class="quarto-category-count">(2)</span></div><div class="category" data-category="R2VuZXJhdGl2ZSUyME1vZGVscw==">Generative Models <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R2VvbWV0cnk=">Geometry <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R1BV">GPU <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R3JhcGglMjBOZXVyYWwlMjBOZXR3b3Jrcw==">Graph Neural Networks <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R3JhcGglMjBUcmFuc2Zvcm1lcnM=">Graph Transformers <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW5mZXJlbmNl">Inference <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50ZXJwcmV0YWJpbGl0eQ==">Interpretability <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TGluZWFyJTIwQWxnZWJyYQ==">Linear Algebra <span class="quarto-category-count">(2)</span></div><div class="category" data-category="TWF0aGVtYXRpY3M=">Mathematics <span class="quarto-category-count">(2)</span></div><div class="category" data-category="TWVjaGFuaXN0aWMlMjBJbnRlcnByZXRhYmlsaXR5">Mechanistic Interpretability <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWVtb3JpemF0aW9u">Memorization <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TnVtZXJpY2FsJTIwTGluZWFyJTIwQWxnZWJyYQ==">Numerical Linear Algebra <span class="quarto-category-count">(1)</span></div><div class="category" data-category="T3B0aW1hbCUyMFRyYW5zcG9ydA==">Optimal Transport <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UGVyZm9ybWFuY2UlMjBFbmdpbmVlcmluZw==">Performance Engineering <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UG9zaXRpb25hbCUyMEVuY29kaW5n">Positional Encoding <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UHJlZmVyZW5jZSUyMExlYXJuaW5n">Preference Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UHJpdmFjeQ==">Privacy <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UXVhbnRpemF0aW9u">Quantization <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UmVhc29uaW5n">Reasoning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UmV0cmlldmFs">Retrieval <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U2NhbGluZyUyMExhd3M=">Scaling Laws <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U2VjdXJpdHk=">Security <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U2VxdWVuY2UlMjBNb2RlbHM=">Sequence Models <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U3RhdGUlMjBTcGFjZSUyME1vZGVscw==">State Space Models <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U3RhdGlzdGljcw==">Statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VGVzdC1UaW1lJTIwQ29tcHV0ZQ==">Test-Time Compute <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VHJhbnNmb3JtZXJz">Transformers <span class="quarto-category-count">(2)</span></div></div></div>
 <!-- main -->
-<main class="content column-page-left" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content column-page-left" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7"></h1></header><div class="quarto-title-block"><div class="quarto-title-tools-only"><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 
 
 
@@ -399,7 +434,7 @@ window.Quarto = {
 <p><span class="eigenholm-section-header">Latest Writing</span></p>
 <div id="listing-latest-posts" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="UHJpdmFjeSUyQ01lbW9yaXphdGlvbiUyQ0dlbmVyYWxpemF0aW9u" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102413" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1955">
+<div class="quarto-post image-right" data-index="0" data-categories="UHJpdmFjeSUyQ01lbW9yaXphdGlvbiUyQ0dlbmVyYWxpemF0aW9u" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259550" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1949">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/generalization-gap-privacy-audit/index.html" class="no-external">A Generalization Gap Is Not a Privacy Audit</a>
@@ -429,7 +464,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="QWR2ZXJzYXJpYWwlMjBSb2J1c3RuZXNzJTJDRXZhbHVhdGlvbiUyQ1NlY3VyaXR5" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102414" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="27" data-listing-word-count-sort="5262">
+<div class="quarto-post image-right" data-index="1" data-categories="QWR2ZXJzYXJpYWwlMjBSb2J1c3RuZXNzJTJDRXZhbHVhdGlvbiUyQ1NlY3VyaXR5" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259551" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="27" data-listing-word-count-sort="5308">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/robustness-numbers-are-upper-bounds/index.html" class="no-external">Every Robustness Number Is an Upper Bound</a>
@@ -459,7 +494,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="UXVhbnRpemF0aW9uJTJDTnVtZXJpY2FsJTIwTGluZWFyJTIwQWxnZWJyYSUyQ0luZmVyZW5jZQ==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102414" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="25" data-listing-word-count-sort="4807">
+<div class="quarto-post image-right" data-index="2" data-categories="UXVhbnRpemF0aW9uJTJDTnVtZXJpY2FsJTIwTGluZWFyJTIwQWxnZWJyYSUyQ0luZmVyZW5jZQ==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259551" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="25" data-listing-word-count-sort="4816">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/quantization-one-quadratic-form/index.html" class="no-external">Four Quantizers, One Quadratic Form</a>
@@ -489,7 +524,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="R3JhcGglMjBOZXVyYWwlMjBOZXR3b3JrcyUyQ0dyYXBoJTIwVHJhbnNmb3JtZXJzJTJDR2VvbWV0cnk=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102413" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1859">
+<div class="quarto-post image-right" data-index="3" data-categories="R3JhcGglMjBOZXVyYWwlMjBOZXR3b3JrcyUyQ0dyYXBoJTIwVHJhbnNmb3JtZXJzJTJDR2VvbWV0cnk=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259550" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1863">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/graph-networks-two-failures/index.html" class="no-external">Graph Networks Fail on Two Axes</a>
@@ -519,7 +554,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="UmVhc29uaW5nJTJDVGVzdC1UaW1lJTIwQ29tcHV0ZSUyQ0V2YWx1YXRpb24=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102415" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1581">
+<div class="quarto-post image-right" data-index="4" data-categories="UmVhc29uaW5nJTJDVGVzdC1UaW1lJTIwQ29tcHV0ZSUyQ0V2YWx1YXRpb24=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259552" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1588">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/test-time-compute-ceilings/index.html" class="no-external">Inference Compute Has Two Ceilings</a>
@@ -549,7 +584,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="QWxpZ25tZW50JTJDUHJlZmVyZW5jZSUyMExlYXJuaW5nJTJDU3RhdGlzdGljcw==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102413" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5016">
+<div class="quarto-post image-right" data-index="5" data-categories="QWxpZ25tZW50JTJDUHJlZmVyZW5jZSUyMExlYXJuaW5nJTJDU3RhdGlzdGljcw==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259550" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5105">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/preference-likelihood-two-jobs/index.html" class="no-external">One Likelihood, Two Jobs</a>
@@ -579,7 +614,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="R2VuZXJhdGl2ZSUyME1vZGVscyUyQ0RpZmZlcmVudGlhbCUyMEVxdWF0aW9ucyUyQ09wdGltYWwlMjBUcmFuc3BvcnQ=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102415" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1886">
+<div class="quarto-post image-right" data-index="6" data-categories="R2VuZXJhdGl2ZSUyME1vZGVscyUyQ0RpZmZlcmVudGlhbCUyMEVxdWF0aW9ucyUyQ09wdGltYWwlMjBUcmFuc3BvcnQ=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259551" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1882">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/straight-paths-cheap-samplers/index.html" class="no-external">Straight Paths, Cheap Samplers</a>
@@ -609,7 +644,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="SW50ZXJwcmV0YWJpbGl0eSUyQ0xpbmVhciUyMEFsZ2VicmElMkNSZXRyaWV2YWw=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102412" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3398">
+<div class="quarto-post image-right" data-index="7" data-categories="SW50ZXJwcmV0YWJpbGl0eSUyQ0xpbmVhciUyMEFsZ2VicmElMkNSZXRyaWV2YWw=" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259549" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3399">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/arithmetic-of-editing-a-fact/index.html" class="no-external">The Arithmetic of Editing a Fact</a>
@@ -639,7 +674,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="U2VxdWVuY2UlMjBNb2RlbHMlMkNTdGF0ZSUyMFNwYWNlJTIwTW9kZWxzJTJDTGluZWFyJTIwQWxnZWJyYQ==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102414" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1350">
+<div class="quarto-post image-right" data-index="8" data-categories="U2VxdWVuY2UlMjBNb2RlbHMlMkNTdGF0ZSUyMFNwYWNlJTIwTW9kZWxzJTJDTGluZWFyJTIwQWxnZWJyYQ==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259551" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1354">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/rank-of-memory/index.html" class="no-external">The Rank of Memory</a>
@@ -669,7 +704,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="R2VuZXJhbGl6YXRpb24lMkNTY2FsaW5nJTIwTGF3cyUyQ01lY2hhbmlzdGljJTIwSW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786700102415" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3490">
+<div class="quarto-post image-right" data-index="9" data-categories="R2VuZXJhbGl6YXRpb24lMkNTY2FsaW5nJTIwTGF3cyUyQ01lY2hhbmlzdGljJTIwSW50ZXJwcmV0YWJpbGl0eQ==" data-listing-date-sort="1786665600000" data-listing-file-modified-sort="1786735259552" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3478">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/three-ways-a-curve-bends/index.html" class="no-external">Three Ways a Curve Bends</a>
@@ -699,7 +734,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="10" data-categories="VHJhbnNmb3JtZXJzJTJDQXR0ZW50aW9uJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786700102413" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1390">
+<div class="quarto-post image-right" data-index="10" data-categories="VHJhbnNmb3JtZXJzJTJDQXR0ZW50aW9uJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786735259549" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1430">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/attention-from-logits-to-context/index.html" class="no-external">Attention, from Logits to Context</a>
@@ -725,11 +760,11 @@ Aug 13, 2026
 <div class="listing-author">
 Diego Filippo Marino
 </div>
-<div class="listing-reading-time">7 min</div>
+<div class="listing-reading-time">8 min</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="11" data-categories="R1BVJTJDQXR0ZW50aW9uJTJDUGVyZm9ybWFuY2UlMjBFbmdpbmVlcmluZw==" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786700102413" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1819">
+<div class="quarto-post image-right" data-index="11" data-categories="R1BVJTJDQXR0ZW50aW9uJTJDUGVyZm9ybWFuY2UlMjBFbmdpbmVlcmluZw==" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786735259550" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1823">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/flashattention-io-aware/index.html" class="no-external">FlashAttention Is an IO Algorithm</a>
@@ -759,7 +794,7 @@ Diego Filippo Marino
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="12" data-categories="VHJhbnNmb3JtZXJzJTJDUG9zaXRpb25hbCUyMEVuY29kaW5nJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786700102414" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1227">
+<div class="quarto-post image-right" data-index="12" data-categories="VHJhbnNmb3JtZXJzJTJDUG9zaXRpb25hbCUyMEVuY29kaW5nJTJDTWF0aGVtYXRpY3M=" data-listing-date-sort="1786579200000" data-listing-file-modified-sort="1786735259551" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1223">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/rope-geometry/index.html" class="no-external">The Geometry of Rotary Position Embeddings</a>
@@ -794,6 +829,8 @@ Diego Filippo Marino
 </div>
 
 
+
+<!-- -->
 
 
 </main> <!-- /main -->
@@ -880,6 +917,57 @@ Diego Filippo Marino
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1216,7 +1304,43 @@ Diego Filippo Marino
       }
     }
   });
-  </script>
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">pagetitle:</span><span class="co"> "Eigenholm"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">listing:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">  id: latest-posts</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  contents: posts</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">  sort: ["date desc", "title"]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">  type: default</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">  categories: true</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">  feed: true</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">  fields: [title, description, author, date, categories, reading-time]</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="an">page-layout:</span><span class="co"> full</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> false</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner:</span><span class="co"> false</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="an">citation:</span><span class="co"> false</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>::: {.eigenholm-hero}</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Eigenholm</span><span class="co">]</span>{.hero-title}</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Research notes, paper analyses, and technical experiments in machine learning, mathematics, and scientific computing.</span><span class="co">]</span>{.hero-tagline}</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>::: {.eigenholm-topics}</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Machine Learning</span><span class="co">]</span>{.topic-tag}</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Deep Learning</span><span class="co">]</span>{.topic-tag}</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Mathematics</span><span class="co">]</span>{.topic-tag}</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Scientific Computing</span><span class="co">]</span>{.topic-tag}</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Paper Replications</span><span class="co">]</span>{.topic-tag}</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Latest Writing</span><span class="co">]</span>{.eigenholm-section-header}</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>::: {#latest-posts}</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

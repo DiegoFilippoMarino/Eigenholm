@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="Two reproducible toy audits connect interpolation, membership inference, duplicated canaries, discoverability, and differential privacy.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/generalization-gap-privacy-audit/index_files/figure-html/fig-canary-discoverability-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="710">
-<meta property="og:image:width" content="1365">
+<meta property="og:image:height" content="1040">
+<meta property="og:image:width" content="1992">
 <meta name="twitter:title" content="A Generalization Gap Is Not a Privacy Audit – Eigenholm">
 <meta name="twitter:description" content="Two reproducible toy audits connect interpolation, membership inference, duplicated canaries, discoverability, and differential privacy.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/generalization-gap-privacy-audit/index_files/figure-html/fig-canary-discoverability-output-1.png">
-<meta name="twitter:image-height" content="710">
-<meta name="twitter:image-width" content="1365">
+<meta name="twitter:image-height" content="1040">
+<meta name="twitter:image-width" content="1992">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -436,7 +436,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">A Generalization Gap Is Not a Privacy Audit</h1>
+<div class="quarto-title-block"><div><h1 class="title">A Generalization Gap Is Not a Privacy Audit</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Privacy</div>
     <div class="quarto-category">Memorization</div>
@@ -509,80 +509,83 @@ s(x)=-\ell(x).
 \hat w=\Phi^+y,
 \tag{2}</span></span></p>
 <p>where <span class="math inline">\Phi^+</span> is the Moore-Penrose pseudoinverse. Near <span class="math inline">p\approx n</span>, the design matrix becomes poorly conditioned and fits noise with large coefficients. Far into the overparameterized regime, many interpolating solutions exist and the minimum-norm bias can reduce test error again. This is the linear core of double descent <span class="citation" data-cites="belkin2019double">(<a href="#ref-belkin2019double" role="doc-biblioref">Belkin et al. 2019</a>)</span>.</p>
-<div id="cell-fig-membership-double-descent" class="cell" data-execution_count="1">
+<div id="7369e93f" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">23</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>n_train, n_test, max_features <span class="op">=</span> <span class="dv">120</span>, <span class="dv">2500</span>, <span class="dv">400</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> rng.normal(size<span class="op">=</span>(n_train, max_features)) <span class="op">/</span> np.sqrt(max_features)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> rng.normal(size<span class="op">=</span>(n_test, max_features)) <span class="op">/</span> np.sqrt(max_features)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># The signal lives in the first 20 coordinates. Later coordinates are nuisance</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># directions that first destabilize interpolation, then create many min-norm fits.</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> np.zeros(max_features)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>beta[:<span class="dv">20</span>] <span class="op">=</span> rng.normal(size<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> X_train <span class="op">@</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">0.12</span>, n_train)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>y_test <span class="op">=</span> X_test <span class="op">@</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">0.12</span>, n_test)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> auc(member_score, nonmember_score):</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Probability that a random member receives a higher score, with half credit for ties.</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    combined <span class="op">=</span> np.concatenate([member_score, nonmember_score])</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    order <span class="op">=</span> np.argsort(combined, kind<span class="op">=</span><span class="st">"mergesort"</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    ranks <span class="op">=</span> np.empty(<span class="bu">len</span>(combined), dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    sorted_values <span class="op">=</span> combined[order]</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> start <span class="op">&lt;</span> <span class="bu">len</span>(combined):</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        end <span class="op">=</span> start <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> end <span class="op">&lt;</span> <span class="bu">len</span>(combined) <span class="kw">and</span> sorted_values[end] <span class="op">==</span> sorted_values[start]:</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            end <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        ranks[order[start:end]] <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (start <span class="op">+</span> end <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> end</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    rank_sum <span class="op">=</span> ranks[:<span class="bu">len</span>(member_score)].<span class="bu">sum</span>()</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    m, n <span class="op">=</span> <span class="bu">len</span>(member_score), <span class="bu">len</span>(nonmember_score)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (rank_sum <span class="op">-</span> m <span class="op">*</span> (m <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> (m <span class="op">*</span> n)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>p_values <span class="op">=</span> np.unique(np.r_[np.arange(<span class="dv">8</span>, <span class="dv">90</span>, <span class="dv">8</span>), np.arange(<span class="dv">90</span>, <span class="dv">151</span>, <span class="dv">5</span>), np.arange(<span class="dv">160</span>, <span class="dv">401</span>, <span class="dv">16</span>)])</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>train_mse, test_mse, attack_auc, weight_norm <span class="op">=</span> [], [], [], []</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> p_values:</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    Phi_train <span class="op">=</span> X_train[:, :<span class="bu">int</span>(p)]</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    Phi_test <span class="op">=</span> X_test[:, :<span class="bu">int</span>(p)]</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.linalg.pinv(Phi_train, rcond<span class="op">=</span><span class="fl">1e-10</span>) <span class="op">@</span> y_train</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    member_loss <span class="op">=</span> (Phi_train <span class="op">@</span> w <span class="op">-</span> y_train) <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    nonmember_loss <span class="op">=</span> (Phi_test <span class="op">@</span> w <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    train_mse.append(member_loss.mean())</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    test_mse.append(nonmember_loss.mean())</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    attack_auc.append(auc(<span class="op">-</span>member_loss, <span class="op">-</span>nonmember_loss))</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    weight_norm.append(np.linalg.norm(w))</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>train_mse <span class="op">=</span> np.array(train_mse)</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>test_mse <span class="op">=</span> np.array(test_mse)</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>attack_auc <span class="op">=</span> np.array(attack_auc)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>weight_norm <span class="op">=</span> np.array(weight_norm)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">8.8</span>, <span class="fl">3.6</span>))</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].semilogy(p_values, train_mse, label<span class="op">=</span><span class="st">"train MSE"</span>)</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].semilogy(p_values, test_mse, label<span class="op">=</span><span class="st">"test MSE"</span>)</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axvline(n_train, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"$p=n$"</span>)</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"visible features $p$"</span>, ylabel<span class="op">=</span><span class="st">"mean squared error"</span>, title<span class="op">=</span><span class="st">"Interpolation and test risk"</span>)</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(p_values, attack_auc, label<span class="op">=</span><span class="st">"loss-attack AUC"</span>)</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"chance"</span>)</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axvline(n_train, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>)</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"visible features $p$"</span>, ylabel<span class="op">=</span><span class="st">"membership AUC"</span>, title<span class="op">=</span><span class="st">"Membership signal"</span>)</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="fl">0.45</span>, <span class="fl">1.01</span>)</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes:</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">23</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>n_train, n_test, max_features <span class="op">=</span> <span class="dv">120</span>, <span class="dv">2500</span>, <span class="dv">400</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> rng.normal(size<span class="op">=</span>(n_train, max_features)) <span class="op">/</span> np.sqrt(max_features)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> rng.normal(size<span class="op">=</span>(n_test, max_features)) <span class="op">/</span> np.sqrt(max_features)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># The signal lives in the first 20 coordinates. Later coordinates are nuisance</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># directions that first destabilize interpolation, then create many min-norm fits.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> np.zeros(max_features)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>beta[:<span class="dv">20</span>] <span class="op">=</span> rng.normal(size<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> X_train <span class="op">@</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">0.12</span>, n_train)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>y_test <span class="op">=</span> X_test <span class="op">@</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">0.12</span>, n_test)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> auc(member_score, nonmember_score):</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Probability that a random member receives a higher score, with half credit for ties.</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    combined <span class="op">=</span> np.concatenate([member_score, nonmember_score])</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    order <span class="op">=</span> np.argsort(combined, kind<span class="op">=</span><span class="st">"mergesort"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    ranks <span class="op">=</span> np.empty(<span class="bu">len</span>(combined), dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    sorted_values <span class="op">=</span> combined[order]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> start <span class="op">&lt;</span> <span class="bu">len</span>(combined):</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        end <span class="op">=</span> start <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> end <span class="op">&lt;</span> <span class="bu">len</span>(combined) <span class="kw">and</span> sorted_values[end] <span class="op">==</span> sorted_values[start]:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            end <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        ranks[order[start:end]] <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (start <span class="op">+</span> end <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> end</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    rank_sum <span class="op">=</span> ranks[:<span class="bu">len</span>(member_score)].<span class="bu">sum</span>()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    m, n <span class="op">=</span> <span class="bu">len</span>(member_score), <span class="bu">len</span>(nonmember_score)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (rank_sum <span class="op">-</span> m <span class="op">*</span> (m <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> (m <span class="op">*</span> n)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>p_values <span class="op">=</span> np.unique(np.r_[np.arange(<span class="dv">8</span>, <span class="dv">90</span>, <span class="dv">8</span>), np.arange(<span class="dv">90</span>, <span class="dv">151</span>, <span class="dv">5</span>), np.arange(<span class="dv">160</span>, <span class="dv">401</span>, <span class="dv">16</span>)])</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>train_mse, test_mse, attack_auc, weight_norm <span class="op">=</span> [], [], [], []</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> p_values:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    Phi_train <span class="op">=</span> X_train[:, :<span class="bu">int</span>(p)]</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    Phi_test <span class="op">=</span> X_test[:, :<span class="bu">int</span>(p)]</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.linalg.pinv(Phi_train, rcond<span class="op">=</span><span class="fl">1e-10</span>) <span class="op">@</span> y_train</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    member_loss <span class="op">=</span> (Phi_train <span class="op">@</span> w <span class="op">-</span> y_train) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    nonmember_loss <span class="op">=</span> (Phi_test <span class="op">@</span> w <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    train_mse.append(member_loss.mean())</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    test_mse.append(nonmember_loss.mean())</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    attack_auc.append(auc(<span class="op">-</span>member_loss, <span class="op">-</span>nonmember_loss))</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    weight_norm.append(np.linalg.norm(w))</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>train_mse <span class="op">=</span> np.array(train_mse)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>test_mse <span class="op">=</span> np.array(test_mse)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>attack_auc <span class="op">=</span> np.array(attack_auc)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>weight_norm <span class="op">=</span> np.array(weight_norm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-membership-double-descent" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].semilogy(p_values, train_mse, label<span class="op">=</span><span class="st">"train MSE"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].semilogy(p_values, test_mse, label<span class="op">=</span><span class="st">"test MSE"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axvline(n_train, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"$p=n$"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"visible features $p$"</span>, ylabel<span class="op">=</span><span class="st">"mean squared error"</span>, title<span class="op">=</span><span class="st">"Interpolation and test risk"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(p_values, attack_auc, label<span class="op">=</span><span class="st">"loss-attack AUC"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"chance"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axvline(n_train, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"visible features $p$"</span>, ylabel<span class="op">=</span><span class="st">"membership AUC"</span>, title<span class="op">=</span><span class="st">"Membership signal"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="fl">0.45</span>, <span class="fl">1.01</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-membership-double-descent" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-membership-double-descent-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-membership-double-descent-output-1.png" width="834" height="335" class="figure-img">
+<img src="index_files/figure-html/fig-membership-double-descent-output-1.png" width="1220" height="492" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-membership-double-descent-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Linear interpolation, double descent, and a loss-threshold membership attack. Test error improves again beyond the interpolation peak while exact fitting keeps membership readily detectable.
@@ -609,51 +612,53 @@ p(w_t\mid w_{t-c:t-1})
 {N(w_{t-c:t-1})+\lambda |\mathcal V|}.
 \tag{3}</span></span></p>
 <p>The geometric mean of these probabilities measures how confidently the model continues the complete canary.</p>
-<div id="cell-fig-canary-discoverability" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> <span class="dv">40</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>background <span class="op">=</span> rng.integers(<span class="dv">0</span>, vocab_size, size<span class="op">=</span>(<span class="dv">5000</span>, <span class="dv">10</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>canary <span class="op">=</span> np.array([<span class="dv">37</span>, <span class="dv">4</span>, <span class="dv">29</span>, <span class="dv">11</span>, <span class="dv">33</span>, <span class="dv">8</span>, <span class="dv">21</span>, <span class="dv">2</span>, <span class="dv">35</span>, <span class="dv">16</span>])</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>repetitions <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>])</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>contexts <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>smoothing <span class="op">=</span> <span class="fl">0.2</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> continuation_score(corpus, sequence, context):</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    prefix_counts <span class="op">=</span> Counter()</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    joint_counts <span class="op">=</span> Counter()</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> corpus:</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(context, <span class="bu">len</span>(row)):</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            prefix <span class="op">=</span> <span class="bu">tuple</span>(row[t<span class="op">-</span>context:t]) <span class="cf">if</span> context <span class="cf">else</span> ()</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            prefix_counts[prefix] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            joint_counts[prefix <span class="op">+</span> (<span class="bu">int</span>(row[t]),)] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    log_probs <span class="op">=</span> []</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(context, <span class="bu">len</span>(sequence)):</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        prefix <span class="op">=</span> <span class="bu">tuple</span>(sequence[t<span class="op">-</span>context:t]) <span class="cf">if</span> context <span class="cf">else</span> ()</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        joint <span class="op">=</span> prefix <span class="op">+</span> (<span class="bu">int</span>(sequence[t]),)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        prob <span class="op">=</span> (joint_counts[joint] <span class="op">+</span> smoothing) <span class="op">/</span> (prefix_counts[prefix] <span class="op">+</span> smoothing <span class="op">*</span> vocab_size)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        log_probs.append(np.log(prob))</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.exp(np.mean(log_probs)))</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> np.empty((<span class="bu">len</span>(contexts), <span class="bu">len</span>(repetitions)))</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, repeats <span class="kw">in</span> <span class="bu">enumerate</span>(repetitions):</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    corpus <span class="op">=</span> np.vstack([background, np.tile(canary, (repeats, <span class="dv">1</span>))])</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, context <span class="kw">in</span> <span class="bu">enumerate</span>(contexts):</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        scores[i, j] <span class="op">=</span> continuation_score(corpus, canary, context)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, context <span class="kw">in</span> <span class="bu">enumerate</span>(contexts):</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    ax.semilogx(repetitions, scores[i], <span class="st">"o-"</span>, base<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>context<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"canary repetitions"</span>, ylabel<span class="op">=</span><span class="st">"geometric mean next-token probability"</span>, title<span class="op">=</span><span class="st">"Duplication and address specificity"</span>)</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>, ncol<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="61d9cee0" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> <span class="dv">40</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>background <span class="op">=</span> rng.integers(<span class="dv">0</span>, vocab_size, size<span class="op">=</span>(<span class="dv">5000</span>, <span class="dv">10</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>canary <span class="op">=</span> np.array([<span class="dv">37</span>, <span class="dv">4</span>, <span class="dv">29</span>, <span class="dv">11</span>, <span class="dv">33</span>, <span class="dv">8</span>, <span class="dv">21</span>, <span class="dv">2</span>, <span class="dv">35</span>, <span class="dv">16</span>])</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>repetitions <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>contexts <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>smoothing <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> continuation_score(corpus, sequence, context):</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    prefix_counts <span class="op">=</span> Counter()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    joint_counts <span class="op">=</span> Counter()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> corpus:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(context, <span class="bu">len</span>(row)):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            prefix <span class="op">=</span> <span class="bu">tuple</span>(row[t<span class="op">-</span>context:t]) <span class="cf">if</span> context <span class="cf">else</span> ()</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            prefix_counts[prefix] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            joint_counts[prefix <span class="op">+</span> (<span class="bu">int</span>(row[t]),)] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    log_probs <span class="op">=</span> []</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(context, <span class="bu">len</span>(sequence)):</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        prefix <span class="op">=</span> <span class="bu">tuple</span>(sequence[t<span class="op">-</span>context:t]) <span class="cf">if</span> context <span class="cf">else</span> ()</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        joint <span class="op">=</span> prefix <span class="op">+</span> (<span class="bu">int</span>(sequence[t]),)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        prob <span class="op">=</span> (joint_counts[joint] <span class="op">+</span> smoothing) <span class="op">/</span> (prefix_counts[prefix] <span class="op">+</span> smoothing <span class="op">*</span> vocab_size)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        log_probs.append(np.log(prob))</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.exp(np.mean(log_probs)))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> np.empty((<span class="bu">len</span>(contexts), <span class="bu">len</span>(repetitions)))</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, repeats <span class="kw">in</span> <span class="bu">enumerate</span>(repetitions):</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    corpus <span class="op">=</span> np.vstack([background, np.tile(canary, (repeats, <span class="dv">1</span>))])</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, context <span class="kw">in</span> <span class="bu">enumerate</span>(contexts):</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        scores[i, j] <span class="op">=</span> continuation_score(corpus, canary, context)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-canary-discoverability" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, context <span class="kw">in</span> <span class="bu">enumerate</span>(contexts):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    ax.semilogx(repetitions, scores[i], <span class="st">"o-"</span>, base<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>context<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"canary repetitions"</span>, ylabel<span class="op">=</span><span class="st">"geometric mean next-token probability"</span>, title<span class="op">=</span><span class="st">"Duplication and address specificity"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ax.legend(ncol<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-canary-discoverability" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-canary-discoverability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-canary-discoverability-output-1.png" width="683" height="355" class="figure-img">
+<img src="index_files/figure-html/fig-canary-discoverability-output-1.png" width="996" height="520" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-canary-discoverability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Exact canary continuation in a smoothed count model. Repetition strengthens the stored sequence, while longer prefixes make the memorized continuation easier to address.
@@ -786,6 +791,8 @@ Shokri, Reza, Marco Stronati, Congzheng Song, and Vitaly Shmatikov. 2017. <span>
 </div>
 
 
+<!-- -->
+
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
@@ -882,6 +889,57 @@ Privacy Audit.”</span> August 14. <a href="https://diegofilippomarino.github.i
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1250,7 +1308,281 @@ Privacy Audit.”</span> August 14. <a href="https://diegofilippomarino.github.i
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "A Generalization Gap Is Not a Privacy Audit"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Two reproducible toy audits connect interpolation, membership inference, duplicated canaries, discoverability, and differential privacy."</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-14"</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Privacy, Memorization, Generalization]</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>Privacy leakage is often explained as a consequence of overfitting: training examples receive lower loss than fresh examples, so an attacker can infer membership. This explanation is useful, but it is too small for modern generative models.</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>A model can generalize well on average and still memorize rare strings. A string can be memorized yet remain undiscoverable under ordinary prompts. Deduplication can reduce one source of leakage without providing a formal guarantee. Differential privacy can bound the effect of one record while offering little comfort when the same secret appears in many records.</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>There is no single scalar called “memorization.” This article builds two small audits to make the distinctions concrete. The first connects interpolation and loss-based membership inference. The second studies exact canary continuation in a count-based language model, where duplication and prefix specificity can be controlled independently.</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## Threat models first</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>Three privacy questions require different evidence.</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>**Membership inference**</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>: Given a known record $x$, decide whether it was used for training. The attacker needs a membership score, often loss or confidence <span class="co">[</span><span class="ot">@shokri2017membership</span><span class="co">]</span>.</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>**Training-data extraction**</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>: Produce an unknown training record from the model. Carlini et al. demonstrated a generate-then-rank attack against GPT-2 using calibrated likelihood signals <span class="co">[</span><span class="ot">@carlini2021extracting</span><span class="co">]</span>.</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>**Extractable memorization**</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>: Given a true prefix of length $k$, does the model emit the exact training continuation? This measures a conditional worst case rather than the success of one discovery algorithm <span class="co">[</span><span class="ot">@carlini2023quantifying</span><span class="co">]</span>.</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>An audit that answers one question does not automatically answer the others.</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Membership inference from loss</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>Let a model assign per-example loss $\ell(x)$. The simplest membership score is</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>s(x)=-\ell(x).</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>$$ {#eq-loss-attack}</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>Members tend to score higher if the training procedure fits them more closely. A threshold attack predicts “member” when $s(x)&gt;\tau$. Its performance depends on the overlap of member and nonmember score distributions, not only on their means.</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>To study this near interpolation, fit linear regressors to noisy samples in a nested sequence of Gaussian feature spaces. With $p$ visible features and $n$ training points, the minimum-norm solution is</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>\hat w=\Phi^+y,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>$$ {#eq-minnorm}</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>where $\Phi^+$ is the Moore-Penrose pseudoinverse. Near $p\approx n$, the design matrix becomes poorly conditioned and fits noise with large coefficients. Far into the overparameterized regime, many interpolating solutions exist and the minimum-norm bias can reduce test error again. This is the linear core of double descent <span class="co">[</span><span class="ot">@belkin2019double</span><span class="co">]</span>.</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">23</span>)</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>n_train, n_test, max_features <span class="op">=</span> <span class="dv">120</span>, <span class="dv">2500</span>, <span class="dv">400</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> rng.normal(size<span class="op">=</span>(n_train, max_features)) <span class="op">/</span> np.sqrt(max_features)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> rng.normal(size<span class="op">=</span>(n_test, max_features)) <span class="op">/</span> np.sqrt(max_features)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="co"># The signal lives in the first 20 coordinates. Later coordinates are nuisance</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="co"># directions that first destabilize interpolation, then create many min-norm fits.</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> np.zeros(max_features)</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>beta[:<span class="dv">20</span>] <span class="op">=</span> rng.normal(size<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> X_train <span class="op">@</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">0.12</span>, n_train)</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>y_test <span class="op">=</span> X_test <span class="op">@</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="fl">0.12</span>, n_test)</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> auc(member_score, nonmember_score):</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Probability that a random member receives a higher score, with half credit for ties.</span></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    combined <span class="op">=</span> np.concatenate([member_score, nonmember_score])</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>    order <span class="op">=</span> np.argsort(combined, kind<span class="op">=</span><span class="st">"mergesort"</span>)</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    ranks <span class="op">=</span> np.empty(<span class="bu">len</span>(combined), dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>    sorted_values <span class="op">=</span> combined[order]</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> start <span class="op">&lt;</span> <span class="bu">len</span>(combined):</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>        end <span class="op">=</span> start <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> end <span class="op">&lt;</span> <span class="bu">len</span>(combined) <span class="kw">and</span> sorted_values[end] <span class="op">==</span> sorted_values[start]:</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>            end <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>        ranks[order[start:end]] <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (start <span class="op">+</span> end <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> end</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>    rank_sum <span class="op">=</span> ranks[:<span class="bu">len</span>(member_score)].<span class="bu">sum</span>()</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>    m, n <span class="op">=</span> <span class="bu">len</span>(member_score), <span class="bu">len</span>(nonmember_score)</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (rank_sum <span class="op">-</span> m <span class="op">*</span> (m <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> (m <span class="op">*</span> n)</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>p_values <span class="op">=</span> np.unique(np.r_[np.arange(<span class="dv">8</span>, <span class="dv">90</span>, <span class="dv">8</span>), np.arange(<span class="dv">90</span>, <span class="dv">151</span>, <span class="dv">5</span>), np.arange(<span class="dv">160</span>, <span class="dv">401</span>, <span class="dv">16</span>)])</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>train_mse, test_mse, attack_auc, weight_norm <span class="op">=</span> [], [], [], []</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> p_values:</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>    Phi_train <span class="op">=</span> X_train[:, :<span class="bu">int</span>(p)]</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>    Phi_test <span class="op">=</span> X_test[:, :<span class="bu">int</span>(p)]</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.linalg.pinv(Phi_train, rcond<span class="op">=</span><span class="fl">1e-10</span>) <span class="op">@</span> y_train</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>    member_loss <span class="op">=</span> (Phi_train <span class="op">@</span> w <span class="op">-</span> y_train) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>    nonmember_loss <span class="op">=</span> (Phi_test <span class="op">@</span> w <span class="op">-</span> y_test) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>    train_mse.append(member_loss.mean())</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>    test_mse.append(nonmember_loss.mean())</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>    attack_auc.append(auc(<span class="op">-</span>member_loss, <span class="op">-</span>nonmember_loss))</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>    weight_norm.append(np.linalg.norm(w))</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>train_mse <span class="op">=</span> np.array(train_mse)</span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>test_mse <span class="op">=</span> np.array(test_mse)</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>attack_auc <span class="op">=</span> np.array(attack_auc)</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>weight_norm <span class="op">=</span> np.array(weight_norm)</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-membership-double-descent</span></span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Linear interpolation, double descent, and a loss-threshold membership attack. Test error improves again beyond the interpolation peak while exact fitting keeps membership readily detectable."</span></span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].semilogy(p_values, train_mse, label<span class="op">=</span><span class="st">"train MSE"</span>)</span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].semilogy(p_values, test_mse, label<span class="op">=</span><span class="st">"test MSE"</span>)</span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axvline(n_train, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"$p=n$"</span>)</span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"visible features $p$"</span>, ylabel<span class="op">=</span><span class="st">"mean squared error"</span>, title<span class="op">=</span><span class="st">"Interpolation and test risk"</span>)</span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(p_values, attack_auc, label<span class="op">=</span><span class="st">"loss-attack AUC"</span>)</span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"chance"</span>)</span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axvline(n_train, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>)</span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"visible features $p$"</span>, ylabel<span class="op">=</span><span class="st">"membership AUC"</span>, title<span class="op">=</span><span class="st">"Membership signal"</span>)</span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="fl">0.45</span>, <span class="fl">1.01</span>)</span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a>The experiment makes the distinction sharper than a simple association. Test risk falls during the second descent, yet membership AUC remains near one because the minimum-norm solution still interpolates every training label. Better test error does not undo the exact member signature. A mean train-test gap also discards the shape and tails of the loss distributions. AUC uses rankings across the distributions, while an operational attack at a very low false-positive rate depends on their extreme tails.</span>
+<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a>Deep models add further signals. Confidence vectors, per-example gradients, sequence likelihood ratios, and reference-model calibration can reveal membership even when average accuracy looks healthy.</span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a><span class="fu">## Average generalization misses rare records</span></span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a>Expected test loss weights records by population frequency. A unique secret has negligible contribution to that average. Memorizing it can therefore leave standard generalization metrics unchanged.</span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a>This is not a paradox. Learning from a long-tailed distribution can require remembering rare examples that have no close substitutes <span class="co">[</span><span class="ot">@feldman2020memorization</span><span class="co">]</span>. The same mechanism can improve utility and create privacy risk. “Memorization” is not synonymous with useless overfitting.</span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a>For language models, Carlini et al. define a sequence as extractable with $k$ tokens of context if a length-$k$ training prefix causes greedy generation of the exact continuation <span class="co">[</span><span class="ot">@carlini2023quantifying</span><span class="co">]</span>. Their experiments report approximately log-linear increases in extractability with model size, duplication count, and context length. The context result creates a discoverability gap: stored content can remain hidden until the prompt is sufficiently specific.</span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a><span class="fu">## A canary with controllable duplication</span></span>
+<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a>We can reproduce the mechanism, not the scale, with an interpolated $n$-gram model. Build a background corpus from a 40-token vocabulary. Insert one synthetic 10-token canary between 1 and 64 times. For each context length $c$, estimate the canary continuation probability with additive smoothing:</span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a>p(w_t\mid w_{t-c:t-1})</span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a>=\frac{N(w_{t-c:t})+\lambda}</span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a>{N(w_{t-c:t-1})+\lambda |\mathcal V|}.</span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a>$$ {#eq-ngram}</span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>The geometric mean of these probabilities measures how confidently the model continues the complete canary.</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-162"><a href="#cb5-162" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-163"><a href="#cb5-163" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-164"><a href="#cb5-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-165"><a href="#cb5-165" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
+<span id="cb5-166"><a href="#cb5-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-167"><a href="#cb5-167" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> <span class="dv">40</span></span>
+<span id="cb5-168"><a href="#cb5-168" aria-hidden="true" tabindex="-1"></a>background <span class="op">=</span> rng.integers(<span class="dv">0</span>, vocab_size, size<span class="op">=</span>(<span class="dv">5000</span>, <span class="dv">10</span>))</span>
+<span id="cb5-169"><a href="#cb5-169" aria-hidden="true" tabindex="-1"></a>canary <span class="op">=</span> np.array([<span class="dv">37</span>, <span class="dv">4</span>, <span class="dv">29</span>, <span class="dv">11</span>, <span class="dv">33</span>, <span class="dv">8</span>, <span class="dv">21</span>, <span class="dv">2</span>, <span class="dv">35</span>, <span class="dv">16</span>])</span>
+<span id="cb5-170"><a href="#cb5-170" aria-hidden="true" tabindex="-1"></a>repetitions <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>])</span>
+<span id="cb5-171"><a href="#cb5-171" aria-hidden="true" tabindex="-1"></a>contexts <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]</span>
+<span id="cb5-172"><a href="#cb5-172" aria-hidden="true" tabindex="-1"></a>smoothing <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb5-173"><a href="#cb5-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-174"><a href="#cb5-174" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> continuation_score(corpus, sequence, context):</span>
+<span id="cb5-175"><a href="#cb5-175" aria-hidden="true" tabindex="-1"></a>    prefix_counts <span class="op">=</span> Counter()</span>
+<span id="cb5-176"><a href="#cb5-176" aria-hidden="true" tabindex="-1"></a>    joint_counts <span class="op">=</span> Counter()</span>
+<span id="cb5-177"><a href="#cb5-177" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> corpus:</span>
+<span id="cb5-178"><a href="#cb5-178" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(context, <span class="bu">len</span>(row)):</span>
+<span id="cb5-179"><a href="#cb5-179" aria-hidden="true" tabindex="-1"></a>            prefix <span class="op">=</span> <span class="bu">tuple</span>(row[t<span class="op">-</span>context:t]) <span class="cf">if</span> context <span class="cf">else</span> ()</span>
+<span id="cb5-180"><a href="#cb5-180" aria-hidden="true" tabindex="-1"></a>            prefix_counts[prefix] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-181"><a href="#cb5-181" aria-hidden="true" tabindex="-1"></a>            joint_counts[prefix <span class="op">+</span> (<span class="bu">int</span>(row[t]),)] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-182"><a href="#cb5-182" aria-hidden="true" tabindex="-1"></a>    log_probs <span class="op">=</span> []</span>
+<span id="cb5-183"><a href="#cb5-183" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(context, <span class="bu">len</span>(sequence)):</span>
+<span id="cb5-184"><a href="#cb5-184" aria-hidden="true" tabindex="-1"></a>        prefix <span class="op">=</span> <span class="bu">tuple</span>(sequence[t<span class="op">-</span>context:t]) <span class="cf">if</span> context <span class="cf">else</span> ()</span>
+<span id="cb5-185"><a href="#cb5-185" aria-hidden="true" tabindex="-1"></a>        joint <span class="op">=</span> prefix <span class="op">+</span> (<span class="bu">int</span>(sequence[t]),)</span>
+<span id="cb5-186"><a href="#cb5-186" aria-hidden="true" tabindex="-1"></a>        prob <span class="op">=</span> (joint_counts[joint] <span class="op">+</span> smoothing) <span class="op">/</span> (prefix_counts[prefix] <span class="op">+</span> smoothing <span class="op">*</span> vocab_size)</span>
+<span id="cb5-187"><a href="#cb5-187" aria-hidden="true" tabindex="-1"></a>        log_probs.append(np.log(prob))</span>
+<span id="cb5-188"><a href="#cb5-188" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.exp(np.mean(log_probs)))</span>
+<span id="cb5-189"><a href="#cb5-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-190"><a href="#cb5-190" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> np.empty((<span class="bu">len</span>(contexts), <span class="bu">len</span>(repetitions)))</span>
+<span id="cb5-191"><a href="#cb5-191" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, repeats <span class="kw">in</span> <span class="bu">enumerate</span>(repetitions):</span>
+<span id="cb5-192"><a href="#cb5-192" aria-hidden="true" tabindex="-1"></a>    corpus <span class="op">=</span> np.vstack([background, np.tile(canary, (repeats, <span class="dv">1</span>))])</span>
+<span id="cb5-193"><a href="#cb5-193" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, context <span class="kw">in</span> <span class="bu">enumerate</span>(contexts):</span>
+<span id="cb5-194"><a href="#cb5-194" aria-hidden="true" tabindex="-1"></a>        scores[i, j] <span class="op">=</span> continuation_score(corpus, canary, context)</span>
+<span id="cb5-195"><a href="#cb5-195" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-196"><a href="#cb5-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-199"><a href="#cb5-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-200"><a href="#cb5-200" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-canary-discoverability</span></span>
+<span id="cb5-201"><a href="#cb5-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Exact canary continuation in a smoothed count model. Repetition strengthens the stored sequence, while longer prefixes make the memorized continuation easier to address."</span></span>
+<span id="cb5-202"><a href="#cb5-202" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb5-203"><a href="#cb5-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-204"><a href="#cb5-204" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb5-205"><a href="#cb5-205" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, context <span class="kw">in</span> <span class="bu">enumerate</span>(contexts):</span>
+<span id="cb5-206"><a href="#cb5-206" aria-hidden="true" tabindex="-1"></a>    ax.semilogx(repetitions, scores[i], <span class="st">"o-"</span>, base<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>context<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-207"><a href="#cb5-207" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"canary repetitions"</span>, ylabel<span class="op">=</span><span class="st">"geometric mean next-token probability"</span>, title<span class="op">=</span><span class="st">"Duplication and address specificity"</span>)</span>
+<span id="cb5-208"><a href="#cb5-208" aria-hidden="true" tabindex="-1"></a>ax.legend(ncol<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-209"><a href="#cb5-209" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-210"><a href="#cb5-210" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-211"><a href="#cb5-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-212"><a href="#cb5-212" aria-hidden="true" tabindex="-1"></a>Longer context functions like a more specific memory address. Duplication strengthens the association stored at that address. Unprompted generation may never discover the canary, even when a nearly complete prefix retrieves it with high confidence.</span>
+<span id="cb5-213"><a href="#cb5-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-214"><a href="#cb5-214" aria-hidden="true" tabindex="-1"></a>This is why sampling-based extraction produces a lower bound on memorization. Failure to discover a record is not evidence that no prefix would retrieve it.</span>
+<span id="cb5-215"><a href="#cb5-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-216"><a href="#cb5-216" aria-hidden="true" tabindex="-1"></a><span class="fu">## Deduplication changes the data geometry</span></span>
+<span id="cb5-217"><a href="#cb5-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-218"><a href="#cb5-218" aria-hidden="true" tabindex="-1"></a>Near-duplicate documents waste training compute and make rare-looking sequences effectively common. Deduplication reduces repeated exposure and also reduces train-test contamination. Lee et al. found that deduplicated language-model corpora can improve both efficiency and evaluation quality <span class="co">[</span><span class="ot">@lee2022dedup</span><span class="co">]</span>. Carlini et al. observed substantially less extractable memorization for moderately repeated sequences in deduplicated models, while highly repeated tails remained difficult to eliminate <span class="co">[</span><span class="ot">@carlini2023quantifying</span><span class="co">]</span>.</span>
+<span id="cb5-219"><a href="#cb5-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-220"><a href="#cb5-220" aria-hidden="true" tabindex="-1"></a>The canary experiment shows the qualitative mechanism. Reducing 64 copies to one lowers count-based confidence at every context length. It does not provide a guarantee for the remaining copy. A sufficiently expressive model can still memorize unique material, particularly when it is unusual or influential.</span>
+<span id="cb5-221"><a href="#cb5-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-222"><a href="#cb5-222" aria-hidden="true" tabindex="-1"></a>Deduplication is therefore a data-quality intervention with privacy benefits, not a privacy definition.</span>
+<span id="cb5-223"><a href="#cb5-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-224"><a href="#cb5-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## Differential privacy answers a narrower, stronger question</span></span>
+<span id="cb5-225"><a href="#cb5-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-226"><a href="#cb5-226" aria-hidden="true" tabindex="-1"></a>A randomized training algorithm $M$ is $(\epsilon,\delta)$-differentially private if, for adjacent datasets $D$ and $D'$ differing in one record and every measurable output set $S$,</span>
+<span id="cb5-227"><a href="#cb5-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-228"><a href="#cb5-228" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-229"><a href="#cb5-229" aria-hidden="true" tabindex="-1"></a>\Pr<span class="co">[</span><span class="ot">M(D)\in S</span><span class="co">]</span></span>
+<span id="cb5-230"><a href="#cb5-230" aria-hidden="true" tabindex="-1"></a>\le e^\epsilon\Pr<span class="co">[</span><span class="ot">M(D')\in S</span><span class="co">]</span>+\delta.</span>
+<span id="cb5-231"><a href="#cb5-231" aria-hidden="true" tabindex="-1"></a>$$ {#eq-dp}</span>
+<span id="cb5-232"><a href="#cb5-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-233"><a href="#cb5-233" aria-hidden="true" tabindex="-1"></a>DP-SGD enforces bounded per-example influence by clipping each gradient to norm $C$ and adding Gaussian noise:</span>
+<span id="cb5-234"><a href="#cb5-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-235"><a href="#cb5-235" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-236"><a href="#cb5-236" aria-hidden="true" tabindex="-1"></a>\tilde g=\frac{1}{|B|}</span>
+<span id="cb5-237"><a href="#cb5-237" aria-hidden="true" tabindex="-1"></a>\left(</span>
+<span id="cb5-238"><a href="#cb5-238" aria-hidden="true" tabindex="-1"></a>\sum_{i\in B}\frac{g_i}{\max(1,<span class="sc">\|</span>g_i<span class="sc">\|</span>_2/C)}</span>
+<span id="cb5-239"><a href="#cb5-239" aria-hidden="true" tabindex="-1"></a>+\mathcal N(0,\sigma^2C^2I)</span>
+<span id="cb5-240"><a href="#cb5-240" aria-hidden="true" tabindex="-1"></a>\right).</span>
+<span id="cb5-241"><a href="#cb5-241" aria-hidden="true" tabindex="-1"></a>$$ {#eq-dpsgd}</span>
+<span id="cb5-242"><a href="#cb5-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-243"><a href="#cb5-243" aria-hidden="true" tabindex="-1"></a>Privacy accounting composes the loss across training steps <span class="co">[</span><span class="ot">@abadi2016dp</span><span class="co">]</span>. Unlike regularization, output rounding, or deduplication, differential privacy bounds what an adversary can infer even with arbitrary auxiliary information and access to the trained parameters.</span>
+<span id="cb5-244"><a href="#cb5-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-245"><a href="#cb5-245" aria-hidden="true" tabindex="-1"></a>The adjacency unit matters. Record-level DP protects the addition or removal of one record. If the same secret appears in 64 independently protected records, removing one leaves 63 copies. Group privacy degrades with group size. Deduplication and DP are complementary precisely because they operate on different units.</span>
+<span id="cb5-246"><a href="#cb5-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-247"><a href="#cb5-247" aria-hidden="true" tabindex="-1"></a><span class="fu">## An audit matrix</span></span>
+<span id="cb5-248"><a href="#cb5-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-249"><a href="#cb5-249" aria-hidden="true" tabindex="-1"></a>No one test covers the full threat surface.</span>
+<span id="cb5-250"><a href="#cb5-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-251"><a href="#cb5-251" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Audit <span class="pp">|</span> What it measures <span class="pp">|</span> Main blind spot <span class="pp">|</span></span>
+<span id="cb5-252"><a href="#cb5-252" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span></span>
+<span id="cb5-253"><a href="#cb5-253" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> train-test loss gap <span class="pp">|</span> average fit difference <span class="pp">|</span> rare and conditional leakage <span class="pp">|</span></span>
+<span id="cb5-254"><a href="#cb5-254" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> membership ROC or low-FPR TPR <span class="pp">|</span> known-record distinguishability <span class="pp">|</span> unknown-record discovery <span class="pp">|</span></span>
+<span id="cb5-255"><a href="#cb5-255" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> canary exposure <span class="pp">|</span> controlled memorization <span class="pp">|</span> representativeness of inserted canaries <span class="pp">|</span></span>
+<span id="cb5-256"><a href="#cb5-256" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> generate-then-rank extraction <span class="pp">|</span> practical discovery attack <span class="pp">|</span> undiscovered memorized tail <span class="pp">|</span></span>
+<span id="cb5-257"><a href="#cb5-257" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> prefix-conditioned extraction <span class="pp">|</span> worst-case conditional retrieval <span class="pp">|</span> assumes knowledge of a true prefix <span class="pp">|</span></span>
+<span id="cb5-258"><a href="#cb5-258" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> dedup statistics <span class="pp">|</span> repeated exposure <span class="pp">|</span> unique sensitive records <span class="pp">|</span></span>
+<span id="cb5-259"><a href="#cb5-259" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> DP accountant <span class="pp">|</span> formal single-record stability <span class="pp">|</span> utility cost and group duplication <span class="pp">|</span></span>
+<span id="cb5-260"><a href="#cb5-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-261"><a href="#cb5-261" aria-hidden="true" tabindex="-1"></a>A credible release process combines several rows. It also states the adversary's access: logits, text-only queries, gradients, weights, or a limited API can lead to different conclusions.</span>
+<span id="cb5-262"><a href="#cb5-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-263"><a href="#cb5-263" aria-hidden="true" tabindex="-1"></a><span class="fu">## What these experiments do not establish</span></span>
+<span id="cb5-264"><a href="#cb5-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-265"><a href="#cb5-265" aria-hidden="true" tabindex="-1"></a>Random Fourier regression is not a language model, and a count-based $n$-gram model has no distributed representation. The experiments are deliberately mechanism probes. They demonstrate that membership signal can vary sharply around interpolation and that duplication and context specificity are independent axes of extractability.</span>
+<span id="cb5-266"><a href="#cb5-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-267"><a href="#cb5-267" aria-hidden="true" tabindex="-1"></a>They do not estimate the leakage of a deployed model. That requires attacks calibrated to the model family, held-out nonmembers from the same distribution, attention to low false-positive regimes, and canaries that reflect plausible sensitive formats without using real secrets.</span>
+<span id="cb5-268"><a href="#cb5-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-269"><a href="#cb5-269" aria-hidden="true" tabindex="-1"></a>The main lesson is methodological. Good average generalization is compatible with dangerous tail behavior. Failed unprompted extraction is compatible with prefix-conditioned memorization. Deduplication is compatible with unique-record leakage. A privacy claim is only as precise as its threat model, adjacency unit, and audit procedure.</span>
+<span id="cb5-270"><a href="#cb5-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-271"><a href="#cb5-271" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb5-272"><a href="#cb5-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-273"><a href="#cb5-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Three Ways a Curve Bends</span><span class="co">](../../posts/three-ways-a-curve-bends/index.qmd)</span> revisits generalization where the curve itself misbehaves.</span>
+<span id="cb5-274"><a href="#cb5-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">The Arithmetic of Editing a Fact</span><span class="co">](../../posts/arithmetic-of-editing-a-fact/index.qmd)</span> asks where a memorized fact physically sits.</span>
+<span id="cb5-275"><a href="#cb5-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Every Robustness Number Is an Upper Bound</span><span class="co">](../../posts/robustness-numbers-are-upper-bounds/index.qmd)</span> shares the structure: an audit is only as strong as its search.</span>
+<span id="cb5-276"><a href="#cb5-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-277"><a href="#cb5-277" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb5-278"><a href="#cb5-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-279"><a href="#cb5-279" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb5-280"><a href="#cb5-280" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

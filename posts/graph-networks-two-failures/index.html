@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="Expressivity and long-range communication are different graph-learning problems, and global attention fixes only one of them.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/graph-networks-two-failures/index_files/figure-html/fig-wl-blind-spot-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="575">
-<meta property="og:image:width" content="1724">
+<meta property="og:image:height" content="844">
+<meta property="og:image:width" content="2496">
 <meta name="twitter:title" content="Graph Networks Fail on Two Axes – Eigenholm">
 <meta name="twitter:description" content="Expressivity and long-range communication are different graph-learning problems, and global attention fixes only one of them.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/graph-networks-two-failures/index_files/figure-html/fig-wl-blind-spot-output-1.png">
-<meta name="twitter:image-height" content="575">
-<meta name="twitter:image-width" content="1724">
+<meta name="twitter:image-height" content="844">
+<meta name="twitter:image-width" content="2496">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -436,7 +436,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Graph Networks Fail on Two Axes</h1>
+<div class="quarto-title-block"><div><h1 class="title">Graph Networks Fail on Two Axes</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Graph Neural Networks</div>
     <div class="quarto-category">Graph Transformers</div>
@@ -496,77 +496,81 @@ h_v^{(\ell+1)}&amp;=\operatorname{UPDATE}^{(\ell)}
 <section id="failure-one-indistinguishable-structures" class="level2">
 <h2 class="anchored" data-anchor-id="failure-one-indistinguishable-structures">Failure one: indistinguishable structures</h2>
 <p>The 1-WL test repeatedly hashes each node’s current color together with the multiset of neighbor colors. Begin with identical colors on a 6-cycle and on two disconnected triangles. Every node has degree two, and every node sees two neighbors of its own color at every round. The color histograms remain identical forever.</p>
-<div id="cell-fig-wl-blind-spot" class="cell" data-execution_count="1">
+<div id="b9c8e554" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adjacency(n, edges):</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.zeros((n, n), dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, j <span class="kw">in</span> edges:</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        A[i, j] <span class="op">=</span> A[j, i] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cycle_edges <span class="op">=</span> [(i, (i <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">6</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>)]</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>tri_edges <span class="op">=</span> [(<span class="dv">0</span>, <span class="dv">1</span>), (<span class="dv">1</span>, <span class="dv">2</span>), (<span class="dv">2</span>, <span class="dv">0</span>), (<span class="dv">3</span>, <span class="dv">4</span>), (<span class="dv">4</span>, <span class="dv">5</span>), (<span class="dv">5</span>, <span class="dv">3</span>)]</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>A_cycle <span class="op">=</span> adjacency(<span class="dv">6</span>, cycle_edges)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>A_tri <span class="op">=</span> adjacency(<span class="dv">6</span>, tri_edges)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> wl_histograms(A, rounds<span class="op">=</span><span class="dv">4</span>):</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> np.zeros(<span class="bu">len</span>(A), dtype<span class="op">=</span><span class="bu">int</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    hist <span class="op">=</span> []</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(rounds <span class="op">+</span> <span class="dv">1</span>):</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        _, counts <span class="op">=</span> np.unique(colors, return_counts<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        hist.append(<span class="bu">tuple</span>(<span class="bu">sorted</span>(counts)))</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        signatures <span class="op">=</span> []</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(A)):</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>            neighbor_colors <span class="op">=</span> <span class="bu">tuple</span>(<span class="bu">sorted</span>(colors[A[v] <span class="op">&gt;</span> <span class="dv">0</span>]))</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>            signatures.append((<span class="bu">int</span>(colors[v]), neighbor_colors))</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        unique <span class="op">=</span> {signature: i <span class="cf">for</span> i, signature <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">sorted</span>(<span class="bu">set</span>(signatures)))}</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        colors <span class="op">=</span> np.array([unique[s] <span class="cf">for</span> s <span class="kw">in</span> signatures])</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hist</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> wl_histograms(A_cycle) <span class="op">==</span> wl_histograms(A_tri)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adjacency(n, edges):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.zeros((n, n), dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, j <span class="kw">in</span> edges:</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        A[i, j] <span class="op">=</span> A[j, i] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>cycle_edges <span class="op">=</span> [(i, (i <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">6</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>)]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>tri_edges <span class="op">=</span> [(<span class="dv">0</span>, <span class="dv">1</span>), (<span class="dv">1</span>, <span class="dv">2</span>), (<span class="dv">2</span>, <span class="dv">0</span>), (<span class="dv">3</span>, <span class="dv">4</span>), (<span class="dv">4</span>, <span class="dv">5</span>), (<span class="dv">5</span>, <span class="dv">3</span>)]</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>A_cycle <span class="op">=</span> adjacency(<span class="dv">6</span>, cycle_edges)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>A_tri <span class="op">=</span> adjacency(<span class="dv">6</span>, tri_edges)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> wl_histograms(A, rounds<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> np.zeros(<span class="bu">len</span>(A), dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    hist <span class="op">=</span> []</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(rounds <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        _, counts <span class="op">=</span> np.unique(colors, return_counts<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        hist.append(<span class="bu">tuple</span>(<span class="bu">sorted</span>(counts)))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        signatures <span class="op">=</span> []</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(A)):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            neighbor_colors <span class="op">=</span> <span class="bu">tuple</span>(<span class="bu">sorted</span>(colors[A[v] <span class="op">&gt;</span> <span class="dv">0</span>]))</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            signatures.append((<span class="bu">int</span>(colors[v]), neighbor_colors))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        unique <span class="op">=</span> {signature: i <span class="cf">for</span> i, signature <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">sorted</span>(<span class="bu">set</span>(signatures)))}</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        colors <span class="op">=</span> np.array([unique[s] <span class="cf">for</span> s <span class="kw">in</span> signatures])</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hist</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalized_laplacian_spectrum(A):</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">=</span> A.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    D_inv_sqrt <span class="op">=</span> np.diag(<span class="dv">1</span> <span class="op">/</span> np.sqrt(np.maximum(degree, <span class="dv">1</span>)))</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    L <span class="op">=</span> np.eye(<span class="bu">len</span>(A)) <span class="op">-</span> D_inv_sqrt <span class="op">@</span> A <span class="op">@</span> D_inv_sqrt</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linalg.eigvalsh(L)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>spec_cycle <span class="op">=</span> normalized_laplacian_spectrum(A_cycle)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>spec_tri <span class="op">=</span> normalized_laplacian_spectrum(A_tri)</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_graph(ax, A, positions, title):</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(A)):</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, <span class="bu">len</span>(A)):</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> A[i, j]:</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                ax.plot([positions[i, <span class="dv">0</span>], positions[j, <span class="dv">0</span>]], [positions[i, <span class="dv">1</span>], positions[j, <span class="dv">1</span>]], color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="fl">1.3</span>)</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    ax.scatter(positions[:, <span class="dv">0</span>], positions[:, <span class="dv">1</span>], s<span class="op">=</span><span class="dv">90</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    ax.set_aspect(<span class="st">"equal"</span>)</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>angles <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">6</span>, endpoint<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>pos_cycle <span class="op">=</span> np.c_[np.cos(angles), np.sin(angles)]</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>tri <span class="op">=</span> np.c_[np.cos(angles[:<span class="dv">3</span>] <span class="op">*</span> <span class="dv">2</span>), np.sin(angles[:<span class="dv">3</span>] <span class="op">*</span> <span class="dv">2</span>)]</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>pos_tri <span class="op">=</span> np.vstack([tri <span class="op">+</span> [<span class="op">-</span><span class="fl">1.25</span>, <span class="dv">0</span>], tri <span class="op">+</span> [<span class="fl">1.25</span>, <span class="dv">0</span>]])</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="fl">3.1</span>))</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">0</span>], A_cycle, pos_cycle, <span class="st">"6-cycle"</span>)</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">1</span>], A_tri, pos_tri, <span class="st">"two triangles"</span>)</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x, spec_cycle, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"6-cycle"</span>)</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x, spec_tri, <span class="st">"s--"</span>, label<span class="op">=</span><span class="st">"two triangles"</span>)</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"eigenvalue index"</span>, ylabel<span class="op">=</span><span class="st">"normalized Laplacian eigenvalue"</span>, title<span class="op">=</span><span class="st">"A structural signal 1-WL misses"</span>)</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> wl_histograms(A_cycle) <span class="op">==</span> wl_histograms(A_tri)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalized_laplacian_spectrum(A):</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">=</span> A.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    D_inv_sqrt <span class="op">=</span> np.diag(<span class="dv">1</span> <span class="op">/</span> np.sqrt(np.maximum(degree, <span class="dv">1</span>)))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    L <span class="op">=</span> np.eye(<span class="bu">len</span>(A)) <span class="op">-</span> D_inv_sqrt <span class="op">@</span> A <span class="op">@</span> D_inv_sqrt</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linalg.eigvalsh(L)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>spec_cycle <span class="op">=</span> normalized_laplacian_spectrum(A_cycle)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>spec_tri <span class="op">=</span> normalized_laplacian_spectrum(A_tri)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-wl-blind-spot" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_graph(ax, A, positions, title):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(A)):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, <span class="bu">len</span>(A)):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> A[i, j]:</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                ax.plot([positions[i, <span class="dv">0</span>], positions[j, <span class="dv">0</span>]], [positions[i, <span class="dv">1</span>], positions[j, <span class="dv">1</span>]], color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="fl">1.3</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    ax.scatter(positions[:, <span class="dv">0</span>], positions[:, <span class="dv">1</span>], s<span class="op">=</span><span class="dv">90</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    ax.set_aspect(<span class="st">"equal"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>angles <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">6</span>, endpoint<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>pos_cycle <span class="op">=</span> np.c_[np.cos(angles), np.sin(angles)]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>tri <span class="op">=</span> np.c_[np.cos(angles[:<span class="dv">3</span>] <span class="op">*</span> <span class="dv">2</span>), np.sin(angles[:<span class="dv">3</span>] <span class="op">*</span> <span class="dv">2</span>)]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>pos_tri <span class="op">=</span> np.vstack([tri <span class="op">+</span> [<span class="op">-</span><span class="fl">1.25</span>, <span class="dv">0</span>], tri <span class="op">+</span> [<span class="fl">1.25</span>, <span class="dv">0</span>]])</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="fl">3.1</span>))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">0</span>], A_cycle, pos_cycle, <span class="st">"6-cycle"</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">1</span>], A_tri, pos_tri, <span class="st">"two triangles"</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x, spec_cycle, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"6-cycle"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x, spec_tri, <span class="st">"s--"</span>, label<span class="op">=</span><span class="st">"two triangles"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"eigenvalue index"</span>, ylabel<span class="op">=</span><span class="st">"normalized Laplacian eigenvalue"</span>, title<span class="op">=</span><span class="st">"A structural signal 1-WL misses"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].legend()</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-wl-blind-spot" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-wl-blind-spot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-wl-blind-spot-output-1.png" width="862" height="288" class="figure-img">
+<img src="index_files/figure-html/fig-wl-blind-spot-output-1.png" width="1248" height="422" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wl-blind-spot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: A 6-cycle and two disjoint triangles remain identical to 1-WL from uniform node features, although their normalized Laplacian spectra and connectivity differ.
@@ -591,64 +595,66 @@ H^{(L)}=P^L X,
 \tag{3}</span></span></p>
 <p>On graphs with narrow cuts, a large amount of dependency must pass through very few edges. Alon and Yahav connected this bottleneck to the difficulty of long-range graph tasks <span class="citation" data-cites="alon2021bottleneck">(<a href="#ref-alon2021bottleneck" role="doc-biblioref">Alon and Yahav 2021</a>)</span>. Later work related over-squashing to graph curvature and rewiring <span class="citation" data-cites="topping2022oversquashing">(<a href="#ref-topping2022oversquashing" role="doc-biblioref">Topping et al. 2022</a>)</span>.</p>
 <p>Consider two dense communities connected by one bridge. The source and target are structurally distinguishable. Communication is still poor.</p>
-<div id="cell-fig-oversquashing" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> barbell(clique_size<span class="op">=</span><span class="dv">10</span>):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> clique_size</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    edges <span class="op">=</span> []</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> offset <span class="kw">in</span> [<span class="dv">0</span>, clique_size]:</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(offset, offset <span class="op">+</span> clique_size):</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, offset <span class="op">+</span> clique_size):</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                edges.append((i, j))</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    edges.append((clique_size <span class="op">-</span> <span class="dv">1</span>, clique_size))</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> adjacency(n, edges)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> propagation(A):</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    A_loop <span class="op">=</span> A <span class="op">+</span> np.eye(<span class="bu">len</span>(A))</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_loop <span class="op">/</span> A_loop.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>A_local <span class="op">=</span> barbell(<span class="dv">10</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>A_rewired <span class="op">=</span> A_local.copy()</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, j <span class="kw">in</span> [(<span class="dv">0</span>, <span class="dv">10</span>), (<span class="dv">2</span>, <span class="dv">12</span>), (<span class="dv">4</span>, <span class="dv">14</span>), (<span class="dv">6</span>, <span class="dv">16</span>), (<span class="dv">8</span>, <span class="dv">18</span>)]:</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    A_rewired[i, j] <span class="op">=</span> A_rewired[j, i] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>P_local <span class="op">=</span> propagation(A_local)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>P_rewired <span class="op">=</span> propagation(A_rewired)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>P_global <span class="op">=</span> np.ones_like(A_local) <span class="op">/</span> <span class="bu">len</span>(A_local)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>depths <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">25</span>)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>source, target <span class="op">=</span> <span class="dv">0</span>, <span class="dv">19</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> influence_curve(P):</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    power <span class="op">=</span> np.eye(<span class="bu">len</span>(P))</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> []</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> depths:</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        power <span class="op">=</span> P <span class="op">@</span> power</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        values.append(<span class="bu">abs</span>(power[target, source]))</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(values)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">8.8</span>, <span class="fl">3.5</span>))</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Compact drawing of the graph and its cut.</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">10</span>, endpoint<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.vstack([</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    np.c_[<span class="fl">0.72</span> <span class="op">*</span> np.cos(theta) <span class="op">-</span> <span class="fl">1.15</span>, <span class="fl">0.72</span> <span class="op">*</span> np.sin(theta)],</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    np.c_[<span class="fl">0.72</span> <span class="op">*</span> np.cos(theta) <span class="op">+</span> <span class="fl">1.15</span>, <span class="fl">0.72</span> <span class="op">*</span> np.sin(theta)],</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">0</span>], A_local, positions, <span class="st">"One edge carries every cross-community message"</span>)</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, np.maximum(influence_curve(P_local), <span class="fl">1e-12</span>), <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"local message passing"</span>)</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, np.maximum(influence_curve(P_rewired), <span class="fl">1e-12</span>), <span class="st">"s-"</span>, label<span class="op">=</span><span class="st">"multi-scale rewiring"</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, influence_curve(P_global), <span class="st">"^-"</span>, label<span class="op">=</span><span class="st">"global mixing"</span>)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"layers"</span>, ylabel<span class="op">=</span><span class="st">"$|</span><span class="ch">\\</span><span class="st">partial h_</span><span class="sc">{target}</span><span class="st">/</span><span class="ch">\\</span><span class="st">partial x_</span><span class="sc">{source}</span><span class="st">|$"</span>, title<span class="op">=</span><span class="st">"Transport through the bottleneck"</span>)</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="359f581f" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> barbell(clique_size<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> clique_size</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    edges <span class="op">=</span> []</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> offset <span class="kw">in</span> [<span class="dv">0</span>, clique_size]:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(offset, offset <span class="op">+</span> clique_size):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, offset <span class="op">+</span> clique_size):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                edges.append((i, j))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    edges.append((clique_size <span class="op">-</span> <span class="dv">1</span>, clique_size))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> adjacency(n, edges)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> propagation(A):</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    A_loop <span class="op">=</span> A <span class="op">+</span> np.eye(<span class="bu">len</span>(A))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_loop <span class="op">/</span> A_loop.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>A_local <span class="op">=</span> barbell(<span class="dv">10</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>A_rewired <span class="op">=</span> A_local.copy()</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, j <span class="kw">in</span> [(<span class="dv">0</span>, <span class="dv">10</span>), (<span class="dv">2</span>, <span class="dv">12</span>), (<span class="dv">4</span>, <span class="dv">14</span>), (<span class="dv">6</span>, <span class="dv">16</span>), (<span class="dv">8</span>, <span class="dv">18</span>)]:</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    A_rewired[i, j] <span class="op">=</span> A_rewired[j, i] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>P_local <span class="op">=</span> propagation(A_local)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>P_rewired <span class="op">=</span> propagation(A_rewired)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>P_global <span class="op">=</span> np.ones_like(A_local) <span class="op">/</span> <span class="bu">len</span>(A_local)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>depths <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">25</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>source, target <span class="op">=</span> <span class="dv">0</span>, <span class="dv">19</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> influence_curve(P):</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    power <span class="op">=</span> np.eye(<span class="bu">len</span>(P))</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> []</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> depths:</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        power <span class="op">=</span> P <span class="op">@</span> power</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        values.append(<span class="bu">abs</span>(power[target, source]))</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(values)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-oversquashing" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">8.8</span>, <span class="fl">3.5</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compact drawing of the graph and its cut.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">10</span>, endpoint<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.vstack([</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    np.c_[<span class="fl">0.72</span> <span class="op">*</span> np.cos(theta) <span class="op">-</span> <span class="fl">1.15</span>, <span class="fl">0.72</span> <span class="op">*</span> np.sin(theta)],</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    np.c_[<span class="fl">0.72</span> <span class="op">*</span> np.cos(theta) <span class="op">+</span> <span class="fl">1.15</span>, <span class="fl">0.72</span> <span class="op">*</span> np.sin(theta)],</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">0</span>], A_local, positions, <span class="st">"One edge carries every cross-community message"</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, np.maximum(influence_curve(P_local), <span class="fl">1e-12</span>), <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"local message passing"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, np.maximum(influence_curve(P_rewired), <span class="fl">1e-12</span>), <span class="st">"s-"</span>, label<span class="op">=</span><span class="st">"multi-scale rewiring"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, influence_curve(P_global), <span class="st">"^-"</span>, label<span class="op">=</span><span class="st">"global mixing"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"layers"</span>, ylabel<span class="op">=</span><span class="st">"$|</span><span class="ch">\\</span><span class="st">partial h_</span><span class="sc">{target}</span><span class="st">/</span><span class="ch">\\</span><span class="st">partial x_</span><span class="sc">{source}</span><span class="st">|$"</span>, title<span class="op">=</span><span class="st">"Transport through the bottleneck"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-oversquashing" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-oversquashing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-oversquashing-output-1.png" width="858" height="326" class="figure-img">
+<img src="index_files/figure-html/fig-oversquashing-output-1.png" width="1219" height="478" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-oversquashing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Linearized source-to-target influence across a two-community bottleneck. Multi-scale rewiring and a global mixing channel reduce graph distance, but they solve communication rather than structural identity.
@@ -766,6 +772,8 @@ Xu, Keyulu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka. 2019. <span>“How P
 </div>
 
 
+<!-- -->
+
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{marino2026,
@@ -862,6 +870,57 @@ Axes.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenho
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1230,7 +1289,285 @@ Axes.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenho
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Graph Networks Fail on Two Axes"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Expressivity and long-range communication are different graph-learning problems, and global attention fixes only one of them."</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-14"</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Graph Neural Networks, Graph Transformers, Geometry]</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>A graph neural network can fail before optimization begins. Two nodes may be impossible for the architecture to distinguish. Alternatively, the nodes may be distinguishable in principle, but relevant information may be compressed through a narrow graph bottleneck before it reaches them.</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>These are not the same failure.</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>The first is an **expressivity** problem. It asks whether the architecture maps distinct graph structures to distinct representations. The second is a **communication** problem. It asks how a signal travels over the graph and how much of it survives aggregation.</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>Global attention shortens communication paths. It does not automatically create structural identity. Positional and structural encodings can break symmetries. They do not automatically create an efficient route for distant signals. Modern graph transformers work because they combine both remedies, often with an ordinary message-passing layer that preserves local edge structure.</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## Message passing as a local invariant program</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>A message-passing GNN updates node $v$ by</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>m_v^{(\ell)}&amp;=\operatorname{AGG}^{(\ell)}</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>\left(\left<span class="sc">\{\!</span>\left<span class="sc">\{</span>h_u^{(\ell)}:u\in\mathcal N(v)\right<span class="sc">\}\!</span>\right<span class="sc">\}</span>\right),<span class="sc">\\</span><span class="co">[</span><span class="ot">2pt</span><span class="co">]</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>h_v^{(\ell+1)}&amp;=\operatorname{UPDATE}^{(\ell)}</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>\left(h_v^{(\ell)},m_v^{(\ell)}\right).</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>$$ {#eq-mpnn}</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>The doubled braces denote a multiset. Permuting the neighbors cannot change the aggregate, so $\operatorname{AGG}^{(\ell)}$ must be a function on multisets rather than on ordered tuples. This is the correct symmetry for an unlabeled graph, and it imposes an information constraint: whatever @eq-mpnn cannot separate at layer $\ell$ stays merged at every later layer.</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>Xu et al. showed that neighborhood-aggregation GNNs are at most as discriminative as the one-dimensional Weisfeiler-Lehman test, usually called 1-WL <span class="co">[</span><span class="ot">@xu2019gin</span><span class="co">]</span>. A model reaches that bound only when its aggregation and readout are injective over multisets. Sum aggregation can be injective under suitable conditions. Mean and max discard multiplicity information.</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure one: indistinguishable structures</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>The 1-WL test repeatedly hashes each node's current color together with the multiset of neighbor colors. Begin with identical colors on a 6-cycle and on two disconnected triangles. Every node has degree two, and every node sees two neighbors of its own color at every round. The color histograms remain identical forever.</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adjacency(n, edges):</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.zeros((n, n), dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, j <span class="kw">in</span> edges:</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        A[i, j] <span class="op">=</span> A[j, i] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>cycle_edges <span class="op">=</span> [(i, (i <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">6</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>)]</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>tri_edges <span class="op">=</span> [(<span class="dv">0</span>, <span class="dv">1</span>), (<span class="dv">1</span>, <span class="dv">2</span>), (<span class="dv">2</span>, <span class="dv">0</span>), (<span class="dv">3</span>, <span class="dv">4</span>), (<span class="dv">4</span>, <span class="dv">5</span>), (<span class="dv">5</span>, <span class="dv">3</span>)]</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>A_cycle <span class="op">=</span> adjacency(<span class="dv">6</span>, cycle_edges)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>A_tri <span class="op">=</span> adjacency(<span class="dv">6</span>, tri_edges)</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> wl_histograms(A, rounds<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> np.zeros(<span class="bu">len</span>(A), dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>    hist <span class="op">=</span> []</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(rounds <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>        _, counts <span class="op">=</span> np.unique(colors, return_counts<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>        hist.append(<span class="bu">tuple</span>(<span class="bu">sorted</span>(counts)))</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>        signatures <span class="op">=</span> []</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(A)):</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>            neighbor_colors <span class="op">=</span> <span class="bu">tuple</span>(<span class="bu">sorted</span>(colors[A[v] <span class="op">&gt;</span> <span class="dv">0</span>]))</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>            signatures.append((<span class="bu">int</span>(colors[v]), neighbor_colors))</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>        unique <span class="op">=</span> {signature: i <span class="cf">for</span> i, signature <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">sorted</span>(<span class="bu">set</span>(signatures)))}</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>        colors <span class="op">=</span> np.array([unique[s] <span class="cf">for</span> s <span class="kw">in</span> signatures])</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hist</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> wl_histograms(A_cycle) <span class="op">==</span> wl_histograms(A_tri)</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalized_laplacian_spectrum(A):</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">=</span> A.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>    D_inv_sqrt <span class="op">=</span> np.diag(<span class="dv">1</span> <span class="op">/</span> np.sqrt(np.maximum(degree, <span class="dv">1</span>)))</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>    L <span class="op">=</span> np.eye(<span class="bu">len</span>(A)) <span class="op">-</span> D_inv_sqrt <span class="op">@</span> A <span class="op">@</span> D_inv_sqrt</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linalg.eigvalsh(L)</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>spec_cycle <span class="op">=</span> normalized_laplacian_spectrum(A_cycle)</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>spec_tri <span class="op">=</span> normalized_laplacian_spectrum(A_tri)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-wl-blind-spot</span></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "A 6-cycle and two disjoint triangles remain identical to 1-WL from uniform node features, although their normalized Laplacian spectra and connectivity differ."</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_graph(ax, A, positions, title):</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(A)):</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, <span class="bu">len</span>(A)):</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> A[i, j]:</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>                ax.plot([positions[i, <span class="dv">0</span>], positions[j, <span class="dv">0</span>]], [positions[i, <span class="dv">1</span>], positions[j, <span class="dv">1</span>]], color<span class="op">=</span><span class="st">"0.55"</span>, lw<span class="op">=</span><span class="fl">1.3</span>)</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>    ax.scatter(positions[:, <span class="dv">0</span>], positions[:, <span class="dv">1</span>], s<span class="op">=</span><span class="dv">90</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>    ax.set_aspect(<span class="st">"equal"</span>)</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>angles <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">6</span>, endpoint<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>pos_cycle <span class="op">=</span> np.c_[np.cos(angles), np.sin(angles)]</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>tri <span class="op">=</span> np.c_[np.cos(angles[:<span class="dv">3</span>] <span class="op">*</span> <span class="dv">2</span>), np.sin(angles[:<span class="dv">3</span>] <span class="op">*</span> <span class="dv">2</span>)]</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>pos_tri <span class="op">=</span> np.vstack([tri <span class="op">+</span> [<span class="op">-</span><span class="fl">1.25</span>, <span class="dv">0</span>], tri <span class="op">+</span> [<span class="fl">1.25</span>, <span class="dv">0</span>]])</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="fl">3.1</span>))</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">0</span>], A_cycle, pos_cycle, <span class="st">"6-cycle"</span>)</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">1</span>], A_tri, pos_tri, <span class="st">"two triangles"</span>)</span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x, spec_cycle, <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"6-cycle"</span>)</span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x, spec_tri, <span class="st">"s--"</span>, label<span class="op">=</span><span class="st">"two triangles"</span>)</span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"eigenvalue index"</span>, ylabel<span class="op">=</span><span class="st">"normalized Laplacian eigenvalue"</span>, title<span class="op">=</span><span class="st">"A structural signal 1-WL misses"</span>)</span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].legend()</span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>Laplacian eigenvalues distinguish these graphs immediately. Supplying eigenvectors or random-walk statistics to a model can therefore break symmetries that local color refinement cannot. This is the motivation for positional and structural encodings in graph transformers.</span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a>There is an important caveat. Eigenvectors have sign ambiguities, and repeated eigenvalues permit rotations within an eigenspace. A model that consumes them naively may depend on an arbitrary basis. Sign-invariant networks, eigenspace-aware constructions, and random-walk encodings address different parts of this problem.</span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure two: distant signals are over-squashed</span></span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>After $L$ message-passing layers, node $v$ can depend only on its $L$-hop neighborhood. Expanding the depth increases the receptive field, but the number of distant nodes can grow exponentially while the hidden vector keeps fixed width. Many signals must be compressed into one representation.</span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>For a linearized mean-aggregation network,</span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a>H^{(L)}=P^L X,</span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a>$$ {#eq-linear-propagation}</span>
+<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a>where $P$ is a normalized adjacency matrix with self-loops. The sensitivity of target $v$ to source $u$ is</span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a>\frac{\partial h_v^{(L)}}{\partial x_u}=(P^L)_{vu}.</span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a>$$ {#eq-influence}</span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a>On graphs with narrow cuts, a large amount of dependency must pass through very few edges. Alon and Yahav connected this bottleneck to the difficulty of long-range graph tasks <span class="co">[</span><span class="ot">@alon2021bottleneck</span><span class="co">]</span>. Later work related over-squashing to graph curvature and rewiring <span class="co">[</span><span class="ot">@topping2022oversquashing</span><span class="co">]</span>.</span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a>Consider two dense communities connected by one bridge. The source and target are structurally distinguishable. Communication is still poor.</span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> barbell(clique_size<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> clique_size</span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a>    edges <span class="op">=</span> []</span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> offset <span class="kw">in</span> [<span class="dv">0</span>, clique_size]:</span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(offset, offset <span class="op">+</span> clique_size):</span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, offset <span class="op">+</span> clique_size):</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a>                edges.append((i, j))</span>
+<span id="cb5-160"><a href="#cb5-160" aria-hidden="true" tabindex="-1"></a>    edges.append((clique_size <span class="op">-</span> <span class="dv">1</span>, clique_size))</span>
+<span id="cb5-161"><a href="#cb5-161" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> adjacency(n, edges)</span>
+<span id="cb5-162"><a href="#cb5-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-163"><a href="#cb5-163" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> propagation(A):</span>
+<span id="cb5-164"><a href="#cb5-164" aria-hidden="true" tabindex="-1"></a>    A_loop <span class="op">=</span> A <span class="op">+</span> np.eye(<span class="bu">len</span>(A))</span>
+<span id="cb5-165"><a href="#cb5-165" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_loop <span class="op">/</span> A_loop.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-166"><a href="#cb5-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-167"><a href="#cb5-167" aria-hidden="true" tabindex="-1"></a>A_local <span class="op">=</span> barbell(<span class="dv">10</span>)</span>
+<span id="cb5-168"><a href="#cb5-168" aria-hidden="true" tabindex="-1"></a>A_rewired <span class="op">=</span> A_local.copy()</span>
+<span id="cb5-169"><a href="#cb5-169" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, j <span class="kw">in</span> [(<span class="dv">0</span>, <span class="dv">10</span>), (<span class="dv">2</span>, <span class="dv">12</span>), (<span class="dv">4</span>, <span class="dv">14</span>), (<span class="dv">6</span>, <span class="dv">16</span>), (<span class="dv">8</span>, <span class="dv">18</span>)]:</span>
+<span id="cb5-170"><a href="#cb5-170" aria-hidden="true" tabindex="-1"></a>    A_rewired[i, j] <span class="op">=</span> A_rewired[j, i] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-171"><a href="#cb5-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-172"><a href="#cb5-172" aria-hidden="true" tabindex="-1"></a>P_local <span class="op">=</span> propagation(A_local)</span>
+<span id="cb5-173"><a href="#cb5-173" aria-hidden="true" tabindex="-1"></a>P_rewired <span class="op">=</span> propagation(A_rewired)</span>
+<span id="cb5-174"><a href="#cb5-174" aria-hidden="true" tabindex="-1"></a>P_global <span class="op">=</span> np.ones_like(A_local) <span class="op">/</span> <span class="bu">len</span>(A_local)</span>
+<span id="cb5-175"><a href="#cb5-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-176"><a href="#cb5-176" aria-hidden="true" tabindex="-1"></a>depths <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">25</span>)</span>
+<span id="cb5-177"><a href="#cb5-177" aria-hidden="true" tabindex="-1"></a>source, target <span class="op">=</span> <span class="dv">0</span>, <span class="dv">19</span></span>
+<span id="cb5-178"><a href="#cb5-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-179"><a href="#cb5-179" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> influence_curve(P):</span>
+<span id="cb5-180"><a href="#cb5-180" aria-hidden="true" tabindex="-1"></a>    power <span class="op">=</span> np.eye(<span class="bu">len</span>(P))</span>
+<span id="cb5-181"><a href="#cb5-181" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> []</span>
+<span id="cb5-182"><a href="#cb5-182" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> depths:</span>
+<span id="cb5-183"><a href="#cb5-183" aria-hidden="true" tabindex="-1"></a>        power <span class="op">=</span> P <span class="op">@</span> power</span>
+<span id="cb5-184"><a href="#cb5-184" aria-hidden="true" tabindex="-1"></a>        values.append(<span class="bu">abs</span>(power[target, source]))</span>
+<span id="cb5-185"><a href="#cb5-185" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(values)</span>
+<span id="cb5-186"><a href="#cb5-186" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-187"><a href="#cb5-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-190"><a href="#cb5-190" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-191"><a href="#cb5-191" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-oversquashing</span></span>
+<span id="cb5-192"><a href="#cb5-192" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Linearized source-to-target influence across a two-community bottleneck. Multi-scale rewiring and a global mixing channel reduce graph distance, but they solve communication rather than structural identity."</span></span>
+<span id="cb5-193"><a href="#cb5-193" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb5-194"><a href="#cb5-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-195"><a href="#cb5-195" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">8.8</span>, <span class="fl">3.5</span>))</span>
+<span id="cb5-196"><a href="#cb5-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-197"><a href="#cb5-197" aria-hidden="true" tabindex="-1"></a><span class="co"># Compact drawing of the graph and its cut.</span></span>
+<span id="cb5-198"><a href="#cb5-198" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">10</span>, endpoint<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-199"><a href="#cb5-199" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.vstack([</span>
+<span id="cb5-200"><a href="#cb5-200" aria-hidden="true" tabindex="-1"></a>    np.c_[<span class="fl">0.72</span> <span class="op">*</span> np.cos(theta) <span class="op">-</span> <span class="fl">1.15</span>, <span class="fl">0.72</span> <span class="op">*</span> np.sin(theta)],</span>
+<span id="cb5-201"><a href="#cb5-201" aria-hidden="true" tabindex="-1"></a>    np.c_[<span class="fl">0.72</span> <span class="op">*</span> np.cos(theta) <span class="op">+</span> <span class="fl">1.15</span>, <span class="fl">0.72</span> <span class="op">*</span> np.sin(theta)],</span>
+<span id="cb5-202"><a href="#cb5-202" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb5-203"><a href="#cb5-203" aria-hidden="true" tabindex="-1"></a>draw_graph(axes[<span class="dv">0</span>], A_local, positions, <span class="st">"One edge carries every cross-community message"</span>)</span>
+<span id="cb5-204"><a href="#cb5-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-205"><a href="#cb5-205" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, np.maximum(influence_curve(P_local), <span class="fl">1e-12</span>), <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"local message passing"</span>)</span>
+<span id="cb5-206"><a href="#cb5-206" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, np.maximum(influence_curve(P_rewired), <span class="fl">1e-12</span>), <span class="st">"s-"</span>, label<span class="op">=</span><span class="st">"multi-scale rewiring"</span>)</span>
+<span id="cb5-207"><a href="#cb5-207" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].semilogy(depths, influence_curve(P_global), <span class="st">"^-"</span>, label<span class="op">=</span><span class="st">"global mixing"</span>)</span>
+<span id="cb5-208"><a href="#cb5-208" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"layers"</span>, ylabel<span class="op">=</span><span class="st">"$|</span><span class="ch">\\</span><span class="st">partial h_</span><span class="sc">{target}</span><span class="st">/</span><span class="ch">\\</span><span class="st">partial x_</span><span class="sc">{source}</span><span class="st">|$"</span>, title<span class="op">=</span><span class="st">"Transport through the bottleneck"</span>)</span>
+<span id="cb5-209"><a href="#cb5-209" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb5-210"><a href="#cb5-210" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-211"><a href="#cb5-211" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-212"><a href="#cb5-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-213"><a href="#cb5-213" aria-hidden="true" tabindex="-1"></a>Global mixing creates an immediate path. Rewiring creates several shorter paths. Neither operation tells two initially identical regular structures apart unless it also introduces asymmetric structural information.</span>
+<span id="cb5-214"><a href="#cb5-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-215"><a href="#cb5-215" aria-hidden="true" tabindex="-1"></a><span class="fu">## A two-axis diagnostic</span></span>
+<span id="cb5-216"><a href="#cb5-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-217"><a href="#cb5-217" aria-hidden="true" tabindex="-1"></a>The preceding examples define a useful matrix for architecture design.</span>
+<span id="cb5-218"><a href="#cb5-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-219"><a href="#cb5-219" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Communication easy <span class="pp">|</span> Communication hard <span class="pp">|</span></span>
+<span id="cb5-220"><a href="#cb5-220" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span></span>
+<span id="cb5-221"><a href="#cb5-221" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Structures distinguishable** <span class="pp">|</span> ordinary local GNN may suffice <span class="pp">|</span> add long-range edges, hierarchy, or global attention <span class="pp">|</span></span>
+<span id="cb5-222"><a href="#cb5-222" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Structures indistinguishable** <span class="pp">|</span> add positional or structural encodings <span class="pp">|</span> add encodings and a communication mechanism <span class="pp">|</span></span>
+<span id="cb5-223"><a href="#cb5-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-224"><a href="#cb5-224" aria-hidden="true" tabindex="-1"></a>This table prevents a common category error. Increasing depth addresses graph distance but can worsen over-smoothing and over-squashing. Adding a virtual node or full attention addresses distance but leaves permutation symmetry intact. Adding a Laplacian encoding addresses symmetry but does not guarantee that a remote feature reaches the decision node without distortion.</span>
+<span id="cb5-225"><a href="#cb5-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-226"><a href="#cb5-226" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why GraphGPS has three ingredients</span></span>
+<span id="cb5-227"><a href="#cb5-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-228"><a href="#cb5-228" aria-hidden="true" tabindex="-1"></a>GraphGPS combines</span>
+<span id="cb5-229"><a href="#cb5-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-230"><a href="#cb5-230" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>positional or structural encodings;</span>
+<span id="cb5-231"><a href="#cb5-231" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>a local message-passing layer;</span>
+<span id="cb5-232"><a href="#cb5-232" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>a global attention layer.</span>
+<span id="cb5-233"><a href="#cb5-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-234"><a href="#cb5-234" aria-hidden="true" tabindex="-1"></a>In one schematic layer,</span>
+<span id="cb5-235"><a href="#cb5-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-236"><a href="#cb5-236" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-237"><a href="#cb5-237" aria-hidden="true" tabindex="-1"></a>H_M^{(\ell+1)}=\operatorname{MPNN}(H^{(\ell)},E),</span>
+<span id="cb5-238"><a href="#cb5-238" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb5-239"><a href="#cb5-239" aria-hidden="true" tabindex="-1"></a>H_T^{(\ell+1)}=\operatorname{Attn}(H^{(\ell)}),</span>
+<span id="cb5-240"><a href="#cb5-240" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-241"><a href="#cb5-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-242"><a href="#cb5-242" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-243"><a href="#cb5-243" aria-hidden="true" tabindex="-1"></a>H^{(\ell+1)}=\operatorname{MLP}</span>
+<span id="cb5-244"><a href="#cb5-244" aria-hidden="true" tabindex="-1"></a>\left(H_M^{(\ell+1)}+H_T^{(\ell+1)}\right).</span>
+<span id="cb5-245"><a href="#cb5-245" aria-hidden="true" tabindex="-1"></a>$$ {#eq-gps-layer}</span>
+<span id="cb5-246"><a href="#cb5-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-247"><a href="#cb5-247" aria-hidden="true" tabindex="-1"></a>The components are not redundant <span class="co">[</span><span class="ot">@rampasek2022graphgps</span><span class="co">]</span>. Encodings give nodes a structurally meaningful coordinate system. Local message passing consumes real edge features and preserves the inductive bias of the input graph. Global attention provides short communication paths. Linear attention variants can keep the global branch near $O(|V|+|E|)$ rather than $O(|V|^2)$.</span>
+<span id="cb5-248"><a href="#cb5-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-249"><a href="#cb5-249" aria-hidden="true" tabindex="-1"></a>The design is consistent with the broader geometric deep-learning blueprint: identify the symmetry group, build equivariant layers, and add invariant readout only where the task requires it <span class="co">[</span><span class="ot">@bronstein2021geometric</span><span class="co">]</span>. Graph attention without structural inputs is permutation equivariant over a set of nodes. That symmetry is necessary but too weak to recover all graph structure on its own.</span>
+<span id="cb5-250"><a href="#cb5-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-251"><a href="#cb5-251" aria-hidden="true" tabindex="-1"></a><span class="fu">## Multi-scale edges are a physical design choice</span></span>
+<span id="cb5-252"><a href="#cb5-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-253"><a href="#cb5-253" aria-hidden="true" tabindex="-1"></a>GraphCast offers a useful example outside graph benchmarks. It maps weather fields to an icosahedral mesh whose edge set is the union of several resolutions. Fine edges handle local dynamics. Coarse edges move information across the globe in few message-passing steps <span class="co">[</span><span class="ot">@lam2023graphcast</span><span class="co">]</span>. The hierarchy is flattened into a multi-mesh, so long and short spatial scales coexist in each processor stack.</span>
+<span id="cb5-254"><a href="#cb5-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-255"><a href="#cb5-255" aria-hidden="true" tabindex="-1"></a>This can be read as deliberate anti-over-squashing. The architecture changes the communication graph to match the dependency graph of atmospheric dynamics.</span>
+<span id="cb5-256"><a href="#cb5-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-257"><a href="#cb5-257" aria-hidden="true" tabindex="-1"></a>GenCast retains the mesh construction but uses a graph-transformer processor inside a conditional diffusion model, producing calibrated ensembles rather than a deterministic mean forecast <span class="co">[</span><span class="ot">@price2025gencast</span><span class="co">]</span>. This connects three parts of the wiki that are usually discussed separately: graph geometry determines communication, diffusion represents forecast uncertainty, and autoregressive rollout determines how errors compound in time.</span>
+<span id="cb5-258"><a href="#cb5-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-259"><a href="#cb5-259" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expressivity is not usefulness</span></span>
+<span id="cb5-260"><a href="#cb5-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-261"><a href="#cb5-261" aria-hidden="true" tabindex="-1"></a>Matching 1-WL is an upper bound within a model class, not a guarantee of good generalization. A maximally expressive aggregator can fit irrelevant distinctions. Positional encodings can leak graph size or dataset-specific regularities. Global attention can overfit spurious long-range correlations. More distinguishability and more communication are capacities, not objectives.</span>
+<span id="cb5-262"><a href="#cb5-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-263"><a href="#cb5-263" aria-hidden="true" tabindex="-1"></a>There are also graph pairs that 1-WL cannot distinguish but Laplacian spectra cannot distinguish either. Cospectral graphs exist. Higher-order WL methods, subgraph GNNs, and richer invariant features push the boundary at greater cost. No single positional encoding is a universal graph identity card.</span>
+<span id="cb5-264"><a href="#cb5-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-265"><a href="#cb5-265" aria-hidden="true" tabindex="-1"></a>Likewise, @eq-influence describes a linearized mean aggregator. Nonlinear gates and attention can route information selectively, and residual connections change the dynamics. The bottleneck remains a useful warning, not a complete theory of trainability.</span>
+<span id="cb5-266"><a href="#cb5-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-267"><a href="#cb5-267" aria-hidden="true" tabindex="-1"></a><span class="fu">## A better architecture question</span></span>
+<span id="cb5-268"><a href="#cb5-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-269"><a href="#cb5-269" aria-hidden="true" tabindex="-1"></a>Instead of asking whether attention is better than message passing, ask two questions about the task:</span>
+<span id="cb5-270"><a href="#cb5-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-271"><a href="#cb5-271" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which graph symmetries should the prediction respect, and what distinct structures must the model identify?</span>
+<span id="cb5-272"><a href="#cb5-272" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Which distant variables must communicate, through how many independent channels, and at what spatial scales?</span>
+<span id="cb5-273"><a href="#cb5-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-274"><a href="#cb5-274" aria-hidden="true" tabindex="-1"></a>The first question chooses invariants and encodings. The second chooses edges, hierarchy, state width, and global mixing. A graph transformer becomes convincing when its answer to both is explicit. Otherwise, global attention is only an expensive way to make every node adjacent to every other node.</span>
+<span id="cb5-275"><a href="#cb5-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-276"><a href="#cb5-276" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb5-277"><a href="#cb5-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-278"><a href="#cb5-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">The Rank of Memory</span><span class="co">](../../posts/rank-of-memory/index.qmd)</span> makes the bottleneck argument algebraic for sequences.</span>
+<span id="cb5-279"><a href="#cb5-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Attention, from Logits to Context</span><span class="co">](../../posts/attention-from-logits-to-context/index.qmd)</span> gives the attention operation used as the global fix.</span>
+<span id="cb5-280"><a href="#cb5-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-281"><a href="#cb5-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb5-282"><a href="#cb5-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-283"><a href="#cb5-283" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb5-284"><a href="#cb5-284" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

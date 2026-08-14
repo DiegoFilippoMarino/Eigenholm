@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="938">
-<meta property="og:image:width" content="1519">
+<meta property="og:image:height" content="1376">
+<meta property="og:image:width" content="2216">
 <meta name="twitter:title" content="The Geometry of Rotary Position Embeddings – Eigenholm">
 <meta name="twitter:description" content="RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/rope-geometry/index_files/figure-html/fig-rope-frequencies-output-1.png">
-<meta name="twitter:image-height" content="938">
-<meta name="twitter:image-width" content="1519">
+<meta name="twitter:image-height" content="1376">
+<meta name="twitter:image-width" content="2216">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -435,7 +435,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">The Geometry of Rotary Position Embeddings</h1>
+<div class="quarto-title-block"><div><h1 class="title">The Geometry of Rotary Position Embeddings</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Transformers</div>
     <div class="quarto-category">Positional Encoding</div>
@@ -503,31 +503,34 @@ R_{\Theta,m}=\operatorname{diag}
 </span></p>
 <p>The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.</p>
 <div id="cell-fig-rope-frequencies" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">64</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="dv">10_000</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">24</span>])</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair_ids <span class="op">/</span> d)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">4097</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, i, frequency <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, pair_ids, theta):</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    ax.plot(offset, np.cos(offset <span class="op">*</span> frequency), lw<span class="op">=</span><span class="fl">1.1</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="vs">fr"pair </span><span class="dv">$</span><span class="vs">i=</span><span class="sc">{</span>i<span class="sc">}</span><span class="dv">$</span><span class="vs">, period </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">pprox </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>np<span class="sc">.</span>pi<span class="op">/</span>frequency<span class="sc">:.0f}</span><span class="dv">$</span><span class="vs">"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[<span class="op">-</span><span class="dv">1</span>]:</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"relative offset"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[:, <span class="dv">0</span>]:</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"cosine phase"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">24</span>])</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair_ids <span class="op">/</span> d)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">4097</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, i, frequency <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, pair_ids, theta):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    ax.plot(offset, np.cos(offset <span class="op">*</span> frequency), lw<span class="op">=</span><span class="fl">1.1</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="vs">fr"pair </span><span class="dv">$</span><span class="vs">i=</span><span class="sc">{</span>i<span class="sc">}</span><span class="dv">$</span><span class="vs">, period </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">pprox </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>np<span class="sc">.</span>pi<span class="op">/</span>frequency<span class="sc">:.0f}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"relative offset"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[:, <span class="dv">0</span>]:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"cosine phase"</span>)</span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-rope-frequencies" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-rope-frequencies-output-1.png" width="760" height="469" class="figure-img">
+<img src="index_files/figure-html/fig-rope-frequencies-output-1.png" width="1108" height="688" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-frequencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64.
@@ -578,6 +581,8 @@ c_i(L)=\frac{L\theta_i}{2\pi}
 </span></p>
 <p>cycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.</p>
 <div id="cell-fig-rope-cycles" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Plotting code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> np.arange(d <span class="op">//</span> <span class="dv">2</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair <span class="op">/</span> d)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -587,15 +592,14 @@ c_i(L)=\frac{L\theta_i}{2\pi}
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>length<span class="sc">:,}</span><span class="ss">"</span>)</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">1</span>, color<span class="op">=</span><span class="st">"0.5"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"coordinate-pair index"</span>, ylabel<span class="op">=</span><span class="st">"completed rotations"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-rope-cycles" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-rope-cycles-output-1.png" width="661" height="336" class="figure-img">
+<img src="index_files/figure-html/fig-rope-cycles-output-1.png" width="968" height="492" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rope-cycles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768.
@@ -656,6 +660,8 @@ Su, Jianlin, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2024
 </div>
 </div>
 
+
+<!-- -->
 
 </section>
 
@@ -753,6 +759,57 @@ Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/E
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1121,7 +1178,213 @@ Embeddings.”</span> August 13. <a href="https://diegofilippomarino.github.io/E
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "The Geometry of Rotary Position Embeddings"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "RoPE derived as a representation of translation, with frequency structure, relative logits, and extrapolation failure modes."</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-13"</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Transformers, Positional Encoding, Mathematics]</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>Self-attention is permutation equivariant. If the rows of $Q$, $K$, and $V$ are permuted together, the output rows are permuted in the same way. A language model therefore needs an additional structure that distinguishes token order.</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>Rotary position embedding, usually called RoPE, inserts that structure by rotating query and key coordinates <span class="co">[</span><span class="ot">@su2024roformer</span><span class="co">]</span>. The construction is small enough to fit in a few lines of code, but its real value is algebraic: absolute positions become relative offsets inside the attention dot product.</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## A two-dimensional representation of position</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>For one coordinate pair, define</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>R(m\theta)=</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>\cos(m\theta)&amp;-\sin(m\theta)<span class="sc">\\</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>\sin(m\theta)&amp; \cos(m\theta)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}.</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>At position $m$, RoPE maps $q\mapsto R(m\theta)q$ and $k\mapsto R(m\theta)k$. Orthogonality and the group law $R(a)^\top R(b)=R(b-a)$ give</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>\langle R(m\theta)q,R(n\theta)k\rangle</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>=q^\top R((n-m)\theta)k.</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>$$ {#eq-relative}</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>The inputs carry absolute angles, but the logit depends only on $n-m$. Equation @eq-relative is the core of RoPE.</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>For even dimension $d$, the complete operator is block diagonal:</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>R_{\Theta,m}=\operatorname{diag}</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>\left(R(m\theta_0),R(m\theta_1),\ldots,R(m\theta_{d/2-1})\right),</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>with the conventional schedule</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>\theta_i=b^{-2i/d},\qquad b=10{,}000.</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>The first pairs rotate quickly and resolve nearby offsets. Later pairs rotate slowly and provide coarse phase information over larger distances.</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-rope-frequencies</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Cosine phase across relative offsets for four RoPE frequency bands at head dimension 64."</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">24</span>])</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair_ids <span class="op">/</span> d)</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">4097</span>)</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, i, frequency <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, pair_ids, theta):</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>    ax.plot(offset, np.cos(offset <span class="op">*</span> frequency), lw<span class="op">=</span><span class="fl">1.1</span>)</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="vs">fr"pair </span><span class="dv">$</span><span class="vs">i=</span><span class="sc">{</span>i<span class="sc">}</span><span class="dv">$</span><span class="vs">, period </span><span class="dv">$</span><span class="ch">\a</span><span class="vs">pprox </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>np<span class="sc">.</span>pi<span class="op">/</span>frequency<span class="sc">:.0f}</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"relative offset"</span>)</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes[:, <span class="dv">0</span>]:</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"cosine phase"</span>)</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>The schedule is not a collection of position counters. Each pair is periodic and therefore ambiguous on its own. Position is represented by the joint phase across all pairs.</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## Complex notation exposes the mechanism</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>Identify a coordinate pair $(x_{2i},x_{2i+1})$ with the complex number $z_i=x_{2i}+\mathrm{i}x_{2i+1}$. Rotation becomes multiplication:</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>z_i^{(m)}=z_i e^{\mathrm{i}m\theta_i}.</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>The real part of the Hermitian product between a rotated query and key contains</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>\operatorname{Re}\left(q_i\overline{k_i}e^{\mathrm{i}(m-n)\theta_i}\right).</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>This makes two facts visible. First, relative position modulates content similarity rather than adding an independent bias. Second, the model can learn how much each frequency matters by shaping $q_i\overline{k_i}$ through the projection matrices.</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## A vectorized implementation</span></span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_rope(x: np.ndarray, positions: np.ndarray, base: <span class="bu">float</span> <span class="op">=</span> <span class="fl">10_000.0</span>):</span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Rotate x with shape [sequence, heads, head_dim]."""</span></span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> x.shape[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> d <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>    inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span>np.arange(<span class="dv">0</span>, d, <span class="dv">2</span>) <span class="op">/</span> d)</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> positions[:, <span class="va">None</span>] <span class="op">*</span> inv_freq[<span class="va">None</span>, :]</span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>    cos, sin <span class="op">=</span> np.cos(angle)[:, <span class="va">None</span>, :], np.sin(angle)[:, <span class="va">None</span>, :]</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>    even, odd <span class="op">=</span> x[..., <span class="dv">0</span>::<span class="dv">2</span>], x[..., <span class="dv">1</span>::<span class="dv">2</span>]</span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(x)</span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">0</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> cos <span class="op">-</span> odd <span class="op">*</span> sin</span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a>    out[..., <span class="dv">1</span>::<span class="dv">2</span>] <span class="op">=</span> even <span class="op">*</span> sin <span class="op">+</span> odd <span class="op">*</span> cos</span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>Real kernels often use a <span class="in">`rotate_half`</span> formulation or interleave dimensions differently. The pairing convention may vary, but queries and keys must use the same convention.</span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why extrapolation is difficult</span></span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a>RoPE defines angles at every integer position, so it is mechanically valid beyond the training length. That does not imply reliable extrapolation. At longer contexts, the model encounters phase combinations and attention distances absent during training.</span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a>For a training limit $L$, frequency pair $i$ completes</span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>c_i(L)=\frac{L\theta_i}{2\pi}</span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a>cycles. High-frequency pairs have observed many cycles and mostly encode local relative structure. Low-frequency pairs may not have completed one cycle, so they behave more like smooth absolute coordinates. Uniformly compressing every frequency changes both regimes, including the local phases the model already learned.</span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-rope-cycles</span></span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Number of rotations observed by each coordinate pair at context lengths 2,048 and 32,768."</span></span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> np.arange(d <span class="op">//</span> <span class="dv">2</span>)</span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a>inv_freq <span class="op">=</span> base <span class="op">**</span> (<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> pair <span class="op">/</span> d)</span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> length <span class="kw">in</span> (<span class="dv">2048</span>, <span class="dv">32768</span>):</span>
+<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a>    ax.semilogy(pair, length <span class="op">*</span> inv_freq <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> np.pi), marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="ss">f"context </span><span class="sc">{</span>length<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">1</span>, color<span class="op">=</span><span class="st">"0.5"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"coordinate-pair index"</span>, ylabel<span class="op">=</span><span class="st">"completed rotations"</span>)</span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a>The horizontal line at one rotation is the boundary worth naming. Pair $i$ has wavelength</span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a>\lambda_i=\frac{2\pi}{\theta_i}=2\pi b^{2i/d},</span>
+<span id="cb5-160"><a href="#cb5-160" aria-hidden="true" tabindex="-1"></a>$$ {#eq-wavelength}</span>
+<span id="cb5-161"><a href="#cb5-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-162"><a href="#cb5-162" aria-hidden="true" tabindex="-1"></a>and the pairs split into two populations at $\lambda_i=L$. Pairs with $\lambda_i\ll L$ have wrapped many times during training and can only encode local offsets, since their phase is ambiguous modulo $\lambda_i$. Pairs with $\lambda_i&gt;L$ never completed a revolution and act as monotone absolute coordinates over the whole training window. At $d=64$, $b=10^4$, and $L=2048$, the crossover sits near pair 20 of 32: roughly a third of the spectrum has never been observed through a full period.</span>
+<span id="cb5-163"><a href="#cb5-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-164"><a href="#cb5-164" aria-hidden="true" tabindex="-1"></a><span class="fu">## Three ways to extend context, and what each one breaks</span></span>
+<span id="cb5-165"><a href="#cb5-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-166"><a href="#cb5-166" aria-hidden="true" tabindex="-1"></a>Read through @eq-wavelength, the standard extension methods stop looking like a list of tricks.</span>
+<span id="cb5-167"><a href="#cb5-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-168"><a href="#cb5-168" aria-hidden="true" tabindex="-1"></a>**Position interpolation** maps $m\mapsto m/s$ for extension factor $s$ <span class="co">[</span><span class="ot">@chen2023extending</span><span class="co">]</span>. Every wavelength is stretched uniformly, so the ratio $\lambda_i/L'$ is preserved for the new limit $L'=sL$. Nothing exceeds its trained phase range, which is why it works with little fine-tuning. The cost is paid at the fast end: neighboring positions are now separated by $\theta_i/s$ instead of $\theta_i$, so the high-frequency pairs that resolve local order become $s$ times less discriminative. The model has to relearn distinctions it had already mastered.</span>
+<span id="cb5-169"><a href="#cb5-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-170"><a href="#cb5-170" aria-hidden="true" tabindex="-1"></a>**Base scaling**, often called NTK-aware scaling, leaves positions alone and raises $b$ to $b'=b\,s^{d/(d-2)}$. The exponent is chosen so that the slowest pair, $i=d/2-1$, is stretched by exactly $s$ while the fastest pair, $i=0$, is untouched, with intermediate pairs interpolating between the two. High-frequency local structure survives; the slow pairs absorb the extension. This is the argument for why simply increasing the base is not a hack but the correct dual of interpolation.</span>
+<span id="cb5-171"><a href="#cb5-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-172"><a href="#cb5-172" aria-hidden="true" tabindex="-1"></a>**Band-wise methods** such as YaRN make the split explicit, interpolating only the pairs whose wavelength exceeds the trained context, leaving short-wavelength pairs untouched, and blending across a transition region; they also rescale attention temperature to compensate for the entropy change that a longer key set induces <span class="co">[</span><span class="ot">@peng2024yarn</span><span class="co">]</span>.</span>
+<span id="cb5-173"><a href="#cb5-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-174"><a href="#cb5-174" aria-hidden="true" tabindex="-1"></a>The pattern across all three is the same trade. Position enters the logit only through phase, total phase budget is fixed by training, and extending context means deciding which pairs surrender resolution. There is no scaling rule that adds information the training distribution never contained; the choice is only where to spend the loss.</span>
+<span id="cb5-175"><a href="#cb5-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-176"><a href="#cb5-176" aria-hidden="true" tabindex="-1"></a><span class="fu">## Numerical and implementation details</span></span>
+<span id="cb5-177"><a href="#cb5-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-178"><a href="#cb5-178" aria-hidden="true" tabindex="-1"></a>RoPE preserves vector norms in exact arithmetic because every block is orthogonal. This provides a useful unit test:</span>
+<span id="cb5-179"><a href="#cb5-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-180"><a href="#cb5-180" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-181"><a href="#cb5-181" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>R_{\Theta,m}x<span class="sc">\|</span>_2=<span class="sc">\|</span>x<span class="sc">\|</span>_2.</span>
+<span id="cb5-182"><a href="#cb5-182" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-183"><a href="#cb5-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-184"><a href="#cb5-184" aria-hidden="true" tabindex="-1"></a>It also preserves a strict relative-position identity. For random $q,k,m,n$, the following quantities should agree:</span>
+<span id="cb5-185"><a href="#cb5-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-186"><a href="#cb5-186" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-187"><a href="#cb5-187" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> np.dot(rotate(q, m), rotate(k, n))</span>
+<span id="cb5-188"><a href="#cb5-188" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> np.dot(q, rotate(k, n <span class="op">-</span> m))</span>
+<span id="cb5-189"><a href="#cb5-189" aria-hidden="true" tabindex="-1"></a>np.testing.assert_allclose(left, right, rtol<span class="op">=</span><span class="fl">1e-6</span>, atol<span class="op">=</span><span class="fl">1e-6</span>)</span>
+<span id="cb5-190"><a href="#cb5-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-191"><a href="#cb5-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-192"><a href="#cb5-192" aria-hidden="true" tabindex="-1"></a>For long contexts, compute the trigonometric tables with care. Low-precision angle formation can lose phase accuracy before the final vectors are cast to the model dtype. Many implementations form frequencies or angles in FP32 even when attention runs in BF16 or FP16.</span>
+<span id="cb5-193"><a href="#cb5-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-194"><a href="#cb5-194" aria-hidden="true" tabindex="-1"></a><span class="fu">## What RoPE buys</span></span>
+<span id="cb5-195"><a href="#cb5-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-196"><a href="#cb5-196" aria-hidden="true" tabindex="-1"></a>RoPE does not make attention cheaper. It gives attention a translation-compatible positional structure with no learned position table and no additive relative-bias matrix. Its popularity comes from that clean interface: rotate $Q$ and $K$, leave $V$ unchanged, and preserve the rest of the attention kernel.</span>
+<span id="cb5-197"><a href="#cb5-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-198"><a href="#cb5-198" aria-hidden="true" tabindex="-1"></a>The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.</span>
+<span id="cb5-199"><a href="#cb5-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-200"><a href="#cb5-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb5-201"><a href="#cb5-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-202"><a href="#cb5-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Attention, from Logits to Context</span><span class="co">](../../posts/attention-from-logits-to-context/index.qmd)</span> sets up the dot product these rotations act on.</span>
+<span id="cb5-203"><a href="#cb5-203" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">The Rank of Memory</span><span class="co">](../../posts/rank-of-memory/index.qmd)</span> covers the other way long context gets expensive.</span>
+<span id="cb5-204"><a href="#cb5-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-205"><a href="#cb5-205" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb5-206"><a href="#cb5-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-207"><a href="#cb5-207" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb5-208"><a href="#cb5-208" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

@@ -105,9 +105,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c292298b866c1609b04557dfac2a86b7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-f99c1dc1708534c5cce941ae1c2f55d7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-74eb6b86cfaf27d9c57d0ad189064341.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-340faa3a77211a0073488b23f94df558.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-16f55ca7a2dbcd01f89fe1984aff21c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -184,13 +184,13 @@ window.Quarto = {
 <meta property="og:description" content="LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set.">
 <meta property="og:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/index_files/figure-html/fig-kink-output-1.png">
 <meta property="og:site_name" content="Eigenholm">
-<meta property="og:image:height" content="746">
-<meta property="og:image:width" content="1399">
+<meta property="og:image:height" content="1096">
+<meta property="og:image:width" content="2048">
 <meta name="twitter:title" content="Four Quantizers, One Quadratic Form – Eigenholm">
 <meta name="twitter:description" content="LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set.">
 <meta name="twitter:image" content="https://diegofilippomarino.github.io/Eigenholm/posts/quantization-one-quadratic-form/index_files/figure-html/fig-kink-output-1.png">
-<meta name="twitter:image-height" content="746">
-<meta name="twitter:image-width" content="1399">
+<meta name="twitter:image-height" content="1096">
+<meta name="twitter:image-width" content="2048">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -435,7 +435,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Four Quantizers, One Quadratic Form</h1>
+<div class="quarto-title-block"><div><h1 class="title">Four Quantizers, One Quadratic Form</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
   <div class="quarto-categories">
     <div class="quarto-category">Quantization</div>
     <div class="quarto-category">Numerical Linear Algebra</div>
@@ -595,65 +595,69 @@ s^\star = \frac{M_{-k}}{|w_k|},
 </ul>
 <p>The idealized minimizer is therefore exactly <span class="math inline">s^\star</span>, but the useful statement is asymmetric rather than exact: below the break, scaling is close to free and eventually stops helping; above it, scaling is quadratically expensive. That asymmetry is why AWQ searches its scale on a grid over one exponent rather than solving a first-order condition, and why the authors report that a gradient-based version converged unstably. It also explains the shape SmoothQuant reports for its migration sweep, a flat basin near the middle of the range with steep sides: when many channels move together, many breaks like <a href="#eq-kink-location" class="quarto-xref">Equation&nbsp;6</a> smear into a basin whose width is set by how spread out the weight magnitudes are.</p>
 <p>There is a fourth regime below all of this, and it is the one the outlier literature is really about. If <span class="math inline">s|w_k| &lt; \Delta/2</span>, the salient weight rounds to zero no matter what, its error is the full <span class="math inline">|w_k|</span>, and no amount of care elsewhere recovers it. That is the arithmetic behind the observation that a single extreme value inflates the shared scale until the small entries are extinguished. The experiment below shows all four regimes in one curve.</p>
-<div id="cell-fig-kink" class="cell" data-execution_count="1">
+<div id="d6f7b8b4" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>BITS <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>LEVELS <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (BITS <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>GROUP <span class="op">=</span> <span class="dv">64</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>KINK <span class="op">=</span> <span class="fl">40.0</span>            <span class="co"># ratio of the incumbent group maximum to the salient weight</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>SALIENT_IMPORTANCE <span class="op">=</span> <span class="fl">900.0</span>   <span class="co"># H_kk / H_jj for a channel whose activations are 30 times larger</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> absmax_round(vec, levels<span class="op">=</span>LEVELS):</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Symmetric absmax quantize-dequantize of one group."""</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(vec))</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> peak <span class="op">==</span> <span class="fl">0.0</span>:</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> vec.copy()</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> peak <span class="op">/</span> levels</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(vec <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_error(scale, rng):</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> rng.uniform(<span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0.85</span>, size<span class="op">=</span>GROUP)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">0</span>], weights[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>                 <span class="co"># pin the incumbent group maximum</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">2</span>] <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> KINK) <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">+</span> <span class="fl">0.02</span> <span class="op">*</span> rng.standard_normal())</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    importance <span class="op">=</span> np.ones(GROUP)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    importance[<span class="dv">2</span>] <span class="op">=</span> SALIENT_IMPORTANCE</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    lifted <span class="op">=</span> weights.copy()</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    lifted[<span class="dv">2</span>] <span class="op">*=</span> scale</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    restored <span class="op">=</span> absmax_round(lifted)</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    restored[<span class="dv">2</span>] <span class="op">/=</span> scale</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.<span class="bu">sum</span>(importance <span class="op">*</span> (restored <span class="op">-</span> weights) <span class="op">**</span> <span class="dv">2</span>))</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>scales <span class="op">=</span> np.geomspace(<span class="fl">1.0</span>, <span class="fl">400.0</span>, <span class="dv">80</span>)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>errors <span class="op">=</span> np.array([</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    np.mean([group_error(s, np.random.default_rng(<span class="dv">7000</span> <span class="op">+</span> i)) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">400</span>)])</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> scales</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>errors <span class="op">/=</span> errors[<span class="dv">0</span>]</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>extinction <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> LEVELS) <span class="op">/</span> <span class="fl">2.0</span> <span class="op">*</span> KINK               <span class="co"># scale at which the weight stops rounding to zero</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>ax.loglog(scales, errors, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>ax.axvline(extinction, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"-."</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="ss">f"rounds to zero below </span><span class="sc">{</span>extinction<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>ax.axvline(KINK, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="ss">f"break $s^</span><span class="ch">\\</span><span class="ss">star$ = </span><span class="sc">{</span>KINK<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"scale applied to the salient channel"</span>,</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"group error / unscaled error"</span>,</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Protecting one channel is nearly free until it becomes the group maximum"</span>)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>BITS <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>LEVELS <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (BITS <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>GROUP <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>KINK <span class="op">=</span> <span class="fl">40.0</span>            <span class="co"># ratio of the incumbent group maximum to the salient weight</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>SALIENT_IMPORTANCE <span class="op">=</span> <span class="fl">900.0</span>   <span class="co"># H_kk / H_jj for a channel whose activations are 30 times larger</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> absmax_round(vec, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Symmetric absmax quantize-dequantize of one group."""</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(vec))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> peak <span class="op">==</span> <span class="fl">0.0</span>:</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> vec.copy()</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> peak <span class="op">/</span> levels</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(vec <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_error(scale, rng):</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> rng.uniform(<span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0.85</span>, size<span class="op">=</span>GROUP)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">0</span>], weights[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>                 <span class="co"># pin the incumbent group maximum</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">2</span>] <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> KINK) <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">+</span> <span class="fl">0.02</span> <span class="op">*</span> rng.standard_normal())</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    importance <span class="op">=</span> np.ones(GROUP)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    importance[<span class="dv">2</span>] <span class="op">=</span> SALIENT_IMPORTANCE</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    lifted <span class="op">=</span> weights.copy()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    lifted[<span class="dv">2</span>] <span class="op">*=</span> scale</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    restored <span class="op">=</span> absmax_round(lifted)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    restored[<span class="dv">2</span>] <span class="op">/=</span> scale</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.<span class="bu">sum</span>(importance <span class="op">*</span> (restored <span class="op">-</span> weights) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>scales <span class="op">=</span> np.geomspace(<span class="fl">1.0</span>, <span class="fl">400.0</span>, <span class="dv">80</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>errors <span class="op">=</span> np.array([</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    np.mean([group_error(s, np.random.default_rng(<span class="dv">7000</span> <span class="op">+</span> i)) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">400</span>)])</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> scales</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>errors <span class="op">/=</span> errors[<span class="dv">0</span>]</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>extinction <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> LEVELS) <span class="op">/</span> <span class="fl">2.0</span> <span class="op">*</span> KINK               <span class="co"># scale at which the weight stops rounding to zero</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-kink" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ax.loglog(scales, errors, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ax.axvline(extinction, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"-."</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="ss">f"rounds to zero below </span><span class="sc">{</span>extinction<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ax.axvline(KINK, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="ss">f"break $s^</span><span class="ch">\\</span><span class="ss">star$ = </span><span class="sc">{</span>KINK<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"scale applied to the salient channel"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"group error / unscaled error"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Protecting one channel is nearly free until it becomes the group maximum"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-kink" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-kink-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-kink-output-1.png" width="700" height="373" class="figure-img">
+<img src="index_files/figure-html/fig-kink-output-1.png" width="1024" height="548" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kink-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Group reconstruction error as one salient input channel is scaled up before rounding, averaged over 400 random draws of the remaining weights. The dotted line marks the scale at which the protected channel becomes the group maximum. Below it protection is nearly free, above it the shared step size grows and every other channel pays.
@@ -667,121 +671,123 @@ Figure&nbsp;1: Group reconstruction error as one salient input channel is scaled
 <section id="a-common-benchmark-for-the-four-constraints" class="level2">
 <h2 class="anchored" data-anchor-id="a-common-benchmark-for-the-four-constraints">A common benchmark for the four constraints</h2>
 <p>To compare the methods on equal footing, the next block builds a synthetic layer with both kinds of anisotropy. Activations are generated from a low-rank factor model, which supplies the off-diagonal structure that error feedback exploits, then multiplied by a log-normal per-channel scale profile with a small set of extreme outlier channels, which supplies the heavy diagonal. Weights are ordinary Gaussians, since every paper agrees that weight distributions are flat and easy. Each quantizer is implemented against the same rounding primitive.</p>
-<div id="quantizers" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_layer(rng, n<span class="op">=</span><span class="dv">512</span>, d_in<span class="op">=</span><span class="dv">256</span>, d_out<span class="op">=</span><span class="dv">256</span>, rank<span class="op">=</span><span class="dv">32</span>, n_outlier<span class="op">=</span><span class="dv">6</span>, outlier_gain<span class="op">=</span><span class="fl">30.0</span>):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Correlated activations with a heavy-tailed channel profile and a few extreme channels."""</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> latent <span class="op">@</span> basis <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    outliers <span class="op">=</span> rng.choice(d_in, size<span class="op">=</span>n_outlier, replace<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    profile[outliers] <span class="op">*=</span> outlier_gain</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> X <span class="op">*</span> profile</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> rng.normal(size<span class="op">=</span>(d_in, d_out)) <span class="op">/</span> np.sqrt(d_in)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, W, profile, outliers, basis</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_round(W, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Round-to-nearest with per-output-row groups along the input dimension."""</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(W)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, W.shape[<span class="dv">0</span>], group):</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        block <span class="op">=</span> W[start:start <span class="op">+</span> group]</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(block), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        out[start:start <span class="op">+</span> group] <span class="op">=</span> np.clip(np.<span class="bu">round</span>(block <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gptq(W, H, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS, damp<span class="op">=</span><span class="fl">0.002</span>):</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Weight-only quantization with inverse-Hessian error feedback (GPTQ)."""</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    d_in <span class="op">=</span> W.shape[<span class="dv">0</span>]</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    Hd <span class="op">=</span> H <span class="op">+</span> damp <span class="op">*</span> np.mean(np.diag(H)) <span class="op">*</span> np.eye(d_in)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.linalg.cholesky(np.linalg.inv(Hd)).T          <span class="co"># H^{-1} = U^T U, U upper</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    Wc <span class="op">=</span> W.copy()</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> np.empty_like(W)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, d_in, group):</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        stop <span class="op">=</span> <span class="bu">min</span>(start <span class="op">+</span> group, d_in)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(Wc[start:stop]), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(start, stop):</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            q <span class="op">=</span> np.clip(np.<span class="bu">round</span>(Wc[i] <span class="op">/</span> step[<span class="dv">0</span>]), <span class="op">-</span>levels, levels) <span class="op">*</span> step[<span class="dv">0</span>]</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            Q[i] <span class="op">=</span> q</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>            err <span class="op">=</span> (Wc[i] <span class="op">-</span> q) <span class="op">/</span> U[i, i]</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>            Wc[i:] <span class="op">-=</span> np.outer(U[i, i:], err)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        Wc[start:stop] <span class="op">=</span> Q[start:stop]</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_round(W, s, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Quantize diag(s) W and divide the scale back out (AWQ / SmoothQuant weight side)."""</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group, levels) <span class="op">/</span> s[:, <span class="va">None</span>]</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mixed_precision(W, keep, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keep a set of input channels in full precision (LLM.int8 decomposition)."""</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> group_round(W, group, levels)</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    Q[keep] <span class="op">=</span> W[keep]</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rel_error(X, W, Wq):</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.linalg.norm(X <span class="op">@</span> (Wq <span class="op">-</span> W)) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="quantizers" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_layer(rng, n<span class="op">=</span><span class="dv">512</span>, d_in<span class="op">=</span><span class="dv">256</span>, d_out<span class="op">=</span><span class="dv">256</span>, rank<span class="op">=</span><span class="dv">32</span>, n_outlier<span class="op">=</span><span class="dv">6</span>, outlier_gain<span class="op">=</span><span class="fl">30.0</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Correlated activations with a heavy-tailed channel profile and a few extreme channels."""</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> latent <span class="op">@</span> basis <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    outliers <span class="op">=</span> rng.choice(d_in, size<span class="op">=</span>n_outlier, replace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    profile[outliers] <span class="op">*=</span> outlier_gain</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> X <span class="op">*</span> profile</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> rng.normal(size<span class="op">=</span>(d_in, d_out)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, W, profile, outliers, basis</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_round(W, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Round-to-nearest with per-output-row groups along the input dimension."""</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(W)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, W.shape[<span class="dv">0</span>], group):</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        block <span class="op">=</span> W[start:start <span class="op">+</span> group]</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(block), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        out[start:start <span class="op">+</span> group] <span class="op">=</span> np.clip(np.<span class="bu">round</span>(block <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gptq(W, H, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS, damp<span class="op">=</span><span class="fl">0.002</span>):</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Weight-only quantization with inverse-Hessian error feedback (GPTQ)."""</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    d_in <span class="op">=</span> W.shape[<span class="dv">0</span>]</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    Hd <span class="op">=</span> H <span class="op">+</span> damp <span class="op">*</span> np.mean(np.diag(H)) <span class="op">*</span> np.eye(d_in)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.linalg.cholesky(np.linalg.inv(Hd)).T          <span class="co"># H^{-1} = U^T U, U upper</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    Wc <span class="op">=</span> W.copy()</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> np.empty_like(W)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, d_in, group):</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        stop <span class="op">=</span> <span class="bu">min</span>(start <span class="op">+</span> group, d_in)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(Wc[start:stop]), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(start, stop):</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>            q <span class="op">=</span> np.clip(np.<span class="bu">round</span>(Wc[i] <span class="op">/</span> step[<span class="dv">0</span>]), <span class="op">-</span>levels, levels) <span class="op">*</span> step[<span class="dv">0</span>]</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>            Q[i] <span class="op">=</span> q</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>            err <span class="op">=</span> (Wc[i] <span class="op">-</span> q) <span class="op">/</span> U[i, i]</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>            Wc[i:] <span class="op">-=</span> np.outer(U[i, i:], err)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        Wc[start:stop] <span class="op">=</span> Q[start:stop]</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_round(W, s, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Quantize diag(s) W and divide the scale back out (AWQ / SmoothQuant weight side)."""</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group, levels) <span class="op">/</span> s[:, <span class="va">None</span>]</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mixed_precision(W, keep, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keep a set of input channels in full precision (LLM.int8 decomposition)."""</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> group_round(W, group, levels)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    Q[keep] <span class="op">=</span> W[keep]</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rel_error(X, W, Wq):</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.linalg.norm(X <span class="op">@</span> (Wq <span class="op">-</span> W)) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>With the primitives in place, the comparison is a few lines. The AWQ scale is chosen by the same grid search the paper uses, minimizing the reconstruction error on the calibration activations over a single exponent.</p>
-<div id="cell-fig-methods" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>X, W, profile, outliers, basis <span class="op">=</span> make_layer(rng)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> X.T <span class="op">@</span> X</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>act_mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> awq_scale(X, W, alphas<span class="op">=</span>np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">21</span>), group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> mag <span class="op">/</span> np.exp(np.mean(np.log(mag)))          <span class="co"># normalize the geometric mean to 1</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    best, best_alpha, best_s <span class="op">=</span> np.inf, <span class="fl">0.0</span>, np.ones(W.shape[<span class="dv">0</span>])</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> mag <span class="op">**</span> alpha</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> rel_error(X, W, scaled_round(W, s, group, levels))</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> err <span class="op">&lt;</span> best:</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            best, best_alpha, best_s <span class="op">=</span> err, alpha, s</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> best_s, best_alpha</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>s_awq, alpha_awq <span class="op">=</span> awq_scale(X, W)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>keep <span class="op">=</span> np.argsort(act_mag)[<span class="op">-</span><span class="dv">6</span>:]</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bits <span class="kw">in</span> (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">8</span>):</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    lv <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (bits <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    rows.append({</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bits"</span>: bits,</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"RTN"</span>: rel_error(X, W, group_round(W, levels<span class="op">=</span>lv)),</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"LLM.int8-style"</span>: rel_error(X, W, mixed_precision(W, keep, levels<span class="op">=</span>lv)),</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AWQ-style"</span>: rel_error(X, W, scaled_round(W, s_awq, levels<span class="op">=</span>lv)),</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"GPTQ"</span>: rel_error(X, W, gptq(W, H, levels<span class="op">=</span>lv)),</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> [<span class="st">"RTN"</span>, <span class="st">"LLM.int8-style"</span>, <span class="st">"AWQ-style"</span>, <span class="st">"GPTQ"</span>]</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">"#8d8d96"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"#a4553a"</span>]</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.2</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.arange(<span class="bu">len</span>(rows))</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">3.9</span>))</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, (name, color) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(methods, colors)):</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> [row[name] <span class="cf">for</span> row <span class="kw">in</span> rows]</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    ax.bar(positions <span class="op">+</span> (k <span class="op">-</span> <span class="fl">1.5</span>) <span class="op">*</span> width, vals, width, label<span class="op">=</span>name, color<span class="op">=</span>color)</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(positions, [<span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'bits'</span>]<span class="sc">}</span><span class="ss">-bit"</span> <span class="cf">for</span> row <span class="kw">in</span> rows])</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"relative output error"</span>, title<span class="op">=</span><span class="ss">f"Weight-only quantization, AWQ exponent = </span><span class="sc">{</span>alpha_awq<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>, ncols<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="81522782" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>X, W, profile, outliers, basis <span class="op">=</span> make_layer(rng)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> X.T <span class="op">@</span> X</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>act_mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> awq_scale(X, W, alphas<span class="op">=</span>np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">21</span>), group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> mag <span class="op">/</span> np.exp(np.mean(np.log(mag)))          <span class="co"># normalize the geometric mean to 1</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    best, best_alpha, best_s <span class="op">=</span> np.inf, <span class="fl">0.0</span>, np.ones(W.shape[<span class="dv">0</span>])</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> mag <span class="op">**</span> alpha</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> rel_error(X, W, scaled_round(W, s, group, levels))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> err <span class="op">&lt;</span> best:</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            best, best_alpha, best_s <span class="op">=</span> err, alpha, s</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> best_s, best_alpha</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>s_awq, alpha_awq <span class="op">=</span> awq_scale(X, W)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>keep <span class="op">=</span> np.argsort(act_mag)[<span class="op">-</span><span class="dv">6</span>:]</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bits <span class="kw">in</span> (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">8</span>):</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    lv <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (bits <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    rows.append({</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bits"</span>: bits,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"RTN"</span>: rel_error(X, W, group_round(W, levels<span class="op">=</span>lv)),</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"LLM.int8-style"</span>: rel_error(X, W, mixed_precision(W, keep, levels<span class="op">=</span>lv)),</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AWQ-style"</span>: rel_error(X, W, scaled_round(W, s_awq, levels<span class="op">=</span>lv)),</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"GPTQ"</span>: rel_error(X, W, gptq(W, H, levels<span class="op">=</span>lv)),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-methods" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> [<span class="st">"RTN"</span>, <span class="st">"LLM.int8-style"</span>, <span class="st">"AWQ-style"</span>, <span class="st">"GPTQ"</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">"#8d8d96"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"#a4553a"</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.arange(<span class="bu">len</span>(rows))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">3.9</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, (name, color) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(methods, colors)):</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> [row[name] <span class="cf">for</span> row <span class="kw">in</span> rows]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    ax.bar(positions <span class="op">+</span> (k <span class="op">-</span> <span class="fl">1.5</span>) <span class="op">*</span> width, vals, width, label<span class="op">=</span>name, color<span class="op">=</span>color)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(positions, [<span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'bits'</span>]<span class="sc">}</span><span class="ss">-bit"</span> <span class="cf">for</span> row <span class="kw">in</span> rows])</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"relative output error"</span>, title<span class="op">=</span><span class="ss">f"Weight-only quantization, AWQ exponent = </span><span class="sc">{</span>alpha_awq<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>ax.legend(ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-methods" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-methods-output-1.png" width="719" height="364" class="figure-img">
+<img src="index_files/figure-html/fig-methods-output-1.png" width="1052" height="534" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-methods-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Relative output error of a synthetic transformer projection under weight-only quantization at 3, 4, and 8 bits. Every method is measured on the calibration activations it was fitted to.
@@ -799,57 +805,56 @@ Figure&nbsp;2: Relative output error of a synthetic transformer projection under
 <p>AWQ’s central criticism of GPTQ is that its reconstruction overfits the calibration set: AWQ reports needing roughly ten times fewer calibration samples, and degrading by 0.5 perplexity under a calibration-to-evaluation domain shift where GPTQ degrades by 2.3 to 4.9.</p>
 <p>Read through <a href="#tbl-taxonomy" class="quarto-xref">Table&nbsp;1</a>, that is not a surprising empirical finding. It is a parameter count. GPTQ fits a number of free values proportional to the size of the weight matrix, all of them tuned to one estimate <span class="math inline">H</span> of the activation second moment. AWQ and SmoothQuant fit a single scalar. Any statistical intuition about degrees of freedom says the first should track a shifted distribution worse than the second, and should need more samples to estimate its target in the first place.</p>
 <p>The synthetic setting lets us test the mechanism directly, without perplexity or a domain corpus, by moving the activation distribution between fit and evaluation. The shift below rotates the latent subspace and redraws the channel profile together, which is what changing corpus domain does to a real layer: different topics excite different directions of the residual stream, while the systematic outlier channels stay outliers.</p>
-<div id="cell-fig-shift" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> shifted_activations(rng, mix, n<span class="op">=</span><span class="dv">512</span>):</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Blend calibration structure with an independent draw; mix = 1 recovers calibration."""</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    rank, d_in <span class="op">=</span> basis.shape</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    fresh_basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    blend <span class="op">=</span> mix <span class="op">*</span> basis <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> mix) <span class="op">*</span> fresh_basis</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> latent <span class="op">@</span> blend <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    fresh_profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    fresh_profile[outliers] <span class="op">*=</span> <span class="fl">30.0</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Xs <span class="op">*</span> (profile <span class="op">**</span> mix <span class="op">*</span> fresh_profile <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> mix))</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>mixes <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">9</span>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>Q_rtn <span class="op">=</span> group_round(W)</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>Q_mix <span class="op">=</span> mixed_precision(W, keep)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>Q_awq <span class="op">=</span> scaled_round(W, s_awq)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>Q_gptq <span class="op">=</span> gptq(W, H)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mix <span class="kw">in</span> mixes:</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>):</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        Xe <span class="op">=</span> shifted_activations(np.random.default_rng(<span class="dv">1000</span> <span class="op">+</span> seed), mix)</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"RTN"</span>].append(rel_error(Xe, W, Q_rtn))</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"LLM.int8-style"</span>].append(rel_error(Xe, W, Q_mix))</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"AWQ-style"</span>].append(rel_error(Xe, W, Q_awq))</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"GPTQ"</span>].append(rel_error(Xe, W, Q_gptq))</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> methods:</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        curves[name].append(np.mean(trials[name]))</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, color <span class="kw">in</span> <span class="bu">zip</span>(methods, colors):</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    ax.plot(mixes, curves[name], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"agreement between calibration and evaluation activations"</span>,</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"4-bit weight-only quantization under activation distribution shift"</span>)</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> methods:</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:16s}</span><span class="ss"> matched </span><span class="sc">{</span>curves[name][<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">   fully shifted </span><span class="sc">{</span>curves[name][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="52a45b4e" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> shifted_activations(rng, mix, n<span class="op">=</span><span class="dv">512</span>):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Blend calibration structure with an independent draw; mix = 1 recovers calibration."""</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    rank, d_in <span class="op">=</span> basis.shape</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    fresh_basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    blend <span class="op">=</span> mix <span class="op">*</span> basis <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> mix) <span class="op">*</span> fresh_basis</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> latent <span class="op">@</span> blend <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    fresh_profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    fresh_profile[outliers] <span class="op">*=</span> <span class="fl">30.0</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Xs <span class="op">*</span> (profile <span class="op">**</span> mix <span class="op">*</span> fresh_profile <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> mix))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>mixes <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">9</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>Q_rtn <span class="op">=</span> group_round(W)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>Q_mix <span class="op">=</span> mixed_precision(W, keep)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>Q_awq <span class="op">=</span> scaled_round(W, s_awq)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>Q_gptq <span class="op">=</span> gptq(W, H)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mix <span class="kw">in</span> mixes:</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>):</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        Xe <span class="op">=</span> shifted_activations(np.random.default_rng(<span class="dv">1000</span> <span class="op">+</span> seed), mix)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"RTN"</span>].append(rel_error(Xe, W, Q_rtn))</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"LLM.int8-style"</span>].append(rel_error(Xe, W, Q_mix))</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"AWQ-style"</span>].append(rel_error(Xe, W, Q_awq))</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"GPTQ"</span>].append(rel_error(Xe, W, Q_gptq))</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> methods:</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        curves[name].append(np.mean(trials[name]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-shift" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, color <span class="kw">in</span> <span class="bu">zip</span>(methods, colors):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    ax.plot(mixes, curves[name], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"agreement between calibration and evaluation activations"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"4-bit weight-only quantization under activation distribution shift"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-shift" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-shift-output-1.png" width="700" height="374" class="figure-img">
+<img src="index_files/figure-html/fig-shift-output-1.png" width="1024" height="548" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Relative output error when the quantizer is fitted on one activation distribution and evaluated on another. The horizontal axis interpolates from a fully redrawn latent subspace and channel profile on the left to the calibration distribution itself on the right.
@@ -857,6 +862,10 @@ Figure&nbsp;3: Relative output error when the quantizer is fitted on one activat
 </figure>
 </div>
 </div>
+</div>
+<div id="0c6d037d" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> methods:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:16s}</span><span class="ss"> matched </span><span class="sc">{</span>curves[name][<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">   fully shifted </span><span class="sc">{</span>curves[name][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>RTN              matched 0.1004   fully shifted 0.1075
 LLM.int8-style   matched 0.0114   fully shifted 0.0213
@@ -873,39 +882,41 @@ GPTQ             matched 0.0131   fully shifted 0.2974</code></pre>
 <p>Everything above is weight-only. Quantizing <span class="math inline">X</span> as well, the W8A8 regime SmoothQuant targets, adds a constraint that has nothing to do with <a href="#eq-proxy-loss" class="quarto-xref">Equation&nbsp;1</a> and everything to do with kernels.</p>
 <p>The natural fix for outlier channels is per-channel activation quantization, one scale per column of <span class="math inline">X</span>. Table 1 of the SmoothQuant paper shows it works, lifting a 175B model from 32.3% to 71.4%. It is also unusable, because in <span class="math inline">Y = XW</span> the channel index is the contraction dimension of the matrix multiply. Scales can be applied along the outer dimensions, per token of <span class="math inline">X</span> or per output column of <span class="math inline">W</span>, and fused into the epilogue. A scale that varies along the summed index cannot be pulled out of the sum.</p>
 <p><a href="#eq-equivalent-transform" class="quarto-xref">Equation&nbsp;3</a> is the workaround: since <span class="math inline">\operatorname{diag}(s)^{-1}</span> and <span class="math inline">\operatorname{diag}(s)</span> multiply on opposite sides of the contraction, they cancel exactly, and the offending per-channel factor is applied offline to the weights instead of online to the activations. The migration exponent <span class="math inline">\alpha</span> then interpolates between two failures, and the sweep below shows both walls of the basin.</p>
-<div id="cell-fig-alpha" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> per_token_round(X, levels<span class="op">=</span><span class="dv">127</span>):</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(X <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">41</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> []</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>) <span class="op">**</span> alpha) <span class="op">/</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(W), axis<span class="op">=</span><span class="dv">1</span>) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> alpha))</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> np.clip(s, <span class="fl">1e-6</span>, <span class="va">None</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> per_token_round(X <span class="op">/</span> s)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    Ws <span class="op">=</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group<span class="op">=</span>W.shape[<span class="dv">0</span>], levels<span class="op">=</span><span class="dv">127</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    w8a8.append(<span class="bu">float</span>(np.linalg.norm(Xs <span class="op">@</span> Ws <span class="op">-</span> X <span class="op">@</span> W) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W)))</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> np.array(w8a8)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>best_alpha <span class="op">=</span> alphas[<span class="bu">int</span>(np.argmin(w8a8))]</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>ax.semilogy(alphas, w8a8, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>ax.axvline(best_alpha, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>, label<span class="op">=</span><span class="ss">f"minimum at $</span><span class="ch">\\</span><span class="ss">alpha$ = </span><span class="sc">{</span>best_alpha<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"migration strength $</span><span class="ch">\\</span><span class="st">alpha$"</span>, ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Moving quantization difficulty from activations to weights"</span>)</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="3dec9a2c" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> per_token_round(X, levels<span class="op">=</span><span class="dv">127</span>):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(X <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">41</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> []</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>) <span class="op">**</span> alpha) <span class="op">/</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(W), axis<span class="op">=</span><span class="dv">1</span>) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> alpha))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> np.clip(s, <span class="fl">1e-6</span>, <span class="va">None</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> per_token_round(X <span class="op">/</span> s)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    Ws <span class="op">=</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group<span class="op">=</span>W.shape[<span class="dv">0</span>], levels<span class="op">=</span><span class="dv">127</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    w8a8.append(<span class="bu">float</span>(np.linalg.norm(Xs <span class="op">@</span> Ws <span class="op">-</span> X <span class="op">@</span> W) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W)))</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> np.array(w8a8)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>best_alpha <span class="op">=</span> alphas[<span class="bu">int</span>(np.argmin(w8a8))]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-fig-alpha" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ax.semilogy(alphas, w8a8, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ax.axvline(best_alpha, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>, label<span class="op">=</span><span class="ss">f"minimum at $</span><span class="ch">\\</span><span class="ss">alpha$ = </span><span class="sc">{</span>best_alpha<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"migration strength $</span><span class="ch">\\</span><span class="st">alpha$"</span>, ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Moving quantization difficulty from activations to weights"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
 <div id="fig-alpha" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-alpha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-alpha-output-1.png" width="681" height="355" class="figure-img">
+<img src="index_files/figure-html/fig-alpha-output-1.png" width="996" height="520" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alpha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4: SmoothQuant migration strength for 8-bit weights and 8-bit activations. Small alpha leaves the outliers in the activations, large alpha moves them into the weights, and the basin between is where both operands are quantizable.
@@ -974,6 +985,8 @@ Xiao, Guangxuan, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han. 2
 </div>
 </div>
 
+
+<!-- -->
 
 </section>
 
@@ -1071,6 +1084,57 @@ Form.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenho
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -1439,7 +1503,471 @@ Form.”</span> August 14. <a href="https://diegofilippomarino.github.io/Eigenho
     document.getElementById("quarto-content").appendChild(script);
   }
   loadGiscus();
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Four Quantizers, One Quadratic Form"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "LLM.int8, GPTQ, AWQ, and SmoothQuant solve the same layerwise least-squares problem under four different constraints, and the constraint predicts which one overfits its calibration set."</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name:</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">      given: Diego Filippo</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">      family: Marino</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-08-14"</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [Quantization, Numerical Linear Algebra, Inference]</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> false</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>The literature on post-training quantization of large language models reads like a catalogue of unrelated tricks. LLM.int8() splits a few hidden dimensions into a separate 16-bit matrix multiply <span class="co">[</span><span class="ot">@dettmers2022llmint8</span><span class="co">]</span>. GPTQ walks along the input dimension, rounding one column at a time and correcting the rest with inverse-Hessian information <span class="co">[</span><span class="ot">@frantar2023gptq</span><span class="co">]</span>. AWQ multiplies salient input channels by a scalar before rounding and divides it back afterwards <span class="co">[</span><span class="ot">@lin2024awq</span><span class="co">]</span>. SmoothQuant divides the activations by a per-channel factor and folds that factor into the weights <span class="co">[</span><span class="ot">@xiao2023smoothquant</span><span class="co">]</span>.</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>Four papers, four mechanisms, four sets of experiments. Underneath, they all minimize the same quadratic form. What separates them is the feasible set they minimize it over, and that choice, not the cleverness of the mechanism, determines both the achievable error and the amount of calibration data each method needs.</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>This article writes the four methods in a common notation, derives why activation-aware scaling has a kink rather than an optimum in the interior, and runs a controlled experiment where the calibration distribution and the evaluation distribution differ. The last part is where the unified view earns its keep: it predicts the calibration-hunger gap that AWQ reports empirically, from a parameter count alone.</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## The objective every method shares</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>Take one linear layer, activations $X \in \mathbb{R}^{n \times d_{\text{in}}}$ collected from a calibration set, weights $W \in \mathbb{R}^{d_{\text{in}} \times d_{\text{out}}}$, output $Y = XW$. A quantizer returns some $\widehat W$ representable in the target format. The layerwise reconstruction error is</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>\mathcal{L}(\widehat W) = \bigl\lVert X(\widehat W - W) \bigr\rVert_F^2</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>= \operatorname{tr}\bigl(E^\top H E\bigr),</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>\qquad E = \widehat W - W,</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>\qquad H = X^\top X.</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>$$ {#eq-proxy-loss}</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>Two facts about @eq-proxy-loss do most of the work.</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>First, it separates across output columns. Writing $E = <span class="co">[</span><span class="ot">e_1, \dots, e_{d_{\text{out}}}</span><span class="co">]</span>$ gives $\mathcal{L} = \sum_c e_c^\top H e_c$, so each output neuron is an independent problem in $\mathbb{R}^{d_{\text{in}}}$ with the same metric $H$. Every method exploits this, which is why they all quantize one layer at a time and never need a backward pass through the network.</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>Second, $H$ is not the identity. It is the uncentered second-moment matrix of the activations, and in a transformer it is spectacularly anisotropic in two separate ways. Its diagonal is heavy-tailed, because a handful of hidden dimensions carry activations two orders of magnitude larger than the rest, and those dimensions are the same across layers and across nearly every token <span class="co">[</span><span class="ot">@dettmers2022llmint8</span><span class="co">]</span>. Its off-diagonal is large, because hidden states are far from having independent coordinates. Rounding treats all coordinates alike. The loss does not.</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>That mismatch is the whole subject. The four methods are four answers to the question of how to reconcile an isotropic rounding grid with an anisotropic error metric, and it will turn out that they respond to the two kinds of anisotropy separately.</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## The four feasible sets</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>Round-to-nearest, the baseline, ignores $H$ completely. Given a group of weights sharing one scale, it sets $\Delta = \max_j |w_j| / (2^{b-1} - 1)$ and rounds. It is the minimizer of $\lVert E \rVert_F^2$, which is @eq-proxy-loss with $H$ replaced by $I$.</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>**GPTQ keeps $W$ free and fixes the metric.** It solves @eq-proxy-loss greedily under the constraint that coordinates are quantized in a fixed order and, once quantized, stay on the grid. This is Optimal Brain Surgeon arithmetic <span class="co">[</span><span class="ot">@hassibi1993obs</span><span class="co">]</span> carried over from pruning to rounding <span class="co">[</span><span class="ot">@frantar2022obc</span><span class="co">]</span>. Suppose coordinate $q$ has just been forced to take the value $Q(w_q)$, an error $\epsilon_q = Q(w_q) - w_q$. Minimizing $e^\top H e$ subject to $e_q = \epsilon_q$ is a linearly constrained quadratic program with solution</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>e = \frac{\epsilon_q}{<span class="co">[</span><span class="ot">H^{-1}</span><span class="co">]</span>_{qq}}\, H^{-1} u_q,</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>\mathcal{L}^\star = \frac{\epsilon_q^2}{<span class="co">[</span><span class="ot">H^{-1}</span><span class="co">]</span>_{qq}},</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>$$ {#eq-obs-update}</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>where $u_q$ is the $q$-th standard basis vector. The still-free coordinates absorb a correction proportional to a column of $H^{-1}$. GPTQ's three contributions are engineering on top of @eq-obs-update: quantize all output rows in the same column order so $H^{-1}$ is shared, batch the updates, and precompute the required part of $H^{-1}$ through a Cholesky factor for numerical stability at 175B parameters.</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>@eq-obs-update also states the exact condition under which error feedback is worth anything. If $H$ is diagonal then $H^{-1}u_q = u_q / H_{qq}$, so $e = \epsilon_q u_q$ and no other coordinate moves at all: GPTQ reduces exactly to round-to-nearest. Its entire advantage is purchased from the off-diagonal of $H$, that is, from correlation between input channels. This matters for the experiments below, because a synthetic layer with independent activation channels would make GPTQ look useless for reasons that have nothing to do with quantization.</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>**AWQ and SmoothQuant keep the rounding and change the coordinates.** Both insert a diagonal $S = \operatorname{diag}(s)$, $s \in \mathbb{R}^{d_{\text{in}}}_{&gt;0}$, and use the exact identity</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>Y = XW = \bigl(X S^{-1}\bigr)\bigl(S W\bigr),</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>$$ {#eq-equivalent-transform}</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>then quantize the reparameterized factors. The transform is free at inference time because $S^{-1}$ folds into the preceding LayerNorm or linear layer. AWQ quantizes only $SW$ and picks $s = s_X^{\alpha}$ with $s_X$ the mean per-channel activation magnitude, searching one scalar $\alpha \in <span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$ <span class="co">[</span><span class="ot">@lin2024awq</span><span class="co">]</span>. SmoothQuant quantizes both factors, targeting INT8 activations as well as weights, and uses</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>s_j = \frac{\max_i |X_{ij}|^{\alpha}}{\max_c |W_{jc}|^{1-\alpha}},</span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>$$ {#eq-smooth-scale}</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>a geometric interpolation that hands a fraction $\alpha$ of the difficulty from the activations to the weights <span class="co">[</span><span class="ot">@xiao2023smoothquant</span><span class="co">]</span>.</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>**LLM.int8() changes the feasible set by partitioning it.** Choose an index set $O \subset <span class="sc">\{</span>1,\dots,d_{\text{in}}<span class="sc">\}</span>$ of outlier channels and require $\widehat W_{j,:} = W_{j,:}$ exactly for $j \in O$, quantizing only the complement. The error becomes $E_{O,:} = 0$, so</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>\mathcal{L} = \operatorname{tr}\bigl(E_{\bar O,:}^\top H_{\bar O \bar O} E_{\bar O,:}\bigr),</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>and the largest diagonal entries of $H$ are removed from the sum by construction. With $|O| \le 7$ out of thousands of channels, this costs about 0.1% extra memory and recovers 16-bit accuracy up to 175B parameters.</span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>Written this way the taxonomy is a table of constraints, not of tricks.</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> What is optimized <span class="pp">|</span> What is fixed <span class="pp">|</span> Free parameters fit to calibration <span class="pp">|</span></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span>:--<span class="pp">|</span>--:<span class="pp">|</span></span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> RTN <span class="pp">|</span> nothing <span class="pp">|</span> grid, $H \equiv I$ <span class="pp">|</span> $0$ <span class="pp">|</span></span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> SmoothQuant <span class="pp">|</span> diagonal $S$ from @eq-smooth-scale <span class="pp">|</span> closed form given $\alpha$ <span class="pp">|</span> $1$ <span class="pp">|</span></span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> AWQ <span class="pp">|</span> scalar $\alpha$, grid search on @eq-proxy-loss <span class="pp">|</span> $s = s_X^\alpha$ <span class="pp">|</span> $1$ <span class="pp">|</span></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> GPTQ <span class="pp">|</span> all unquantized weights, via @eq-obs-update <span class="pp">|</span> column order <span class="pp">|</span> $\mathcal{O}(d_{\text{in}} d_{\text{out}})$ <span class="pp">|</span></span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LLM.int8() <span class="pp">|</span> outlier set $O$ <span class="pp">|</span> threshold $\alpha = 6$ <span class="pp">|</span> $\approx <span class="pp">|</span>O<span class="pp">|</span>$ <span class="pp">|</span></span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>: The four post-training quantizers as constrained minimizers of the same layerwise objective. The last column is the count that matters for the calibration experiment below. {#tbl-taxonomy}</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why scaling a salient channel has a kink</span></span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>The AWQ argument is usually stated as an empirical observation: scaling up salient channels reduces their relative error by roughly $1/s$, because the round error stays near $\Delta/2$ while the group maximum rarely moves. That "rarely" hides the entire structure of the problem, and making it precise gives a sharper statement than the papers do.</span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>Consider one group of $g$ weights sharing a symmetric absmax scale, with $b$-bit signed integers, $M = \max_{j} |w_j|$ and $\Delta = M / (2^{b-1}-1)$. Scale a single channel $k$ by $s \ge 1$ and leave the rest alone. The group maximum becomes $M(s) = \max\bigl(s|w_k|, \max_{j \ne k}|w_j|\bigr)$. After de-scaling, the effective error on channel $k$ is $\Delta(s)/(2s)$ and on every other channel it is $\Delta(s)/2$. With importances $h_j = H_{jj}$, the expected contribution of the group to @eq-proxy-loss under a uniform round-error model is</span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>J(s) \;=\; \frac{\Delta(s)^2}{12}\left(\frac{h_k}{s^2} + \sum_{j \ne k} h_j\right),</span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>\Delta(s) = \frac{\max\bigl(s|w_k|,\, M_{-k}\bigr)}{2^{b-1}-1},</span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>$$ {#eq-awq-kink}</span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>with $M_{-k} = \max_{j\ne k}|w_j|$. The function is piecewise smooth with a break at</span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>s^\star = \frac{M_{-k}}{|w_k|},</span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a>$$ {#eq-kink-location}</span>
+<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a>the scale at which the protected channel becomes the group maximum. On either side of @eq-kink-location the behaviour is qualitatively different:</span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>For $s \le s^\star$ the step size $\Delta$ is constant, so $J(s) = c\,(h_k s^{-2} + F)$ with $F = \sum_{j\ne k} h_j$. The function is strictly decreasing, quadratically at first and then asymptotically flat once the salient term drops below the floor $F$ contributed by the rest of the group.</span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>For $s &gt; s^\star$ we have $\Delta \propto s$, so $J(s) = c'(h_k + F s^2)$. The salient term is now pinned and the floor grows quadratically. Every other channel in the group pays for the protection of channel $k$.</span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a>The idealized minimizer is therefore exactly $s^\star$, but the useful statement is asymmetric rather than exact: below the break, scaling is close to free and eventually stops helping; above it, scaling is quadratically expensive. That asymmetry is why AWQ searches its scale on a grid over one exponent rather than solving a first-order condition, and why the authors report that a gradient-based version converged unstably. It also explains the shape SmoothQuant reports for its migration sweep, a flat basin near the middle of the range with steep sides: when many channels move together, many breaks like @eq-kink-location smear into a basin whose width is set by how spread out the weight magnitudes are.</span>
+<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a>There is a fourth regime below all of this, and it is the one the outlier literature is really about. If $s|w_k| &lt; \Delta/2$, the salient weight rounds to zero no matter what, its error is the full $|w_k|$, and no amount of care elsewhere recovers it. That is the arithmetic behind the observation that a single extreme value inflates the shared scale until the small entries are extinguished. The experiment below shows all four regimes in one curve.</span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-125"><a href="#cb12-125" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"../../eigenholm.mplstyle"</span>)</span>
+<span id="cb12-126"><a href="#cb12-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-127"><a href="#cb12-127" aria-hidden="true" tabindex="-1"></a>BITS <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb12-128"><a href="#cb12-128" aria-hidden="true" tabindex="-1"></a>LEVELS <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (BITS <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb12-129"><a href="#cb12-129" aria-hidden="true" tabindex="-1"></a>GROUP <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb12-130"><a href="#cb12-130" aria-hidden="true" tabindex="-1"></a>KINK <span class="op">=</span> <span class="fl">40.0</span>            <span class="co"># ratio of the incumbent group maximum to the salient weight</span></span>
+<span id="cb12-131"><a href="#cb12-131" aria-hidden="true" tabindex="-1"></a>SALIENT_IMPORTANCE <span class="op">=</span> <span class="fl">900.0</span>   <span class="co"># H_kk / H_jj for a channel whose activations are 30 times larger</span></span>
+<span id="cb12-132"><a href="#cb12-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-133"><a href="#cb12-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-134"><a href="#cb12-134" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> absmax_round(vec, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb12-135"><a href="#cb12-135" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Symmetric absmax quantize-dequantize of one group."""</span></span>
+<span id="cb12-136"><a href="#cb12-136" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(vec))</span>
+<span id="cb12-137"><a href="#cb12-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> peak <span class="op">==</span> <span class="fl">0.0</span>:</span>
+<span id="cb12-138"><a href="#cb12-138" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> vec.copy()</span>
+<span id="cb12-139"><a href="#cb12-139" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> peak <span class="op">/</span> levels</span>
+<span id="cb12-140"><a href="#cb12-140" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(vec <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb12-141"><a href="#cb12-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-142"><a href="#cb12-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-143"><a href="#cb12-143" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_error(scale, rng):</span>
+<span id="cb12-144"><a href="#cb12-144" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> rng.uniform(<span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0.85</span>, size<span class="op">=</span>GROUP)</span>
+<span id="cb12-145"><a href="#cb12-145" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">0</span>], weights[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>                 <span class="co"># pin the incumbent group maximum</span></span>
+<span id="cb12-146"><a href="#cb12-146" aria-hidden="true" tabindex="-1"></a>    weights[<span class="dv">2</span>] <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> KINK) <span class="op">*</span> (<span class="fl">1.0</span> <span class="op">+</span> <span class="fl">0.02</span> <span class="op">*</span> rng.standard_normal())</span>
+<span id="cb12-147"><a href="#cb12-147" aria-hidden="true" tabindex="-1"></a>    importance <span class="op">=</span> np.ones(GROUP)</span>
+<span id="cb12-148"><a href="#cb12-148" aria-hidden="true" tabindex="-1"></a>    importance[<span class="dv">2</span>] <span class="op">=</span> SALIENT_IMPORTANCE</span>
+<span id="cb12-149"><a href="#cb12-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-150"><a href="#cb12-150" aria-hidden="true" tabindex="-1"></a>    lifted <span class="op">=</span> weights.copy()</span>
+<span id="cb12-151"><a href="#cb12-151" aria-hidden="true" tabindex="-1"></a>    lifted[<span class="dv">2</span>] <span class="op">*=</span> scale</span>
+<span id="cb12-152"><a href="#cb12-152" aria-hidden="true" tabindex="-1"></a>    restored <span class="op">=</span> absmax_round(lifted)</span>
+<span id="cb12-153"><a href="#cb12-153" aria-hidden="true" tabindex="-1"></a>    restored[<span class="dv">2</span>] <span class="op">/=</span> scale</span>
+<span id="cb12-154"><a href="#cb12-154" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.<span class="bu">sum</span>(importance <span class="op">*</span> (restored <span class="op">-</span> weights) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb12-155"><a href="#cb12-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-156"><a href="#cb12-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-157"><a href="#cb12-157" aria-hidden="true" tabindex="-1"></a>scales <span class="op">=</span> np.geomspace(<span class="fl">1.0</span>, <span class="fl">400.0</span>, <span class="dv">80</span>)</span>
+<span id="cb12-158"><a href="#cb12-158" aria-hidden="true" tabindex="-1"></a>errors <span class="op">=</span> np.array([</span>
+<span id="cb12-159"><a href="#cb12-159" aria-hidden="true" tabindex="-1"></a>    np.mean([group_error(s, np.random.default_rng(<span class="dv">7000</span> <span class="op">+</span> i)) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">400</span>)])</span>
+<span id="cb12-160"><a href="#cb12-160" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> scales</span>
+<span id="cb12-161"><a href="#cb12-161" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb12-162"><a href="#cb12-162" aria-hidden="true" tabindex="-1"></a>errors <span class="op">/=</span> errors[<span class="dv">0</span>]</span>
+<span id="cb12-163"><a href="#cb12-163" aria-hidden="true" tabindex="-1"></a>extinction <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> LEVELS) <span class="op">/</span> <span class="fl">2.0</span> <span class="op">*</span> KINK               <span class="co"># scale at which the weight stops rounding to zero</span></span>
+<span id="cb12-164"><a href="#cb12-164" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-165"><a href="#cb12-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-168"><a href="#cb12-168" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-169"><a href="#cb12-169" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-kink</span></span>
+<span id="cb12-170"><a href="#cb12-170" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Group reconstruction error as one salient input channel is scaled up before rounding, averaged over 400 random draws of the remaining weights. The dotted line marks the scale at which the protected channel becomes the group maximum. Below it protection is nearly free, above it the shared step size grows and every other channel pays."</span></span>
+<span id="cb12-171"><a href="#cb12-171" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb12-172"><a href="#cb12-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-173"><a href="#cb12-173" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb12-174"><a href="#cb12-174" aria-hidden="true" tabindex="-1"></a>ax.loglog(scales, errors, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
+<span id="cb12-175"><a href="#cb12-175" aria-hidden="true" tabindex="-1"></a>ax.axvline(extinction, color<span class="op">=</span><span class="st">"#8d8d96"</span>, ls<span class="op">=</span><span class="st">"-."</span>, lw<span class="op">=</span><span class="fl">1.1</span>,</span>
+<span id="cb12-176"><a href="#cb12-176" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="ss">f"rounds to zero below </span><span class="sc">{</span>extinction<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb12-177"><a href="#cb12-177" aria-hidden="true" tabindex="-1"></a>ax.axvline(KINK, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="ss">f"break $s^</span><span class="ch">\\</span><span class="ss">star$ = </span><span class="sc">{</span>KINK<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb12-178"><a href="#cb12-178" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"scale applied to the salient channel"</span>,</span>
+<span id="cb12-179"><a href="#cb12-179" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"group error / unscaled error"</span>,</span>
+<span id="cb12-180"><a href="#cb12-180" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Protecting one channel is nearly free until it becomes the group maximum"</span>)</span>
+<span id="cb12-181"><a href="#cb12-181" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb12-182"><a href="#cb12-182" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb12-183"><a href="#cb12-183" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-184"><a href="#cb12-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-185"><a href="#cb12-185" aria-hidden="true" tabindex="-1"></a>All four regimes appear. The curve is flat at the far left, where the protected weight still rounds to zero and the scale accomplishes nothing. It then falls quadratically until the salient channel stops dominating the group. It runs along a shallow basin up to the predicted break. Past the break it climbs with slope two on the log-log axes, which is the $F s^2$ term of @eq-awq-kink and nothing else. Nothing in this is specific to language models. It is a property of sharing one step size across a group of weights with unequal importance.</span>
+<span id="cb12-186"><a href="#cb12-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-187"><a href="#cb12-187" aria-hidden="true" tabindex="-1"></a><span class="fu">## A common benchmark for the four constraints</span></span>
+<span id="cb12-188"><a href="#cb12-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-189"><a href="#cb12-189" aria-hidden="true" tabindex="-1"></a>To compare the methods on equal footing, the next block builds a synthetic layer with both kinds of anisotropy. Activations are generated from a low-rank factor model, which supplies the off-diagonal structure that error feedback exploits, then multiplied by a log-normal per-channel scale profile with a small set of extreme outlier channels, which supplies the heavy diagonal. Weights are ordinary Gaussians, since every paper agrees that weight distributions are flat and easy. Each quantizer is implemented against the same rounding primitive.</span>
+<span id="cb12-190"><a href="#cb12-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-193"><a href="#cb12-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-194"><a href="#cb12-194" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: quantizers</span></span>
+<span id="cb12-195"><a href="#cb12-195" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb12-196"><a href="#cb12-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-197"><a href="#cb12-197" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_layer(rng, n<span class="op">=</span><span class="dv">512</span>, d_in<span class="op">=</span><span class="dv">256</span>, d_out<span class="op">=</span><span class="dv">256</span>, rank<span class="op">=</span><span class="dv">32</span>, n_outlier<span class="op">=</span><span class="dv">6</span>, outlier_gain<span class="op">=</span><span class="fl">30.0</span>):</span>
+<span id="cb12-198"><a href="#cb12-198" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Correlated activations with a heavy-tailed channel profile and a few extreme channels."""</span></span>
+<span id="cb12-199"><a href="#cb12-199" aria-hidden="true" tabindex="-1"></a>    basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
+<span id="cb12-200"><a href="#cb12-200" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
+<span id="cb12-201"><a href="#cb12-201" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> latent <span class="op">@</span> basis <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb12-202"><a href="#cb12-202" aria-hidden="true" tabindex="-1"></a>    profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
+<span id="cb12-203"><a href="#cb12-203" aria-hidden="true" tabindex="-1"></a>    outliers <span class="op">=</span> rng.choice(d_in, size<span class="op">=</span>n_outlier, replace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb12-204"><a href="#cb12-204" aria-hidden="true" tabindex="-1"></a>    profile[outliers] <span class="op">*=</span> outlier_gain</span>
+<span id="cb12-205"><a href="#cb12-205" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> X <span class="op">*</span> profile</span>
+<span id="cb12-206"><a href="#cb12-206" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> rng.normal(size<span class="op">=</span>(d_in, d_out)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb12-207"><a href="#cb12-207" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, W, profile, outliers, basis</span>
+<span id="cb12-208"><a href="#cb12-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-209"><a href="#cb12-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-210"><a href="#cb12-210" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_round(W, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb12-211"><a href="#cb12-211" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Round-to-nearest with per-output-row groups along the input dimension."""</span></span>
+<span id="cb12-212"><a href="#cb12-212" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> np.empty_like(W)</span>
+<span id="cb12-213"><a href="#cb12-213" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, W.shape[<span class="dv">0</span>], group):</span>
+<span id="cb12-214"><a href="#cb12-214" aria-hidden="true" tabindex="-1"></a>        block <span class="op">=</span> W[start:start <span class="op">+</span> group]</span>
+<span id="cb12-215"><a href="#cb12-215" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(block), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-216"><a href="#cb12-216" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb12-217"><a href="#cb12-217" aria-hidden="true" tabindex="-1"></a>        out[start:start <span class="op">+</span> group] <span class="op">=</span> np.clip(np.<span class="bu">round</span>(block <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb12-218"><a href="#cb12-218" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb12-219"><a href="#cb12-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-220"><a href="#cb12-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-221"><a href="#cb12-221" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gptq(W, H, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS, damp<span class="op">=</span><span class="fl">0.002</span>):</span>
+<span id="cb12-222"><a href="#cb12-222" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Weight-only quantization with inverse-Hessian error feedback (GPTQ)."""</span></span>
+<span id="cb12-223"><a href="#cb12-223" aria-hidden="true" tabindex="-1"></a>    d_in <span class="op">=</span> W.shape[<span class="dv">0</span>]</span>
+<span id="cb12-224"><a href="#cb12-224" aria-hidden="true" tabindex="-1"></a>    Hd <span class="op">=</span> H <span class="op">+</span> damp <span class="op">*</span> np.mean(np.diag(H)) <span class="op">*</span> np.eye(d_in)</span>
+<span id="cb12-225"><a href="#cb12-225" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.linalg.cholesky(np.linalg.inv(Hd)).T          <span class="co"># H^{-1} = U^T U, U upper</span></span>
+<span id="cb12-226"><a href="#cb12-226" aria-hidden="true" tabindex="-1"></a>    Wc <span class="op">=</span> W.copy()</span>
+<span id="cb12-227"><a href="#cb12-227" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> np.empty_like(W)</span>
+<span id="cb12-228"><a href="#cb12-228" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, d_in, group):</span>
+<span id="cb12-229"><a href="#cb12-229" aria-hidden="true" tabindex="-1"></a>        stop <span class="op">=</span> <span class="bu">min</span>(start <span class="op">+</span> group, d_in)</span>
+<span id="cb12-230"><a href="#cb12-230" aria-hidden="true" tabindex="-1"></a>        peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(Wc[start:stop]), axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-231"><a href="#cb12-231" aria-hidden="true" tabindex="-1"></a>        step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb12-232"><a href="#cb12-232" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(start, stop):</span>
+<span id="cb12-233"><a href="#cb12-233" aria-hidden="true" tabindex="-1"></a>            q <span class="op">=</span> np.clip(np.<span class="bu">round</span>(Wc[i] <span class="op">/</span> step[<span class="dv">0</span>]), <span class="op">-</span>levels, levels) <span class="op">*</span> step[<span class="dv">0</span>]</span>
+<span id="cb12-234"><a href="#cb12-234" aria-hidden="true" tabindex="-1"></a>            Q[i] <span class="op">=</span> q</span>
+<span id="cb12-235"><a href="#cb12-235" aria-hidden="true" tabindex="-1"></a>            err <span class="op">=</span> (Wc[i] <span class="op">-</span> q) <span class="op">/</span> U[i, i]</span>
+<span id="cb12-236"><a href="#cb12-236" aria-hidden="true" tabindex="-1"></a>            Wc[i:] <span class="op">-=</span> np.outer(U[i, i:], err)</span>
+<span id="cb12-237"><a href="#cb12-237" aria-hidden="true" tabindex="-1"></a>        Wc[start:stop] <span class="op">=</span> Q[start:stop]</span>
+<span id="cb12-238"><a href="#cb12-238" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
+<span id="cb12-239"><a href="#cb12-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-240"><a href="#cb12-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-241"><a href="#cb12-241" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_round(W, s, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb12-242"><a href="#cb12-242" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Quantize diag(s) W and divide the scale back out (AWQ / SmoothQuant weight side)."""</span></span>
+<span id="cb12-243"><a href="#cb12-243" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group, levels) <span class="op">/</span> s[:, <span class="va">None</span>]</span>
+<span id="cb12-244"><a href="#cb12-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-245"><a href="#cb12-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-246"><a href="#cb12-246" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mixed_precision(W, keep, group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb12-247"><a href="#cb12-247" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Keep a set of input channels in full precision (LLM.int8 decomposition)."""</span></span>
+<span id="cb12-248"><a href="#cb12-248" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> group_round(W, group, levels)</span>
+<span id="cb12-249"><a href="#cb12-249" aria-hidden="true" tabindex="-1"></a>    Q[keep] <span class="op">=</span> W[keep]</span>
+<span id="cb12-250"><a href="#cb12-250" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q</span>
+<span id="cb12-251"><a href="#cb12-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-252"><a href="#cb12-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-253"><a href="#cb12-253" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rel_error(X, W, Wq):</span>
+<span id="cb12-254"><a href="#cb12-254" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.linalg.norm(X <span class="op">@</span> (Wq <span class="op">-</span> W)) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W))</span>
+<span id="cb12-255"><a href="#cb12-255" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-256"><a href="#cb12-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-257"><a href="#cb12-257" aria-hidden="true" tabindex="-1"></a>With the primitives in place, the comparison is a few lines. The AWQ scale is chosen by the same grid search the paper uses, minimizing the reconstruction error on the calibration activations over a single exponent.</span>
+<span id="cb12-258"><a href="#cb12-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-261"><a href="#cb12-261" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-262"><a href="#cb12-262" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb12-263"><a href="#cb12-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-264"><a href="#cb12-264" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">11</span>)</span>
+<span id="cb12-265"><a href="#cb12-265" aria-hidden="true" tabindex="-1"></a>X, W, profile, outliers, basis <span class="op">=</span> make_layer(rng)</span>
+<span id="cb12-266"><a href="#cb12-266" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> X.T <span class="op">@</span> X</span>
+<span id="cb12-267"><a href="#cb12-267" aria-hidden="true" tabindex="-1"></a>act_mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-268"><a href="#cb12-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-269"><a href="#cb12-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-270"><a href="#cb12-270" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> awq_scale(X, W, alphas<span class="op">=</span>np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">21</span>), group<span class="op">=</span><span class="dv">64</span>, levels<span class="op">=</span>LEVELS):</span>
+<span id="cb12-271"><a href="#cb12-271" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb12-272"><a href="#cb12-272" aria-hidden="true" tabindex="-1"></a>    mag <span class="op">=</span> mag <span class="op">/</span> np.exp(np.mean(np.log(mag)))          <span class="co"># normalize the geometric mean to 1</span></span>
+<span id="cb12-273"><a href="#cb12-273" aria-hidden="true" tabindex="-1"></a>    best, best_alpha, best_s <span class="op">=</span> np.inf, <span class="fl">0.0</span>, np.ones(W.shape[<span class="dv">0</span>])</span>
+<span id="cb12-274"><a href="#cb12-274" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
+<span id="cb12-275"><a href="#cb12-275" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> mag <span class="op">**</span> alpha</span>
+<span id="cb12-276"><a href="#cb12-276" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> rel_error(X, W, scaled_round(W, s, group, levels))</span>
+<span id="cb12-277"><a href="#cb12-277" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> err <span class="op">&lt;</span> best:</span>
+<span id="cb12-278"><a href="#cb12-278" aria-hidden="true" tabindex="-1"></a>            best, best_alpha, best_s <span class="op">=</span> err, alpha, s</span>
+<span id="cb12-279"><a href="#cb12-279" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> best_s, best_alpha</span>
+<span id="cb12-280"><a href="#cb12-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-281"><a href="#cb12-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-282"><a href="#cb12-282" aria-hidden="true" tabindex="-1"></a>s_awq, alpha_awq <span class="op">=</span> awq_scale(X, W)</span>
+<span id="cb12-283"><a href="#cb12-283" aria-hidden="true" tabindex="-1"></a>keep <span class="op">=</span> np.argsort(act_mag)[<span class="op">-</span><span class="dv">6</span>:]</span>
+<span id="cb12-284"><a href="#cb12-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-285"><a href="#cb12-285" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb12-286"><a href="#cb12-286" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bits <span class="kw">in</span> (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">8</span>):</span>
+<span id="cb12-287"><a href="#cb12-287" aria-hidden="true" tabindex="-1"></a>    lv <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> (bits <span class="op">-</span> <span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb12-288"><a href="#cb12-288" aria-hidden="true" tabindex="-1"></a>    rows.append({</span>
+<span id="cb12-289"><a href="#cb12-289" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bits"</span>: bits,</span>
+<span id="cb12-290"><a href="#cb12-290" aria-hidden="true" tabindex="-1"></a>        <span class="st">"RTN"</span>: rel_error(X, W, group_round(W, levels<span class="op">=</span>lv)),</span>
+<span id="cb12-291"><a href="#cb12-291" aria-hidden="true" tabindex="-1"></a>        <span class="st">"LLM.int8-style"</span>: rel_error(X, W, mixed_precision(W, keep, levels<span class="op">=</span>lv)),</span>
+<span id="cb12-292"><a href="#cb12-292" aria-hidden="true" tabindex="-1"></a>        <span class="st">"AWQ-style"</span>: rel_error(X, W, scaled_round(W, s_awq, levels<span class="op">=</span>lv)),</span>
+<span id="cb12-293"><a href="#cb12-293" aria-hidden="true" tabindex="-1"></a>        <span class="st">"GPTQ"</span>: rel_error(X, W, gptq(W, H, levels<span class="op">=</span>lv)),</span>
+<span id="cb12-294"><a href="#cb12-294" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb12-295"><a href="#cb12-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-296"><a href="#cb12-296" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-297"><a href="#cb12-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-300"><a href="#cb12-300" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-301"><a href="#cb12-301" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-methods</span></span>
+<span id="cb12-302"><a href="#cb12-302" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Relative output error of a synthetic transformer projection under weight-only quantization at 3, 4, and 8 bits. Every method is measured on the calibration activations it was fitted to."</span></span>
+<span id="cb12-303"><a href="#cb12-303" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb12-304"><a href="#cb12-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-305"><a href="#cb12-305" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> [<span class="st">"RTN"</span>, <span class="st">"LLM.int8-style"</span>, <span class="st">"AWQ-style"</span>, <span class="st">"GPTQ"</span>]</span>
+<span id="cb12-306"><a href="#cb12-306" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">"#8d8d96"</span>, <span class="st">"#4c6ea8"</span>, <span class="st">"#2a6e6e"</span>, <span class="st">"#a4553a"</span>]</span>
+<span id="cb12-307"><a href="#cb12-307" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb12-308"><a href="#cb12-308" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> np.arange(<span class="bu">len</span>(rows))</span>
+<span id="cb12-309"><a href="#cb12-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-310"><a href="#cb12-310" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.6</span>, <span class="fl">3.9</span>))</span>
+<span id="cb12-311"><a href="#cb12-311" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, (name, color) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(methods, colors)):</span>
+<span id="cb12-312"><a href="#cb12-312" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> [row[name] <span class="cf">for</span> row <span class="kw">in</span> rows]</span>
+<span id="cb12-313"><a href="#cb12-313" aria-hidden="true" tabindex="-1"></a>    ax.bar(positions <span class="op">+</span> (k <span class="op">-</span> <span class="fl">1.5</span>) <span class="op">*</span> width, vals, width, label<span class="op">=</span>name, color<span class="op">=</span>color)</span>
+<span id="cb12-314"><a href="#cb12-314" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb12-315"><a href="#cb12-315" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(positions, [<span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'bits'</span>]<span class="sc">}</span><span class="ss">-bit"</span> <span class="cf">for</span> row <span class="kw">in</span> rows])</span>
+<span id="cb12-316"><a href="#cb12-316" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"relative output error"</span>, title<span class="op">=</span><span class="ss">f"Weight-only quantization, AWQ exponent = </span><span class="sc">{</span>alpha_awq<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb12-317"><a href="#cb12-317" aria-hidden="true" tabindex="-1"></a>ax.legend(ncols<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-318"><a href="#cb12-318" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb12-319"><a href="#cb12-319" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-320"><a href="#cb12-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-321"><a href="#cb12-321" aria-hidden="true" tabindex="-1"></a>Round-to-nearest is tolerable at 8 bits and falls apart below it, exactly as every paper reports. The other three land within a factor of about five of each other and roughly an order of magnitude below round-to-nearest at 4 bits. Outlier decomposition is the strongest here, which flatters it: six extreme channels out of 256 is 2.3% of the layer, whereas real models concentrate the same effect into roughly 0.1% of dimensions, so the synthetic version pays less for the full-precision carve-out than the real one does. Error feedback and activation-aware scaling both beat plain rounding by a wide margin on the data they were fitted to.</span>
+<span id="cb12-322"><a href="#cb12-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-323"><a href="#cb12-323" aria-hidden="true" tabindex="-1"></a>One implementation detail deserves a warning, because it is easy to misread as a property of the method. GPTQ dampens $H$ by adding a fraction of its mean diagonal. When that diagonal is heavy-tailed, the mean is set by the outlier channels, so the customary 1% dampening can exceed the entire diagonal entry of an ordinary channel and erase the metric precisely where the method needs it. The runs above use 0.2%, and the sensitivity is not subtle: at 1% in this setup, error feedback loses most of its advantage over plain rounding. Dampening is a numerical guard, but the fraction interacts directly with the anisotropy that the method exists to exploit.</span>
+<span id="cb12-324"><a href="#cb12-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-325"><a href="#cb12-325" aria-hidden="true" tabindex="-1"></a>The phrase "on the data they were fitted to" is doing a lot of work.</span>
+<span id="cb12-326"><a href="#cb12-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-327"><a href="#cb12-327" aria-hidden="true" tabindex="-1"></a><span class="fu">## The calibration experiment</span></span>
+<span id="cb12-328"><a href="#cb12-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-329"><a href="#cb12-329" aria-hidden="true" tabindex="-1"></a>AWQ's central criticism of GPTQ is that its reconstruction overfits the calibration set: AWQ reports needing roughly ten times fewer calibration samples, and degrading by 0.5 perplexity under a calibration-to-evaluation domain shift where GPTQ degrades by 2.3 to 4.9.</span>
+<span id="cb12-330"><a href="#cb12-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-331"><a href="#cb12-331" aria-hidden="true" tabindex="-1"></a>Read through @tbl-taxonomy, that is not a surprising empirical finding. It is a parameter count. GPTQ fits a number of free values proportional to the size of the weight matrix, all of them tuned to one estimate $H$ of the activation second moment. AWQ and SmoothQuant fit a single scalar. Any statistical intuition about degrees of freedom says the first should track a shifted distribution worse than the second, and should need more samples to estimate its target in the first place.</span>
+<span id="cb12-332"><a href="#cb12-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-333"><a href="#cb12-333" aria-hidden="true" tabindex="-1"></a>The synthetic setting lets us test the mechanism directly, without perplexity or a domain corpus, by moving the activation distribution between fit and evaluation. The shift below rotates the latent subspace and redraws the channel profile together, which is what changing corpus domain does to a real layer: different topics excite different directions of the residual stream, while the systematic outlier channels stay outliers.</span>
+<span id="cb12-334"><a href="#cb12-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-337"><a href="#cb12-337" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-338"><a href="#cb12-338" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb12-339"><a href="#cb12-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-340"><a href="#cb12-340" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> shifted_activations(rng, mix, n<span class="op">=</span><span class="dv">512</span>):</span>
+<span id="cb12-341"><a href="#cb12-341" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Blend calibration structure with an independent draw; mix = 1 recovers calibration."""</span></span>
+<span id="cb12-342"><a href="#cb12-342" aria-hidden="true" tabindex="-1"></a>    rank, d_in <span class="op">=</span> basis.shape</span>
+<span id="cb12-343"><a href="#cb12-343" aria-hidden="true" tabindex="-1"></a>    fresh_basis <span class="op">=</span> rng.normal(size<span class="op">=</span>(rank, d_in)) <span class="op">/</span> np.sqrt(rank)</span>
+<span id="cb12-344"><a href="#cb12-344" aria-hidden="true" tabindex="-1"></a>    blend <span class="op">=</span> mix <span class="op">*</span> basis <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> mix) <span class="op">*</span> fresh_basis</span>
+<span id="cb12-345"><a href="#cb12-345" aria-hidden="true" tabindex="-1"></a>    latent <span class="op">=</span> rng.normal(size<span class="op">=</span>(n, rank))</span>
+<span id="cb12-346"><a href="#cb12-346" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> latent <span class="op">@</span> blend <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> rng.normal(size<span class="op">=</span>(n, d_in)) <span class="op">/</span> np.sqrt(d_in)</span>
+<span id="cb12-347"><a href="#cb12-347" aria-hidden="true" tabindex="-1"></a>    fresh_profile <span class="op">=</span> np.exp(rng.normal(<span class="fl">0.0</span>, <span class="fl">0.6</span>, size<span class="op">=</span>d_in))</span>
+<span id="cb12-348"><a href="#cb12-348" aria-hidden="true" tabindex="-1"></a>    fresh_profile[outliers] <span class="op">*=</span> <span class="fl">30.0</span></span>
+<span id="cb12-349"><a href="#cb12-349" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Xs <span class="op">*</span> (profile <span class="op">**</span> mix <span class="op">*</span> fresh_profile <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> mix))</span>
+<span id="cb12-350"><a href="#cb12-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-351"><a href="#cb12-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-352"><a href="#cb12-352" aria-hidden="true" tabindex="-1"></a>mixes <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">9</span>)</span>
+<span id="cb12-353"><a href="#cb12-353" aria-hidden="true" tabindex="-1"></a>curves <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb12-354"><a href="#cb12-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-355"><a href="#cb12-355" aria-hidden="true" tabindex="-1"></a>Q_rtn <span class="op">=</span> group_round(W)</span>
+<span id="cb12-356"><a href="#cb12-356" aria-hidden="true" tabindex="-1"></a>Q_mix <span class="op">=</span> mixed_precision(W, keep)</span>
+<span id="cb12-357"><a href="#cb12-357" aria-hidden="true" tabindex="-1"></a>Q_awq <span class="op">=</span> scaled_round(W, s_awq)</span>
+<span id="cb12-358"><a href="#cb12-358" aria-hidden="true" tabindex="-1"></a>Q_gptq <span class="op">=</span> gptq(W, H)</span>
+<span id="cb12-359"><a href="#cb12-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-360"><a href="#cb12-360" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mix <span class="kw">in</span> mixes:</span>
+<span id="cb12-361"><a href="#cb12-361" aria-hidden="true" tabindex="-1"></a>    trials <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb12-362"><a href="#cb12-362" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">12</span>):</span>
+<span id="cb12-363"><a href="#cb12-363" aria-hidden="true" tabindex="-1"></a>        Xe <span class="op">=</span> shifted_activations(np.random.default_rng(<span class="dv">1000</span> <span class="op">+</span> seed), mix)</span>
+<span id="cb12-364"><a href="#cb12-364" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"RTN"</span>].append(rel_error(Xe, W, Q_rtn))</span>
+<span id="cb12-365"><a href="#cb12-365" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"LLM.int8-style"</span>].append(rel_error(Xe, W, Q_mix))</span>
+<span id="cb12-366"><a href="#cb12-366" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"AWQ-style"</span>].append(rel_error(Xe, W, Q_awq))</span>
+<span id="cb12-367"><a href="#cb12-367" aria-hidden="true" tabindex="-1"></a>        trials[<span class="st">"GPTQ"</span>].append(rel_error(Xe, W, Q_gptq))</span>
+<span id="cb12-368"><a href="#cb12-368" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> methods:</span>
+<span id="cb12-369"><a href="#cb12-369" aria-hidden="true" tabindex="-1"></a>        curves[name].append(np.mean(trials[name]))</span>
+<span id="cb12-370"><a href="#cb12-370" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-371"><a href="#cb12-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-374"><a href="#cb12-374" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-375"><a href="#cb12-375" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-shift</span></span>
+<span id="cb12-376"><a href="#cb12-376" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Relative output error when the quantizer is fitted on one activation distribution and evaluated on another. The horizontal axis interpolates from a fully redrawn latent subspace and channel profile on the left to the calibration distribution itself on the right."</span></span>
+<span id="cb12-377"><a href="#cb12-377" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb12-378"><a href="#cb12-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-379"><a href="#cb12-379" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.4</span>, <span class="fl">4.0</span>))</span>
+<span id="cb12-380"><a href="#cb12-380" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, color <span class="kw">in</span> <span class="bu">zip</span>(methods, colors):</span>
+<span id="cb12-381"><a href="#cb12-381" aria-hidden="true" tabindex="-1"></a>    ax.plot(mixes, curves[name], <span class="st">"o-"</span>, ms<span class="op">=</span><span class="dv">4</span>, color<span class="op">=</span>color, label<span class="op">=</span>name)</span>
+<span id="cb12-382"><a href="#cb12-382" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb12-383"><a href="#cb12-383" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"agreement between calibration and evaluation activations"</span>,</span>
+<span id="cb12-384"><a href="#cb12-384" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
+<span id="cb12-385"><a href="#cb12-385" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"4-bit weight-only quantization under activation distribution shift"</span>)</span>
+<span id="cb12-386"><a href="#cb12-386" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb12-387"><a href="#cb12-387" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb12-388"><a href="#cb12-388" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-389"><a href="#cb12-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-392"><a href="#cb12-392" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-393"><a href="#cb12-393" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb12-394"><a href="#cb12-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-395"><a href="#cb12-395" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> methods:</span>
+<span id="cb12-396"><a href="#cb12-396" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:16s}</span><span class="ss"> matched </span><span class="sc">{</span>curves[name][<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">   fully shifted </span><span class="sc">{</span>curves[name][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb12-397"><a href="#cb12-397" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-398"><a href="#cb12-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-399"><a href="#cb12-399" aria-hidden="true" tabindex="-1"></a>On matched activations, error feedback is about twice as accurate as activation-aware scaling. Under a full shift it is not merely overtaken. It becomes the worst method in the comparison, roughly three times worse than doing nothing beyond round-to-nearest, a swing of more than twenty times its own matched error. Activation-aware scaling degrades by about a factor of two, and outlier decomposition degrades least of all, because the fact it encodes, which handful of channels is enormous, is the most stable fact in the layer.</span>
+<span id="cb12-400"><a href="#cb12-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-401"><a href="#cb12-401" aria-hidden="true" tabindex="-1"></a>The asymmetry has a clean explanation in @eq-obs-update. Error feedback does not merely fail to help when $H$ changes, it actively injects a correction computed for the wrong geometry. The quantized weights carry a compensation term aligned with the calibration subspace, and when the evaluation activations excite a different subspace, that term is pure added error. A method that fits nothing cannot be wrong in this way, which is the entire content of the flat round-to-nearest line.</span>
+<span id="cb12-402"><a href="#cb12-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-403"><a href="#cb12-403" aria-hidden="true" tabindex="-1"></a>None of this is evidence against GPTQ. It is evidence that the methods occupy different points on a bias-variance curve whose axis is the last column of @tbl-taxonomy. Under a fixed, well-sampled deployment distribution, more calibration-fitted parameters is the right trade, and that is the regime the GPTQ results were measured in. Under domain shift or a small calibration budget it is the wrong trade, which is the regime AWQ measured. The framing also suggests where the repair would live: shrinking the error-feedback update toward zero, or estimating $H$ from a deliberately broad corpus, rather than giving up second-order compensation. Whether the gap can be closed rather than merely traded is, as far as the cited work goes, still open.</span>
+<span id="cb12-404"><a href="#cb12-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-405"><a href="#cb12-405" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where the activation side changes the problem</span></span>
+<span id="cb12-406"><a href="#cb12-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-407"><a href="#cb12-407" aria-hidden="true" tabindex="-1"></a>Everything above is weight-only. Quantizing $X$ as well, the W8A8 regime SmoothQuant targets, adds a constraint that has nothing to do with @eq-proxy-loss and everything to do with kernels.</span>
+<span id="cb12-408"><a href="#cb12-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-409"><a href="#cb12-409" aria-hidden="true" tabindex="-1"></a>The natural fix for outlier channels is per-channel activation quantization, one scale per column of $X$. Table 1 of the SmoothQuant paper shows it works, lifting a 175B model from 32.3% to 71.4%. It is also unusable, because in $Y = XW$ the channel index is the contraction dimension of the matrix multiply. Scales can be applied along the outer dimensions, per token of $X$ or per output column of $W$, and fused into the epilogue. A scale that varies along the summed index cannot be pulled out of the sum.</span>
+<span id="cb12-410"><a href="#cb12-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-411"><a href="#cb12-411" aria-hidden="true" tabindex="-1"></a>@eq-equivalent-transform is the workaround: since $\operatorname{diag}(s)^{-1}$ and $\operatorname{diag}(s)$ multiply on opposite sides of the contraction, they cancel exactly, and the offending per-channel factor is applied offline to the weights instead of online to the activations. The migration exponent $\alpha$ then interpolates between two failures, and the sweep below shows both walls of the basin.</span>
+<span id="cb12-412"><a href="#cb12-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-415"><a href="#cb12-415" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-416"><a href="#cb12-416" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb12-417"><a href="#cb12-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-418"><a href="#cb12-418" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> per_token_round(X, levels<span class="op">=</span><span class="dv">127</span>):</span>
+<span id="cb12-419"><a href="#cb12-419" aria-hidden="true" tabindex="-1"></a>    peak <span class="op">=</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-420"><a href="#cb12-420" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> np.where(peak <span class="op">&gt;</span> <span class="dv">0</span>, peak <span class="op">/</span> levels, <span class="fl">1.0</span>)</span>
+<span id="cb12-421"><a href="#cb12-421" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.clip(np.<span class="bu">round</span>(X <span class="op">/</span> step), <span class="op">-</span>levels, levels) <span class="op">*</span> step</span>
+<span id="cb12-422"><a href="#cb12-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-423"><a href="#cb12-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-424"><a href="#cb12-424" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">41</span>)</span>
+<span id="cb12-425"><a href="#cb12-425" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> []</span>
+<span id="cb12-426"><a href="#cb12-426" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> alpha <span class="kw">in</span> alphas:</span>
+<span id="cb12-427"><a href="#cb12-427" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(X), axis<span class="op">=</span><span class="dv">0</span>) <span class="op">**</span> alpha) <span class="op">/</span> (np.<span class="bu">max</span>(np.<span class="bu">abs</span>(W), axis<span class="op">=</span><span class="dv">1</span>) <span class="op">**</span> (<span class="fl">1.0</span> <span class="op">-</span> alpha))</span>
+<span id="cb12-428"><a href="#cb12-428" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> np.clip(s, <span class="fl">1e-6</span>, <span class="va">None</span>)</span>
+<span id="cb12-429"><a href="#cb12-429" aria-hidden="true" tabindex="-1"></a>    Xs <span class="op">=</span> per_token_round(X <span class="op">/</span> s)</span>
+<span id="cb12-430"><a href="#cb12-430" aria-hidden="true" tabindex="-1"></a>    Ws <span class="op">=</span> group_round(W <span class="op">*</span> s[:, <span class="va">None</span>], group<span class="op">=</span>W.shape[<span class="dv">0</span>], levels<span class="op">=</span><span class="dv">127</span>)</span>
+<span id="cb12-431"><a href="#cb12-431" aria-hidden="true" tabindex="-1"></a>    w8a8.append(<span class="bu">float</span>(np.linalg.norm(Xs <span class="op">@</span> Ws <span class="op">-</span> X <span class="op">@</span> W) <span class="op">/</span> np.linalg.norm(X <span class="op">@</span> W)))</span>
+<span id="cb12-432"><a href="#cb12-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-433"><a href="#cb12-433" aria-hidden="true" tabindex="-1"></a>w8a8 <span class="op">=</span> np.array(w8a8)</span>
+<span id="cb12-434"><a href="#cb12-434" aria-hidden="true" tabindex="-1"></a>best_alpha <span class="op">=</span> alphas[<span class="bu">int</span>(np.argmin(w8a8))]</span>
+<span id="cb12-435"><a href="#cb12-435" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-436"><a href="#cb12-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-439"><a href="#cb12-439" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-440"><a href="#cb12-440" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-alpha</span></span>
+<span id="cb12-441"><a href="#cb12-441" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "SmoothQuant migration strength for 8-bit weights and 8-bit activations. Small alpha leaves the outliers in the activations, large alpha moves them into the weights, and the basin between is where both operands are quantizable."</span></span>
+<span id="cb12-442"><a href="#cb12-442" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "Plotting code"</span></span>
+<span id="cb12-443"><a href="#cb12-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-444"><a href="#cb12-444" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">7.2</span>, <span class="fl">3.8</span>))</span>
+<span id="cb12-445"><a href="#cb12-445" aria-hidden="true" tabindex="-1"></a>ax.semilogy(alphas, w8a8, lw<span class="op">=</span><span class="fl">1.7</span>, color<span class="op">=</span><span class="st">"#2a6e6e"</span>)</span>
+<span id="cb12-446"><a href="#cb12-446" aria-hidden="true" tabindex="-1"></a>ax.axvline(best_alpha, color<span class="op">=</span><span class="st">"black"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="fl">1.1</span>, label<span class="op">=</span><span class="ss">f"minimum at $</span><span class="ch">\\</span><span class="ss">alpha$ = </span><span class="sc">{</span>best_alpha<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb12-447"><a href="#cb12-447" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"migration strength $</span><span class="ch">\\</span><span class="st">alpha$"</span>, ylabel<span class="op">=</span><span class="st">"relative output error"</span>,</span>
+<span id="cb12-448"><a href="#cb12-448" aria-hidden="true" tabindex="-1"></a>       title<span class="op">=</span><span class="st">"Moving quantization difficulty from activations to weights"</span>)</span>
+<span id="cb12-449"><a href="#cb12-449" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb12-450"><a href="#cb12-450" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb12-451"><a href="#cb12-451" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-452"><a href="#cb12-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-453"><a href="#cb12-453" aria-hidden="true" tabindex="-1"></a>The minimum lands in the region the paper reports, and the curve is asymmetric in the way the kink analysis predicts: overshooting into the weights is punished harder than undershooting, because weights are dense in their range while activation outliers are sparse.</span>
+<span id="cb12-454"><a href="#cb12-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-455"><a href="#cb12-455" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb12-456"><a href="#cb12-456" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why weight-only quantization speeds anything up</span></span>
+<span id="cb12-457"><a href="#cb12-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-458"><a href="#cb12-458" aria-hidden="true" tabindex="-1"></a>Nothing in @eq-proxy-loss says anything about latency, and 4-bit weights do not make a GPU multiply faster, since no mainstream hardware does a mixed 16-bit by 4-bit product. The speedup is a memory-traffic result. Single-sequence decoding has arithmetic intensity near one: each weight is read once and used for one multiply-accumulate. The kernel is bandwidth-bound, so dequantizing on the fly trades idle arithmetic units for a fourfold reduction in bytes moved, and the reported 3 to 4.5 times end-to-end gains follow. Batched serving moves toward compute-bound, which is where quantizing activations as well starts to matter, and is the reason SmoothQuant and the weight-only methods are complementary rather than competing.</span>
+<span id="cb12-459"><a href="#cb12-459" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb12-460"><a href="#cb12-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-461"><a href="#cb12-461" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the common form does not capture</span></span>
+<span id="cb12-462"><a href="#cb12-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-463"><a href="#cb12-463" aria-hidden="true" tabindex="-1"></a>Three limitations are worth stating plainly.</span>
+<span id="cb12-464"><a href="#cb12-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-465"><a href="#cb12-465" aria-hidden="true" tabindex="-1"></a>The layerwise objective is a proxy. Minimizing $\lVert X(\widehat W - W)\rVert_F^2$ layer by layer is not the same as minimizing end-to-end loss, and every method inherits the gap. GPTQ mitigates it by feeding already-quantized activations forward into the next block, which makes each layer's $H$ reflect the errors upstream, but the objective is still local.</span>
+<span id="cb12-466"><a href="#cb12-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-467"><a href="#cb12-467" aria-hidden="true" tabindex="-1"></a>The uniform round-error model used in @eq-awq-kink is an approximation. At 3 bits and below, errors are neither small nor independent of the weights, and clipping interacts with the group maximum in ways the second-moment analysis misses. The empirical curves above hold anyway, which suggests the approximation is adequate for locating kinks rather than predicting absolute error.</span>
+<span id="cb12-468"><a href="#cb12-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-469"><a href="#cb12-469" aria-hidden="true" tabindex="-1"></a>The format itself is a design variable this framing takes as given. QLoRA's NF4 changes the grid rather than the coordinates: it places the $2^k$ levels at equal-probability quantiles of a standard normal, which is optimal for zero-mean normally distributed weights and beats integer and float grids bit for bit <span class="co">[</span><span class="ot">@dettmers2023qlora</span><span class="co">]</span>. That is a fifth answer to the same question, and it composes with all four constraints above rather than competing with them. The training-time analogue is fine-grained FP8 scaling, where the tile-level scales in DeepSeek-V3 play exactly the role of $S$ in @eq-equivalent-transform, applied to sub-tensors rather than channels <span class="co">[</span><span class="ot">@deepseekai2024v3</span><span class="co">]</span>.</span>
+<span id="cb12-470"><a href="#cb12-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-471"><a href="#cb12-471" aria-hidden="true" tabindex="-1"></a>What survives is a modest but useful claim. Post-training quantization is one least-squares problem in a metric set by the activations. The methods differ in whether they move the weights, the coordinates, or the precision boundary, and in how many numbers they fit to the calibration set. The last of those is the axis nobody reports, and it is the one that predicts what happens when the deployment distribution stops matching the calibration corpus.</span>
+<span id="cb12-472"><a href="#cb12-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-473"><a href="#cb12-473" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related reading</span></span>
+<span id="cb12-474"><a href="#cb12-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-475"><a href="#cb12-475" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">The Arithmetic of Editing a Fact</span><span class="co">](../../posts/arithmetic-of-editing-a-fact/index.qmd)</span> solves a closely related problem, least squares in a data-defined metric.</span>
+<span id="cb12-476"><a href="#cb12-476" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">FlashAttention Is an IO Algorithm</span><span class="co">](../../posts/flashattention-io-aware/index.qmd)</span> explains the bandwidth bound that makes low-bit weights pay.</span>
+<span id="cb12-477"><a href="#cb12-477" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Three Ways a Curve Bends</span><span class="co">](../../posts/three-ways-a-curve-bends/index.qmd)</span> covers the scaling behaviour behind outlier features.</span>
+<span id="cb12-478"><a href="#cb12-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-479"><a href="#cb12-479" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
+<span id="cb12-480"><a href="#cb12-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-481"><a href="#cb12-481" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb12-482"><a href="#cb12-482" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
