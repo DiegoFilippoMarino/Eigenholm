@@ -3,7 +3,7 @@ title: "Projects"
 listing:
   id: projects-list
   contents: "*/index.qmd"
-  sort: "date desc"
+  sort: ["date desc", "title"]
   type: default
   categories: true
   fields: [title, description, author, date, categories]

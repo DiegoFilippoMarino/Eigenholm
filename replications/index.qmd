@@ -1,0 +1,21 @@
+---
+title: "Replications"
+listing:
+  id: replications-list
+  contents: "*/index.qmd"
+  sort: ["date desc", "title"]
+  type: default
+  categories: true
+  fields: [title, description, author, date, categories]
+page-layout: full
+toc: false
+comments: false
+citation: false
+---
+
+Attempts to reproduce published results as closely as the available compute and data allow.
+
+Each entry states up front which numbers from the paper it targets, what was reproduced, what was not, and where the reproduction departs from the original setup. A result that fails to reproduce is reported as a failure rather than tuned until it agrees.
+
+::: {#replications-list}
+:::

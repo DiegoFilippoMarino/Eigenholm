@@ -492,6 +492,11 @@ Two honest limitations of everything above. The bandit removes generalization, w
 
 The structural point survives both. A model used to fit is a model used to score, and the assumptions it makes get exactly one audit for two applications. Publishing the residual deviance alongside the scores would be a reasonable place to start collecting the second one.
 
+## Related reading
+
+- [Inference Compute Has Two Ceilings](../../posts/test-time-compute-ceilings/index.qmd) uses these verifiers as a selection mechanism.
+- [Every Robustness Number Is an Upper Bound](../../posts/robustness-numbers-are-upper-bounds/index.qmd) finds the same quantifier failure in safety evaluation.
+
 ## References
 
 ::: {#refs}

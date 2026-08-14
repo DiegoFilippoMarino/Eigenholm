@@ -11,7 +11,7 @@ $eigenholm-bg:               #1a1d24;
 $eigenholm-surface:          #22252e;
 $eigenholm-text:             #dcdce0;
 $eigenholm-text-secondary:   #9e9ea8;
-$eigenholm-text-muted:       #6e6e7a;
+$eigenholm-text-muted:       #9a9aa6;  // 6.1:1 on the page background (WCAG AA)
 $eigenholm-border:           #33363f;
 $eigenholm-border-light:     #2a2d35;
 $eigenholm-accent:           #4fb8b8;
@@ -38,10 +38,10 @@ $headings-font-weight:   600;
 $headings-line-height:   1.3;
 $headings-margin-bottom: 0.75rem;
 
-$h1-font-size: 2.25rem;
-$h2-font-size: 1.6rem;
-$h3-font-size: 1.3rem;
-$h4-font-size: 1.1rem;
+$h1-font-size: 1.85rem;
+$h2-font-size: 1.35rem;
+$h3-font-size: 1.12rem;
+$h4-font-size: 1rem;
 
 $paragraph-margin-bottom: 1.25rem;
 

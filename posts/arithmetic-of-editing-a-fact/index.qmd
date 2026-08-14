@@ -292,6 +292,11 @@ The damage metric here is the error on stored associations, which is a proxy for
 
 And the sequential-edit result is a statement about repeated application of @eq-mem-rankone, not about the best possible batched procedure. Solving for many associations jointly is a different and better-conditioned problem than solving for them one at a time, which is the direction later mass-editing methods take. The point that survives is the capacity bound in the first section: whatever procedure writes the facts, a linear store of key dimension $d$ has about $d$ independent directions to write them into, and edits beyond that are borrowing from facts already there.
 
+## Related reading
+
+- [Four Quantizers, One Quadratic Form](../../posts/quantization-one-quadratic-form/index.qmd) minimizes the same kind of quadratic form under a different constraint.
+- [A Generalization Gap Is Not a Privacy Audit](../../posts/generalization-gap-privacy-audit/index.qmd) asks what a stored fact leaks.
+
 ## References
 
 ::: {#refs}

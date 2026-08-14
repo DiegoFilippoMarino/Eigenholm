@@ -259,6 +259,11 @@ Instead of asking whether attention is better than message passing, ask two ques
 
 The first question chooses invariants and encodings. The second chooses edges, hierarchy, state width, and global mixing. A graph transformer becomes convincing when its answer to both is explicit. Otherwise, global attention is only an expensive way to make every node adjacent to every other node.
 
+## Related reading
+
+- [The Rank of Memory](../../posts/rank-of-memory/index.qmd) makes the bottleneck argument algebraic for sequences.
+- [Attention, from Logits to Context](../../posts/attention-from-logits-to-context/index.qmd) gives the attention operation used as the global fix.
+
 ## References
 
 ::: {#refs}

@@ -219,6 +219,12 @@ A minimal implementation should satisfy three invariants:
 
 Those tests catch axis errors and many masking mistakes before they become training pathologies.
 
+## Related reading
+
+- [The Geometry of Rotary Position Embeddings](../../posts/rope-geometry/index.qmd) adds the position structure that plain attention lacks.
+- [FlashAttention Is an IO Algorithm](../../posts/flashattention-io-aware/index.qmd) keeps this function and changes only its evaluation schedule.
+- [The Rank of Memory](../../posts/rank-of-memory/index.qmd) asks what recurrence gives up relative to the lookup done here.
+
 ## References
 
 ::: {#refs}

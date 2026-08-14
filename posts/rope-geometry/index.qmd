@@ -195,6 +195,11 @@ RoPE does not make attention cheaper. It gives attention a translation-compatibl
 
 The price is spectral. Context length, base frequency, scaling rule, and the distribution of training positions are coupled. Extending context is therefore a change to the geometry seen by the model, not merely an increase in an array bound.
 
+## Related reading
+
+- [Attention, from Logits to Context](../../posts/attention-from-logits-to-context/index.qmd) sets up the dot product these rotations act on.
+- [The Rank of Memory](../../posts/rank-of-memory/index.qmd) covers the other way long context gets expensive.
+
 ## References
 
 ::: {#refs}

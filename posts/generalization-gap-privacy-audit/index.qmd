@@ -255,6 +255,12 @@ They do not estimate the leakage of a deployed model. That requires attacks cali
 
 The main lesson is methodological. Good average generalization is compatible with dangerous tail behavior. Failed unprompted extraction is compatible with prefix-conditioned memorization. Deduplication is compatible with unique-record leakage. A privacy claim is only as precise as its threat model, adjacency unit, and audit procedure.
 
+## Related reading
+
+- [Three Ways a Curve Bends](../../posts/three-ways-a-curve-bends/index.qmd) revisits generalization where the curve itself misbehaves.
+- [The Arithmetic of Editing a Fact](../../posts/arithmetic-of-editing-a-fact/index.qmd) asks where a memorized fact physically sits.
+- [Every Robustness Number Is an Upper Bound](../../posts/robustness-numbers-are-upper-bounds/index.qmd) shares the structure: an audit is only as strong as its search.
+
 ## References
 
 ::: {#refs}

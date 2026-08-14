@@ -247,6 +247,12 @@ FlashAttention does not make dense attention asymptotically linear in compute. I
 
 That distinction is worth keeping. Similar words such as memory-efficient can refer to activation memory, persistent cache capacity, allocator fragmentation, or bandwidth traffic. These are different constraints with different remedies.
 
+## Related reading
+
+- [Attention, from Logits to Context](../../posts/attention-from-logits-to-context/index.qmd) derives the operation this article reschedules.
+- [Four Quantizers, One Quadratic Form](../../posts/quantization-one-quadratic-form/index.qmd) attacks the same bandwidth bound from the precision side.
+- [A Paged KV-Cache Allocator, Built from First Principles](../../projects/paged-kv-cache-simulator/index.qmd) takes the memory argument to the serving layer.
+
 ## References
 
 ::: {#refs}

@@ -214,6 +214,12 @@ Still, every recurrent layer must communicate through its state at each cut. The
 
 The practical question is therefore not whether recurrence can remember. It can. The question is whether the task's useful past admits a compact sufficient statistic. State-space models are strongest when the answer is yes. Attention remains valuable when future queries need many independently addressable facts whose relevance was impossible to predict when they first arrived.
 
+## Related reading
+
+- [Attention, from Logits to Context](../../posts/attention-from-logits-to-context/index.qmd) derives the attention operation compared here.
+- [The Arithmetic of Editing a Fact](../../posts/arithmetic-of-editing-a-fact/index.qmd) measures the other memory bottleneck, capacity rather than bandwidth across time.
+- [Graph Networks Fail on Two Axes](../../posts/graph-networks-two-failures/index.qmd) finds the same bottleneck argument on graphs.
+
 ## References
 
 ::: {#refs}

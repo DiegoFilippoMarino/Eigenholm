@@ -435,6 +435,12 @@ The format itself is a design variable this framing takes as given. QLoRA's NF4 
 
 What survives is a modest but useful claim. Post-training quantization is one least-squares problem in a metric set by the activations. The methods differ in whether they move the weights, the coordinates, or the precision boundary, and in how many numbers they fit to the calibration set. The last of those is the axis nobody reports, and it is the one that predicts what happens when the deployment distribution stops matching the calibration corpus.
 
+## Related reading
+
+- [The Arithmetic of Editing a Fact](../../posts/arithmetic-of-editing-a-fact/index.qmd) solves a closely related problem, least squares in a data-defined metric.
+- [FlashAttention Is an IO Algorithm](../../posts/flashattention-io-aware/index.qmd) explains the bandwidth bound that makes low-bit weights pay.
+- [Three Ways a Curve Bends](../../posts/three-ways-a-curve-bends/index.qmd) covers the scaling behaviour behind outlier features.
+
 ## References
 
 ::: {#refs}

@@ -357,6 +357,12 @@ The unifying methodological point is not that sharpness is always an illusion. I
 
 Two limits of what is above. The independence assumption behind @eq-bend-exact-match is generous: token errors in a real generation are strongly correlated, so a single mistake often derails the rest, which changes the effective $k$ without changing the structure of the argument. And the grokking experiment uses a task where the target algorithm is known, which is exactly what makes the progress measures constructible. The open problem the mechanistic work states plainly is that these measures are hand-derived per task, and they announce that a transition is coming without saying when. Nothing above changes that. What the width formula @eq-bend-width adds is a small piece of the forecasting problem: given a scaling exponent, the transition has a known duration, so a capability that is going to arrive will not arrive instantaneously, and the useful thing to estimate is where its crossing sits rather than how steep it will be.
 
+## Related reading
+
+- [Chinchilla's Parametric Fit Does Not Imply Twenty Tokens per Parameter](../../replications/chinchilla-parametric-fit/index.qmd) checks whether a published scaling law implies what it claims.
+- [A Generalization Gap Is Not a Privacy Audit](../../posts/generalization-gap-privacy-audit/index.qmd) studies the memorization side of the same phenomenon.
+- [Inference Compute Has Two Ceilings](../../posts/test-time-compute-ceilings/index.qmd) looks at a metric that saturates for a different reason.
+
 ## References
 
 ::: {#refs}

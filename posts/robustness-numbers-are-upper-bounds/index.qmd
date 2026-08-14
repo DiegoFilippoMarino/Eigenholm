@@ -534,6 +534,12 @@ The dataset is synthetic and low-dimensional, and the attacks are the textbook o
 
 If there is one transferable habit, it is to report the attack set alongside the number, and to treat any evaluation whose diagnostics fire as unfinished rather than as evidence. A robustness result without its $\mathcal{A}$ is not a measurement. It is an upper bound with the bound left off.
 
+## Related reading
+
+- [One Likelihood, Two Jobs](../../posts/preference-likelihood-two-jobs/index.qmd) traces the same problem through alignment training.
+- [A Generalization Gap Is Not a Privacy Audit](../../posts/generalization-gap-privacy-audit/index.qmd) runs the argument for privacy audits.
+- [Inference Compute Has Two Ceilings](../../posts/test-time-compute-ceilings/index.qmd) covers what happens when the search set grows instead.
+
 ## References
 
 ::: {#refs}

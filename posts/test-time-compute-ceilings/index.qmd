@@ -233,6 +233,12 @@ The model is still useful because it separates three curves that are often repor
 
 More inference compute is valuable when it explores genuinely different possibilities and when the selection mechanism remains reliable over the expanded search distribution. If either condition fails, scaling $N$ is not reasoning harder. It is paying to repeat a mistake or to find a new way to fool the judge.
 
+## Related reading
+
+- [One Likelihood, Two Jobs](../../posts/preference-likelihood-two-jobs/index.qmd) examines the verifier this argument depends on.
+- [Every Robustness Number Is an Upper Bound](../../posts/robustness-numbers-are-upper-bounds/index.qmd) generalizes the point that a reported number is an optimum over a search.
+- [Speculative Sampling Preserves the Target Distribution](../../notes/speculative-sampling/index.qmd) covers the sampling machinery underneath.
+
 ## References
 
 ::: {#refs}

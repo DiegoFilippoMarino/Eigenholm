@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_DIRECTORIES = ("about", "colophon", "notes", "posts", "projects")
+PUBLIC_DIRECTORIES = ("about", "colophon", "notes", "posts", "projects", "replications")
 
 EQUATION_LABEL = re.compile(r"\{#(eq-[A-Za-z0-9_-]+)\}")
 EQUATION_REFERENCE = re.compile(r"(?<![\w-])@(eq-[A-Za-z0-9_-]+)")

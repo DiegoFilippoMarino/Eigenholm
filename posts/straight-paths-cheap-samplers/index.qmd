@@ -302,6 +302,11 @@ The analytic coupling knows which noise sample maps to which data sample. In unc
 
 The experiment nevertheless establishes a narrow result: endpoint distributions do not determine sampling cost. The geometry of the chosen probability path contributes directly to the numerical budget. Before designing a more elaborate solver, it is worth asking whether the model was trained to follow an unnecessarily difficult road.
 
+## Related reading
+
+- [Inference Compute Has Two Ceilings](../../posts/test-time-compute-ceilings/index.qmd) asks the parallel question for reasoning: when does more sampling stop paying.
+- [Three Ways a Curve Bends](../../posts/three-ways-a-curve-bends/index.qmd) looks at what else a smooth curve can hide.
+
 ## References
 
 ::: {#refs}

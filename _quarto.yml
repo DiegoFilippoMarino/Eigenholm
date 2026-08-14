@@ -18,6 +18,8 @@ website:
         text: Projects
       - href: notes/index.qmd
         text: Notes
+      - href: replications/index.qmd
+        text: Replications
       - href: about/index.qmd
         text: About
     right:

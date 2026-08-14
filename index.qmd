@@ -3,7 +3,7 @@ pagetitle: "Eigenholm"
 listing:
   id: latest-posts
   contents: posts
-  sort: "date desc"
+  sort: ["date desc", "title"]
   type: default
   categories: true
   feed: true

@@ -44,12 +44,35 @@ to repeat its location.
 Keep the visual system defined here:
 
 - `_quarto.yml` controls the Quarto website and HTML behavior.
-- `custom.scss` and `custom-dark.scss` define the light and dark themes.
-- Headings use Source Serif 4; body text uses Inter; code uses the configured
-  monospace fallback stack.
+- `custom.scss` and `custom-dark.scss` define the light and dark themes; the
+  shared rules live in `_eigenholm-rules.scss`.
+- Two typographic registers, applied consistently. **Document structure**
+  (headings, article titles, listing titles) uses Source Serif 4, mixed case,
+  sized above the body text. **Interface chrome** (navbar, hero, section labels,
+  listing metadata, table headers, categories) uses Inter, uppercase, letter
+  spaced. Body text is Inter; code uses the configured monospace fallback stack.
+- Text colors must clear WCAG AA (4.5:1) against the page background. The muted
+  token is the tightest one and is already at the edge, so do not lighten it.
 - The editorial look is calm, minimal, readable, and research-oriented. Favor
   clear hierarchy, short sections, restrained callouts, and purposeful figures
   over decorative elements.
+
+## Sections
+
+Four content areas, each with its own listing page and its own bar for entry:
+
+- `posts/` (**Writing**) - long-form articles and attempts at original synthesis.
+- `projects/` (**Projects**) - executable artifacts: simulators, implementations,
+  things that could be lifted into a repository.
+- `notes/` (**Notes**) - narrower derivations and results, shorter than an article.
+- `replications/` (**Replications**) - attempts to reproduce published results.
+  Every entry opens with a callout naming the target numbers, the method, and the
+  outcome. A failed reproduction is reported as a failure, never tuned into
+  agreement.
+
+Every page ends with a `## Related reading` section of two to four links to other
+pages on the site, placed immediately before `## References`. Use relative paths
+such as `../../posts/<slug>/index.qmd`.
 
 The wiki provides subject knowledge; this repository provides the article
 format, tone, theme, typography, and final published artifact.

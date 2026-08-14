@@ -211,6 +211,11 @@ The guarantee applies to the acceptance and residual rule above. Heuristic accep
 
 The draft model is a performance hint. Equations @eq-accepted-mass and @eq-rejection show why it has no authority over the final distribution: accepted overlap plus rejected residual reconstructs the target exactly.
 
+## Related reading
+
+- [Inference Compute Has Two Ceilings](../../posts/test-time-compute-ceilings/index.qmd) puts a budget on the tokens this machinery produces.
+- [A Paged KV-Cache Allocator, Built from First Principles](../../projects/paged-kv-cache-simulator/index.qmd) handles the memory these extra sequences need.
+
 ## References
 
 ::: {#refs}

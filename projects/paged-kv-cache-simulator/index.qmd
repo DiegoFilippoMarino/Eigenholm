@@ -312,6 +312,12 @@ This simulator counts token slots. Real systems allocate per layer, shard tensor
 
 Still, the model captures the essential systems insight: once persistent state has irregular lifetimes, a tensor is not only a numerical object. It is also a dynamically allocated resource.
 
+## Related reading
+
+- [FlashAttention Is an IO Algorithm](../../posts/flashattention-io-aware/index.qmd) makes the case for treating attention as a memory problem.
+- [The Rank of Memory](../../posts/rank-of-memory/index.qmd) asks what the cache is buying in the first place.
+- [Speculative Sampling Preserves the Target Distribution](../../notes/speculative-sampling/index.qmd) adds sequences that this allocator has to hold.
+
 ## References
 
 ::: {#refs}
